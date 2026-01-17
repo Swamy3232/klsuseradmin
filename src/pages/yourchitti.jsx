@@ -117,22 +117,24 @@ const YourChitti = () => {
           {/* Tabs */}
           <div className="flex border-b">
             <button
-              className={`flex-1 py-4 text-lg font-semibold transition-all ${
+              className={`flex-1 py-4 text-lg font-semibold transition-all touch-manipulation min-h-[48px] ${
                 activeTab === 'register'
                   ? 'bg-amber-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
               }`}
               onClick={() => setActiveTab('register')}
+              type="button"
             >
               Register
             </button>
             <button
-              className={`flex-1 py-4 text-lg font-semibold transition-all ${
+              className={`flex-1 py-4 text-lg font-semibold transition-all touch-manipulation min-h-[48px] ${
                 activeTab === 'login'
                   ? 'bg-amber-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
               }`}
               onClick={() => setActiveTab('login')}
+              type="button"
             >
               Login
             </button>
@@ -165,9 +167,10 @@ const YourChitti = () => {
                       name="phone"
                       value={registerData.phone}
                       onChange={handleRegisterChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
                       placeholder="9876543210"
                       pattern="[0-9]{10}"
+                      inputMode="numeric"
                       required
                     />
                   </div>
@@ -182,7 +185,7 @@ const YourChitti = () => {
                       name="full_name"
                       value={registerData.full_name}
                       onChange={handleRegisterChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
                       placeholder="Enter your full name"
                       required
                     />
@@ -197,7 +200,7 @@ const YourChitti = () => {
                       name="address"
                       value={registerData.address}
                       onChange={handleRegisterChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
                       placeholder="Enter your complete address"
                       rows="3"
                       required
@@ -214,7 +217,7 @@ const YourChitti = () => {
                       name="password"
                       value={registerData.password}
                       onChange={handleRegisterChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
                       placeholder="Create a strong password"
                       required
                     />
@@ -230,7 +233,7 @@ const YourChitti = () => {
                       name="start_date"
                       value={registerData.start_date}
                       onChange={handleRegisterChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
                     />
                   </div>
 
@@ -244,9 +247,10 @@ const YourChitti = () => {
                       name="total_months"
                       value={registerData.total_months}
                       onChange={handleRegisterChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
                       placeholder="e.g., 24"
                       min="1"
+                      inputMode="numeric"
                       required
                     />
                   </div>
@@ -256,7 +260,7 @@ const YourChitti = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-amber-700 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-amber-700 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation min-h-[48px] active:from-amber-800 active:to-amber-900"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
@@ -293,9 +297,10 @@ const YourChitti = () => {
                         name="phone"
                         value={loginData.phone}
                         onChange={handleLoginChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
                         placeholder="9876543210"
                         pattern="[0-9]{10}"
+                        inputMode="numeric"
                         required
                       />
                     </div>
@@ -310,7 +315,7 @@ const YourChitti = () => {
                         name="password"
                         value={loginData.password}
                         onChange={handleLoginChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
                         placeholder="Enter your password"
                         required
                       />
@@ -321,7 +326,7 @@ const YourChitti = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-amber-700 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-amber-700 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation min-h-[48px] active:from-amber-800 active:to-amber-900"
                   >
                     {loading ? (
                       <span className="flex items-center justify-center">
