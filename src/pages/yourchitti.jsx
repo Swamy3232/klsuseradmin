@@ -105,7 +105,7 @@ const YourChitti = () => {
         {/* Header */}
         <header className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-amber-900 mb-4">
-            YourChitti Gold KLs
+            YourChitti Gold KLS
           </h1>
           <p className="text-amber-700 text-lg">
             Secure Gold Chitti Platform - Manage Your Investments
@@ -446,7 +446,7 @@ const YourChitti = () => {
 
         {/* Footer */}
         <footer className="mt-12 text-center text-gray-600 text-sm">
-          <p>© {new Date().getFullYear()} YourChitti Gold KLs. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} YourChitti Gold KLS. All rights reserved.</p>
           <p className="mt-1">Secure Gold Chitti Management System</p>
         </footer>
       </div>
