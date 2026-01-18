@@ -60,53 +60,39 @@ const PaymentForm = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage({ text: "", type: "" });
+ const handleSubmit = (e) => {
+  e.preventDefault();
 
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
+  const errors = validateForm();
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
+    return;
+  }
 
-    setLoading(true);
-    setFormErrors({});
+  const amount = Number(formData.paidAmount).toFixed(2);
+  const upiId = formData.upiId.trim();
 
-    try {
-      // Generate UPI payment link with amount
-      const amount = parseFloat(formData.paidAmount).toFixed(2);
-      const upiId = formData.upiId.trim();
-      
-      // UPI payment link format: upi://pay?pa=<UPI_ID>&am=<AMOUNT>&cu=INR
-      const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&am=${amount}&cu=INR&tn=Payment`;
-      
-      // Try to open UPI link
-      window.location.href = upiLink;
-      
-      setMessage({ 
-        text: "Opening UPI payment...", 
-        type: "success" 
-      });
-      
-      // Reset form after a delay
-      setTimeout(() => {
-        setFormData({
-          paidAmount: "",
-          upiId: "",
-        });
-        setMessage({ text: "", type: "" });
-      }, 2000);
+  const txnRef = `KLS${Date.now()}`; // unique transaction id
+  const payeeName = "KLS Gold";
 
-    } catch (err) {
-      setMessage({ 
-        text: "Error opening UPI payment. Please try again.", 
-        type: "error" 
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const upiLink =
+    `upi://pay` +
+    `?pa=${encodeURIComponent(upiId)}` +
+    `&pn=${encodeURIComponent(payeeName)}` +
+    `&am=${amount}` +
+    `&cu=INR` +
+    `&tr=${txnRef}` +
+    `&tn=${encodeURIComponent("Gold Payment")}`;
+
+  // IMPORTANT: direct redirect (no async / no timeout)
+  window.location.assign(upiLink);
+
+  setMessage({
+    text: "Opening UPI app…",
+    type: "success",
+  });
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-4">
