@@ -4,7 +4,7 @@ import {
   QrCode,
   Smartphone,
 } from "lucide-react";
-import qrImage from "../assets/upi_id.jpeg";
+import qrImage from "../assets/upi_id1.jpeg";
 
 const PaymentForm = () => {
   const [amount, setAmount] = useState("");
