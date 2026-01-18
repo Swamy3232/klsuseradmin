@@ -9,7 +9,7 @@ import qrImage from "../assets/upi_id.jpeg";
 const PaymentForm = () => {
   const [amount, setAmount] = useState("");
 
-  const UPI_ID = "niru1997bank-3@okaxis"; // use verified UPI
+  const UPI_ID = "niru1997.bank-3@okaxis"; // use verified UPI
   const PAYEE_NAME = "KLS Gold";
 
   const payWithPhonePe = () => {
