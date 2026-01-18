@@ -4,7 +4,7 @@ import upiQr from "../assets/upi_id1.jpeg";
 const UpiPayment = () => {
   const upiId = "niru1997.bank-3@okaxis";
   const name = "Niranjan K V";
-  const mobileUpi = "9019740523@upi";
+  const mobileUpi = "8431497802@ybl";
   const amount = 10; // ₹10 fixed
 
   const payViaUpiApp = () => {
