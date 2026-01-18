@@ -6,7 +6,7 @@ const PaymentPage = () => {
   const upiNumber = "8431497802"; // your number
 
   const payWithNumber = () => {
-    const upiUrl = `upi://pay?pa=${upiNumber}@upi&pn=${encodeURIComponent(
+    const upiUrl = `upi://pay?pa=${upiNumber}@ybl&pn=${encodeURIComponent(
       name
     )}&am=${amount}&cu=INR`;
 
