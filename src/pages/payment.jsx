@@ -1,46 +1,69 @@
 import React from "react";
-import upiQr from "../assets/upi_id1.jpeg";
+import upiQr from "../assets/upi_qr.jpeg";
 
 const UpiPayment = () => {
   const upiId = "niru1997.bank-3@okaxis";
   const name = "Niranjan K V";
+  const mobileUpi = "9019740523@upi";
+  const amount = 10; // ₹10 fixed
 
-  const payNow = () => {
-    const amount = ""; // keep empty or set fixed amount like 1000
-    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+  const payViaUpiApp = () => {
+    const url = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
       name
-    )}&cu=INR${amount ? `&am=${amount}` : ""}`;
+    )}&am=${amount}&cu=INR`;
+    window.location.href = url;
+  };
 
-    window.location.href = upiUrl;
+  const payViaMobile = () => {
+    const url = `upi://pay?pa=${mobileUpi}&pn=${encodeURIComponent(
+      name
+    )}&am=${amount}&cu=INR`;
+    window.location.href = url;
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center">
-        <h1 className="text-xl font-semibold mb-1">Pay via UPI</h1>
-        <p className="text-gray-600 text-sm mb-4">
-          Scan or pay using any UPI app
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="bg-white w-full max-w-sm rounded-2xl shadow-lg p-6 text-center">
+        <h1 className="text-xl font-bold mb-1">UPI Payment</h1>
+        <p className="text-sm text-gray-600 mb-4">
+          Pay ₹{amount} using any UPI app
         </p>
 
         <img
           src={upiQr}
-          alt="UPI QR Code"
-          className="w-64 mx-auto mb-4 rounded-lg border"
+          alt="UPI QR"
+          className="w-64 mx-auto border rounded-lg mb-4"
         />
 
-        <p className="text-sm text-gray-700 mb-1">UPI ID</p>
-        <p className="font-medium text-gray-900 mb-4">{upiId}</p>
+        <div className="mb-4">
+          <p className="text-sm text-gray-500">UPI ID</p>
+          <p className="font-medium">{upiId}</p>
+        </div>
 
         <button
-          onClick={payNow}
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold"
+          onClick={payViaUpiApp}
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold mb-3"
         >
-          Pay using UPI App
+          Pay ₹10 using UPI App
         </button>
 
-        <p className="text-xs text-gray-500 mt-4">
-          After payment, please inform us
-        </p>
+        <button
+          onClick={payViaMobile}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold"
+        >
+          Pay via Mobile Number
+        </button>
+
+        <div className="mt-4 text-xs text-gray-500 text-left bg-gray-50 p-3 rounded-lg">
+          ⚠️ <strong>Important:</strong>
+          <ul className="list-disc pl-4 mt-1">
+            <li>
+              Do <b>NOT</b> select QR from gallery (₹2000 limit issue)
+            </li>
+            <li>Use <b>Scan & Pay camera</b> OR buttons above</li>
+            <li>₹10 payment works without any issue</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
