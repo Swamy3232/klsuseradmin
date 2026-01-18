@@ -1,320 +1,98 @@
 import React, { useState } from "react";
-import { 
-  CreditCard, 
-  Send, 
-  CheckCircle, 
-  AlertCircle, 
-  Loader2,
-  Smartphone,
+import {
   IndianRupee,
-  Hash,
-  ShieldCheck,
-  TrendingUp,
-  QrCode
+  QrCode,
+  Smartphone,
 } from "lucide-react";
+import qrImage from "../assets/upi_id.jpeg";
 
 const PaymentForm = () => {
-  const [formData, setFormData] = useState({
-    paidAmount: "",
-    upiId: "8431497802-2@ybl",
-  });
-  const [message, setMessage] = useState({ text: "", type: "" });
-  const [loading, setLoading] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
+  const [amount, setAmount] = useState("");
 
-  const validateForm = () => {
-    const errors = {};
-    
-    // Amount validation
-    if (!formData.paidAmount) {
-      errors.paidAmount = "Amount is required";
-    } else if (parseFloat(formData.paidAmount) <= 0) {
-      errors.paidAmount = "Amount must be greater than 0";
-    } else if (parseFloat(formData.paidAmount) > 1000000) {
-      errors.paidAmount = "Amount exceeds maximum limit";
+  const UPI_ID = "8431497802@ybl"; // use verified UPI
+  const PAYEE_NAME = "KLS Gold";
+
+  const payWithPhonePe = () => {
+    if (!amount || Number(amount) <= 0) {
+      alert("Please enter a valid amount");
+      return;
     }
 
-    // UPI ID validation
-    const upiRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
-    if (!formData.upiId) {
-      errors.upiId = "UPI ID is required";
-    } else if (!upiRegex.test(formData.upiId)) {
-      errors.upiId = "Please enter a valid UPI ID (e.g., name@paytm, name@ybl)";
-    }
+    const phonePeUrl =
+      `phonepe://pay` +
+      `?pa=${encodeURIComponent(UPI_ID)}` +
+      `&pn=${encodeURIComponent(PAYEE_NAME)}` +
+      `&am=${Number(amount).toFixed(2)}` +
+      `&cu=INR` +
+      `&tn=${encodeURIComponent("Gold Payment")}`;
 
-    return errors;
+    // Direct open (must be inside click)
+    window.location.href = phonePeUrl;
   };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error for this field when user starts typing
-    if (formErrors[name]) {
-      setFormErrors(prev => ({
-        ...prev,
-        [name]: ""
-      }));
-    }
-  };
-
- const handleSubmit = (e) => {
-  e.preventDefault();
-
-  const errors = validateForm();
-  if (Object.keys(errors).length > 0) {
-    setFormErrors(errors);
-    return;
-  }
-
-  const amount = Number(formData.paidAmount).toFixed(2);
-  const upiId = formData.upiId.trim();
-
-  const txnRef = `KLS${Date.now()}`; // unique transaction id
-  const payeeName = "KLS Gold";
-
-  const upiLink =
-    `upi://pay` +
-    `?pa=${encodeURIComponent(upiId)}` +
-    `&pn=${encodeURIComponent(payeeName)}` +
-    `&am=${amount}` +
-    `&cu=INR` +
-    `&tr=${txnRef}` +
-    `&tn=${encodeURIComponent("Gold Payment")}`;
-
-  // IMPORTANT: direct redirect (no async / no timeout)
-  window.location.assign(upiLink);
-
-  setMessage({
-    text: "Opening UPI app…",
-    type: "success",
-  });
-};
-
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-6 sm:mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6">
-            <CreditCard className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
-            Payment Submission
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-lg p-6 space-y-6">
+
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Scan & Pay
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 max-w-md mx-auto px-4">
-            Enter amount and UPI ID to proceed with payment
+          <p className="text-sm text-gray-600 mt-1">
+            Pay securely using UPI
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {/* Left Side - Info Cards */}
-          <div className="lg:col-span-1 space-y-4 sm:space-y-6">
-            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Secure Payment</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">Bank-level security</p>
-                </div>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-700">
-                All transactions are encrypted and processed securely through UPI.
-              </p>
+        {/* Amount Input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex items-center gap-2">
+              <IndianRupee className="w-4 h-4" />
+              Enter Amount
             </div>
-
-            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Instant Processing</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">Real-time updates</p>
-                </div>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-700">
-                Payments are processed immediately and reflected in your account instantly.
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
-              <h3 className="font-bold text-base sm:text-lg mb-2 sm:mb-3">Need Help?</h3>
-              <p className="mb-3 sm:mb-4 text-emerald-100 text-xs sm:text-sm">
-                Contact our support team for assistance with payments.
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Smartphone className="w-3 h-3" />
-                  </div>
-                  <span className="text-xs sm:text-sm">+91 98765 43210</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CreditCard className="w-3 h-3" />
-                  </div>
-                  <span className="text-xs sm:text-sm break-all">support@goldfinance.com</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side - Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 shadow-lg p-4 sm:p-6 md:p-8">
-              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Send className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Payment Details</h2>
-                  <p className="text-xs sm:text-sm text-gray-600">Enter amount and UPI ID to proceed</p>
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                {/* Amount Field */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <div className="flex items-center gap-2">
-                      <IndianRupee className="w-4 h-4" />
-                      Payment Amount
-                    </div>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-700 font-medium text-sm sm:text-base">₹</span>
-                    </div>
-                    <input
-                      type="number"
-                      name="paidAmount"
-                      value={formData.paidAmount}
-                      onChange={handleInputChange}
-                      placeholder="Enter amount"
-                      className={`w-full pl-10 pr-4 py-3 sm:py-3.5 border text-sm sm:text-base ${
-                        formErrors.paidAmount ? 'border-red-300' : 'border-gray-300'
-                      } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
-                      step="0.01"
-                      min="1"
-                    />
-                  </div>
-                  {formErrors.paidAmount && (
-                    <p className="mt-2 text-xs sm:text-sm text-red-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                      {formErrors.paidAmount}
-                    </p>
-                  )}
-                </div>
-
-                {/* UPI ID Field */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <div className="flex items-center gap-2">
-                      <QrCode className="w-4 h-4" />
-                      UPI ID
-                    </div>
-                  </label>
-                  <input
-                    type="text"
-                    name="upiId"
-                    value={formData.upiId}
-                    onChange={handleInputChange}
-                    placeholder="Enter UPI ID (e.g., name@paytm, name@ybl)"
-                    className={`w-full px-4 py-3 sm:py-3.5 border text-sm sm:text-base ${
-                      formErrors.upiId ? 'border-red-300' : 'border-gray-300'
-                    } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
-                  />
-                  {formErrors.upiId && (
-                    <p className="mt-2 text-xs sm:text-sm text-red-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                      {formErrors.upiId}
-                    </p>
-                  )}
-                  <p className="mt-2 text-xs sm:text-sm text-gray-500">
-                    Enter the UPI ID where you want to send the payment (e.g., merchant@paytm, merchant@ybl)
-                  </p>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full min-h-[44px] py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-sm sm:text-base ${
-                    loading ? 'opacity-80 cursor-not-allowed' : 'hover:from-emerald-600 hover:to-emerald-700'
-                  }`}
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Opening UPI Payment...
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <Send className="w-5 h-5" />
-                      Pay Now
-                    </div>
-                  )}
-                </button>
-              </form>
-
-              {/* Status Message */}
-              {message.text && (
-                <div className={`mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg sm:rounded-xl border ${
-                  message.type === 'success' 
-                    ? 'bg-emerald-50 border-emerald-200' 
-                    : 'bg-red-50 border-red-200'
-                }`}>
-                  <div className="flex items-start gap-2 sm:gap-3">
-                    <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      message.type === 'success' 
-                        ? 'bg-emerald-100 text-emerald-600' 
-                        : 'bg-red-100 text-red-600'
-                    }`}>
-                      {message.type === 'success' ? (
-                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                      ) : (
-                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-medium text-sm sm:text-base ${
-                        message.type === 'success' ? 'text-emerald-800' : 'text-red-800'
-                      }`}>
-                        {message.text}
-                      </p>
-                      {message.type === 'success' && (
-                        <p className="text-xs sm:text-sm text-emerald-600 mt-1">
-                          Your UPI app will open with the payment details.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Terms & Conditions */}
-              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
-                <p className="text-xs sm:text-sm text-gray-600">
-                  By submitting this payment, you agree to our{" "}
-                  <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                    Privacy Policy
-                  </a>
-                  . All payments are subject to verification and processing.
-                </p>
-              </div>
-            </div>
-          </div>
+          </label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Enter amount"
+            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none"
+          />
         </div>
+
+        {/* QR Code */}
+        <div className="text-center space-y-3">
+          <img
+            src={qrImage}
+            alt="Scan to Pay"
+            className="mx-auto w-60 rounded-xl border"
+          />
+
+          <p className="text-sm text-gray-600">
+            Scan using PhonePe / GPay / Paytm
+          </p>
+
+          <p className="text-sm">
+            UPI ID: <strong>{UPI_ID}</strong>
+          </p>
+        </div>
+
+        {/* PhonePe Button */}
+        <button
+          type="button"
+          onClick={payWithPhonePe}
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+        >
+          <Smartphone className="w-5 h-5" />
+          Pay with PhonePe
+        </button>
+
+        {/* Info */}
+        <div className="text-xs text-gray-500 text-center">
+          After payment, please return and confirm with the admin.
+        </div>
+
       </div>
     </div>
   );
