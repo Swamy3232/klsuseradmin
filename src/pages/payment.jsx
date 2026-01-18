@@ -7,7 +7,7 @@ const SimpleUpiPayment = () => {
   
   // Your UPI details from the image
   const upiId = "niru1997.bank-3@okaxis";
-  const upiName = "Niranjan k.v";
+  const upiName = "Niranjan k.vs";
 
   // Handle payment
   const handlePayNow = () => {
