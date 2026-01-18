@@ -1,211 +1,337 @@
 import React, { useState } from "react";
-import axios from "axios";
-import {
-  CreditCard,
-  ArrowRight,
-  MessageCircle,
-  AlertCircle,
-  CheckCircle
+import { 
+  CreditCard, 
+  Send, 
+  CheckCircle, 
+  AlertCircle, 
+  Loader2,
+  Smartphone,
+  IndianRupee,
+  Hash,
+  ShieldCheck,
+  TrendingUp,
+  QrCode
 } from "lucide-react";
 
-import upiQR from "../assets/upi_id.jpeg"; 
-
-
-
-const UPI_ID = "901904523@ybl";
-const WHATSAPP_NUMBER = "919019740523"; 
-const API_URL = "https://klsbackend.onrender.com/create-payment";
-
-
-const Payment = () => {
-  const [step, setStep] = useState("pay"); // pay | form
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
-
+const PaymentForm = () => {
   const [formData, setFormData] = useState({
-    phone: "",
     paidAmount: "",
-    utrNumber: "",
+    upiId: "",
   });
+  const [message, setMessage] = useState({ text: "", type: "" });
+  const [loading, setLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
-  const [errors, setErrors] = useState({});
+  const validateForm = () => {
+    const errors = {};
+    
+    // Amount validation
+    if (!formData.paidAmount) {
+      errors.paidAmount = "Amount is required";
+    } else if (parseFloat(formData.paidAmount) <= 0) {
+      errors.paidAmount = "Amount must be greater than 0";
+    } else if (parseFloat(formData.paidAmount) > 1000000) {
+      errors.paidAmount = "Amount exceeds maximum limit";
+    }
 
-  const upiLink = `upi://pay?pa=${UPI_ID}&pn=KLS Gold&cu=INR`;
+    // UPI ID validation
+    const upiRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
+    if (!formData.upiId) {
+      errors.upiId = "UPI ID is required";
+    } else if (!upiRegex.test(formData.upiId)) {
+      errors.upiId = "Please enter a valid UPI ID (e.g., name@paytm, name@ybl)";
+    }
 
-  /* ================= VALIDATION ================= */
-  const validate = () => {
-    const err = {};
-    if (!/^[6-9]\d{9}$/.test(formData.phone))
-      err.phone = "Enter valid 10-digit phone number";
-    if (!formData.paidAmount || Number(formData.paidAmount) <= 0)
-      err.paidAmount = "Enter valid amount";
-    if (!/^[A-Za-z0-9]{8,20}$/.test(formData.utrNumber))
-      err.utrNumber = "Invalid UTR number";
-    return err;
+    return errors;
   };
 
-  /* ================= HANDLERS ================= */
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error for this field when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const err = validate();
-    if (Object.keys(err).length) {
-      setErrors(err);
+    setMessage({ text: "", type: "" });
+
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
     setLoading(true);
+    setFormErrors({});
+
     try {
-      const res = await axios.post(API_URL, {
-        phone: formData.phone,
-        paid_amount: Number(formData.paidAmount),
-        utr_number: formData.utrNumber,
+      // Generate UPI payment link with amount
+      const amount = parseFloat(formData.paidAmount).toFixed(2);
+      const upiId = formData.upiId.trim();
+      
+      // UPI payment link format: upi://pay?pa=<UPI_ID>&am=<AMOUNT>&cu=INR
+      const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&am=${amount}&cu=INR&tn=Payment`;
+      
+      // Try to open UPI link
+      window.location.href = upiLink;
+      
+      setMessage({ 
+        text: "Opening UPI payment...", 
+        type: "success" 
       });
+      
+      // Reset form after a delay
+      setTimeout(() => {
+        setFormData({
+          paidAmount: "",
+          upiId: "",
+        });
+        setMessage({ text: "", type: "" });
+      }, 2000);
 
-      setMessage({
-        text: res.data.message || "Payment submitted successfully",
-        type: "success",
-      });
-
-      setFormData({ phone: "", paidAmount: "", utrNumber: "" });
-    } catch (error) {
-      setMessage({
-        text: error.response?.data?.detail || "Payment submission failed",
-        type: "error",
+    } catch (err) {
+      setMessage({ 
+        text: "Error opening UPI payment. Please try again.", 
+        type: "error" 
       });
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= UI ================= */
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-xl mx-auto">
-
-        {/* ================= STEP 1 : PAY ================= */}
-        {step === "pay" && (
-          <div className="bg-white rounded-2xl p-6 shadow text-center space-y-6">
-            <CreditCard className="w-12 h-12 mx-auto text-emerald-600" />
-            <h1 className="text-2xl font-bold">Pay via UPI</h1>
-
-            <a
-              href={upiLink}
-              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold"
-            >
-              Pay Now <ArrowRight />
-            </a>
-
-            {/* QR IMAGE */}
-            <div className="flex justify-center">
-              <img
-                src={upiQR}
-                alt="UPI QR Code"
-                className="w-48 h-48 object-contain border rounded-lg"
-              />
-            </div>
-
-            <p className="text-gray-600 text-sm">
-              UPI ID: <span className="font-semibold">{UPI_ID}</span>
-            </p>
-
-            <button
-              onClick={() => setStep("form")}
-              className="text-emerald-600 font-semibold"
-            >
-              I have paid → Enter details
-            </button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-6 sm:mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6">
+            <CreditCard className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600" />
           </div>
-        )}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
+            Payment Submission
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 max-w-md mx-auto px-4">
+            Enter amount and UPI ID to proceed with payment
+          </p>
+        </div>
 
-        {/* ================= STEP 2 : FORM ================= */}
-        {step === "form" && (
-          <div className="bg-white rounded-2xl p-6 shadow mt-6">
-            <h2 className="text-xl font-bold mb-4">Submit Payment Details</h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Phone Number"
-                className="w-full border p-3 rounded"
-              />
-              {errors.phone && (
-                <p className="text-red-500 text-sm">{errors.phone}</p>
-              )}
-
-              <input
-                name="paidAmount"
-                type="number"
-                value={formData.paidAmount}
-                onChange={handleChange}
-                placeholder="Paid Amount ₹"
-                className="w-full border p-3 rounded"
-              />
-              {errors.paidAmount && (
-                <p className="text-red-500 text-sm">{errors.paidAmount}</p>
-              )}
-
-              <input
-                name="utrNumber"
-                value={formData.utrNumber}
-                onChange={handleChange}
-                placeholder="UTR Number"
-                className="w-full border p-3 rounded"
-              />
-              {errors.utrNumber && (
-                <p className="text-red-500 text-sm">{errors.utrNumber}</p>
-              )}
-
-              <button
-                disabled={loading}
-                className="w-full bg-emerald-600 text-white py-3 rounded font-semibold"
-              >
-                {loading ? "Submitting..." : "Submit Payment"}
-              </button>
-            </form>
-
-            {/* STATUS MESSAGE */}
-            {message.text && (
-              <div
-                className={`mt-4 p-3 rounded flex items-center gap-2 ${
-                  message.type === "success"
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {message.type === "success" ? (
-                  <CheckCircle />
-                ) : (
-                  <AlertCircle />
-                )}
-                {message.text}
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          {/* Left Side - Info Cards */}
+          <div className="lg:col-span-1 space-y-4 sm:space-y-6">
+            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Secure Payment</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">Bank-level security</p>
+                </div>
               </div>
-            )}
-
-            {/* WHATSAPP NOTE */}
-            <div className="mt-6 text-center text-sm text-gray-600">
-              <p className="font-medium mb-2">
-                📸 Please send UTR screenshot on WhatsApp
+              <p className="text-xs sm:text-sm text-gray-700">
+                All transactions are encrypted and processed securely through UPI.
               </p>
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                className="inline-flex items-center gap-2 text-green-600 font-semibold"
-              >
-                <MessageCircle /> WhatsApp
-              </a>
+            </div>
+
+            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Instant Processing</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">Real-time updates</p>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-700">
+                Payments are processed immediately and reflected in your account instantly.
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+              <h3 className="font-bold text-base sm:text-lg mb-2 sm:mb-3">Need Help?</h3>
+              <p className="mb-3 sm:mb-4 text-emerald-100 text-xs sm:text-sm">
+                Contact our support team for assistance with payments.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Smartphone className="w-3 h-3" />
+                  </div>
+                  <span className="text-xs sm:text-sm">+91 98765 43210</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CreditCard className="w-3 h-3" />
+                  </div>
+                  <span className="text-xs sm:text-sm break-all">support@goldfinance.com</span>
+                </div>
+              </div>
             </div>
           </div>
-        )}
 
+          {/* Right Side - Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 shadow-lg p-4 sm:p-6 md:p-8">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Send className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Payment Details</h2>
+                  <p className="text-xs sm:text-sm text-gray-600">Enter amount and UPI ID to proceed</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                {/* Amount Field */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center gap-2">
+                      <IndianRupee className="w-4 h-4" />
+                      Payment Amount
+                    </div>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-700 font-medium text-sm sm:text-base">₹</span>
+                    </div>
+                    <input
+                      type="number"
+                      name="paidAmount"
+                      value={formData.paidAmount}
+                      onChange={handleInputChange}
+                      placeholder="Enter amount"
+                      className={`w-full pl-10 pr-4 py-3 sm:py-3.5 border text-sm sm:text-base ${
+                        formErrors.paidAmount ? 'border-red-300' : 'border-gray-300'
+                      } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
+                      step="0.01"
+                      min="1"
+                    />
+                  </div>
+                  {formErrors.paidAmount && (
+                    <p className="mt-2 text-xs sm:text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      {formErrors.paidAmount}
+                    </p>
+                  )}
+                </div>
+
+                {/* UPI ID Field */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center gap-2">
+                      <QrCode className="w-4 h-4" />
+                      UPI ID
+                    </div>
+                  </label>
+                  <input
+                    type="text"
+                    name="upiId"
+                    value={formData.upiId}
+                    onChange={handleInputChange}
+                    placeholder="Enter UPI ID (e.g., name@paytm, name@ybl)"
+                    className={`w-full px-4 py-3 sm:py-3.5 border text-sm sm:text-base ${
+                      formErrors.upiId ? 'border-red-300' : 'border-gray-300'
+                    } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all`}
+                  />
+                  {formErrors.upiId && (
+                    <p className="mt-2 text-xs sm:text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      {formErrors.upiId}
+                    </p>
+                  )}
+                  <p className="mt-2 text-xs sm:text-sm text-gray-500">
+                    Enter the UPI ID where you want to send the payment (e.g., merchant@paytm, merchant@ybl)
+                  </p>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full min-h-[44px] py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-sm sm:text-base ${
+                    loading ? 'opacity-80 cursor-not-allowed' : 'hover:from-emerald-600 hover:to-emerald-700'
+                  }`}
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Opening UPI Payment...
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <Send className="w-5 h-5" />
+                      Pay Now
+                    </div>
+                  )}
+                </button>
+              </form>
+
+              {/* Status Message */}
+              {message.text && (
+                <div className={`mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg sm:rounded-xl border ${
+                  message.type === 'success' 
+                    ? 'bg-emerald-50 border-emerald-200' 
+                    : 'bg-red-50 border-red-200'
+                }`}>
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      message.type === 'success' 
+                        ? 'bg-emerald-100 text-emerald-600' 
+                        : 'bg-red-100 text-red-600'
+                    }`}>
+                      {message.type === 'success' ? (
+                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium text-sm sm:text-base ${
+                        message.type === 'success' ? 'text-emerald-800' : 'text-red-800'
+                      }`}>
+                        {message.text}
+                      </p>
+                      {message.type === 'success' && (
+                        <p className="text-xs sm:text-sm text-emerald-600 mt-1">
+                          Your UPI app will open with the payment details.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Terms & Conditions */}
+              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+                <p className="text-xs sm:text-sm text-gray-600">
+                  By submitting this payment, you agree to our{" "}
+                  <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                    Terms of Service
+                  </a>{" "}
+                  and{" "}
+                  <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                    Privacy Policy
+                  </a>
+                  . All payments are subject to verification and processing.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Payment;
+export default PaymentForm;
