@@ -1,209 +1,132 @@
 import React, { useState } from 'react';
-import './UpiPaymentPage.css';
+import './SimpleUpiPayment.css';
 
-const UpiPaymentPage = () => {
+const SimpleUpiPayment = () => {
   const [amount, setAmount] = useState('');
-  const [note, setNote] = useState('');
-  const [copied, setCopied] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-
+  const [paymentStatus, setPaymentStatus] = useState('idle'); // idle, processing, success
+  
+  // Your UPI details from the image
   const upiId = "niru1997.bank-3@okaxis";
   const upiName = "Niranjan k.v";
-  
-  // Function to generate UPI payment links
-  const generateUpiLink = (app) => {
-    const encodedNote = encodeURIComponent(note || 'Payment');
-    const encodedAmount = amount || '0';
-    
-    const links = {
-      phonepe: `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${encodedAmount}&tn=${encodedNote}&cu=INR`,
-      gpay: `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${encodedAmount}&tn=${encodedNote}`,
-      paytm: `paytmmp://upi/pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${encodedAmount}&tn=${encodedNote}`,
-      bhim: `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${encodedAmount}&tn=${encodedNote}`,
-      default: `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${encodedAmount}&tn=${encodedNote}`
-    };
-    
-    return links[app] || links.default;
-  };
 
-  // Handle payment initiation
-  const handlePayment = (app) => {
+  // Handle payment
+  const handlePayNow = () => {
     if (!amount || parseFloat(amount) <= 0) {
       alert("Please enter a valid amount");
       return;
     }
+
+    setPaymentStatus('processing');
     
-    const paymentLink = generateUpiLink(app);
-    window.location.href = paymentLink;
+    // Generate UPI payment link
+    const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${amount}&tn=Payment&cu=INR`;
     
-    // Simulate payment success after 2 seconds
+    // Try to open UPI app
+    window.location.href = upiLink;
+    
+    // Show success message after a delay (simulating payment)
     setTimeout(() => {
-      setPaymentSuccess(true);
+      setPaymentStatus('success');
     }, 2000);
+  };
+
+  // Reset payment
+  const resetPayment = () => {
+    setPaymentStatus('idle');
+    setAmount('');
   };
 
   // Copy UPI ID to clipboard
   const copyUpiId = () => {
     navigator.clipboard.writeText(upiId)
       .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        alert("UPI ID copied to clipboard!");
       });
   };
 
-  // Reset payment
-  const resetPayment = () => {
-    setPaymentSuccess(false);
-    setAmount('');
-    setNote('');
-  };
-
   return (
-    <div className="upi-payment-container">
-      <div className="payment-card">
-        <h1 className="payment-title">UPI Payment</h1>
+    <div className="simple-upi-container">
+      <div className="simple-payment-card">
+        <h1 className="simple-title">Pay with UPI</h1>
         
-        {paymentSuccess ? (
-          <div className="success-container">
-            <div className="success-icon">✓</div>
-            <h2>Payment Successful!</h2>
-            <p>Your payment of ₹{amount} has been completed successfully.</p>
-            <button className="pay-button" onClick={resetPayment}>
-              Make Another Payment
-            </button>
+        {/* UPI Details */}
+        <div className="simple-upi-details">
+          <div className="simple-recipient">
+            <span className="simple-label">Recipient:</span>
+            <span className="simple-value">{upiName}</span>
           </div>
-        ) : (
-          <>
-            {/* UPI Details Section */}
-            <div className="upi-details">
-              <div className="upi-header">
-                <h3>Pay to: {upiName}</h3>
-                <div className="upi-id-display">
-                  <span className="upi-id-label">UPI ID:</span>
-                  <span className="upi-id-value">{upiId}</span>
-                  <button 
-                    className="copy-button"
-                    onClick={copyUpiId}
-                    title="Copy UPI ID"
-                  >
-                    {copied ? 'Copied!' : 'Copy'}
-                  </button>
-                </div>
-              </div>
-              
-              {/* QR Code Placeholder (would be your actual image in production) */}
-              <div className="qr-container">
-                <div className="qr-placeholder">
-                  <div className="qr-code">
-                    {/* This is a QR code representation - replace with actual QR image */}
-                    <div className="qr-grid">
-                      {Array.from({ length: 25 }).map((_, i) => (
-                        <div key={i} className="qr-cell"></div>
-                      ))}
-                    </div>
-                    <div className="qr-overlay">
-                      <div className="upi-logo">UPI</div>
-                    </div>
-                  </div>
-                  <p className="qr-label">Scan to pay with any UPI app</p>
-                </div>
-              </div>
+          
+          <div className="simple-upi-id">
+            <span className="simple-label">UPI ID:</span>
+            <div className="upi-id-container">
+              <span className="upi-id-value">{upiId}</span>
+              <button className="copy-btn" onClick={copyUpiId}>Copy</button>
             </div>
-            
-            {/* Payment Form */}
-            <div className="payment-form">
-              <h3>Enter Payment Details</h3>
-              
-              <div className="form-group">
-                <label htmlFor="amount">Amount (₹)</label>
-                <input
-                  type="number"
-                  id="amount"
-                  placeholder="Enter amount"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  min="1"
-                  step="1"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="note">Note (Optional)</label>
-                <input
-                  type="text"
-                  id="note"
-                  placeholder="Payment for..."
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  maxLength="50"
-                />
-              </div>
-              
-              {/* Payment Options */}
-              <div className="payment-options">
-                <h4>Pay with:</h4>
-                
-                <div className="payment-buttons">
-                  <button 
-                    className="payment-option-button phonepe"
-                    onClick={() => handlePayment('phonepe')}
-                  >
-                    <span className="payment-icon">P</span>
-                    <span>PhonePe</span>
-                  </button>
-                  
-                  <button 
-                    className="payment-option-button gpay"
-                    onClick={() => handlePayment('gpay')}
-                  >
-                    <span className="payment-icon">G</span>
-                    <span>Google Pay</span>
-                  </button>
-                  
-                  <button 
-                    className="payment-option-button paytm"
-                    onClick={() => handlePayment('paytm')}
-                  >
-                    <span className="payment-icon">P</span>
-                    <span>Paytm</span>
-                  </button>
-                  
-                  <button 
-                    className="payment-option-button bhim"
-                    onClick={() => handlePayment('bhim')}
-                  >
-                    <span className="payment-icon">B</span>
-                    <span>BHIM</span>
-                  </button>
-                </div>
-                
-                <div className="or-divider">
-                  <span>OR</span>
-                </div>
-                
-                <button 
-                  className="pay-any-upi-button"
-                  onClick={() => handlePayment('default')}
-                >
-                  Pay with any UPI App
-                </button>
-                
-                <p className="upi-note">
-                  After clicking, you'll be redirected to your UPI app to complete the payment
-                </p>
+          </div>
+        </div>
+
+        {/* Payment Form - Only shown when not in success state */}
+        {paymentStatus !== 'success' ? (
+          <>
+            <div className="simple-amount-section">
+              <label htmlFor="amount" className="amount-label">Enter Amount (₹)</label>
+              <input
+                type="number"
+                id="amount"
+                className="amount-input"
+                placeholder="e.g., 1"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                min="1"
+                step="1"
+              />
+              <div className="amount-hint">Try ₹1 for testing</div>
+            </div>
+
+            {/* Pay Button */}
+            <button 
+              className="simple-pay-button" 
+              onClick={handlePayNow}
+              disabled={paymentStatus === 'processing'}
+            >
+              {paymentStatus === 'processing' ? 'Opening UPI App...' : 'Pay Now'}
+            </button>
+
+            {/* UPI Apps Quick Buttons */}
+            <div className="upi-apps-note">
+              <p>Will open your default UPI app</p>
+              <div className="upi-apps-icons">
+                <span className="upi-app-icon">PhonePe</span>
+                <span className="upi-app-icon">GPay</span>
+                <span className="upi-app-icon">Paytm</span>
+                <span className="upi-app-icon">BHIM</span>
               </div>
             </div>
           </>
+        ) : (
+          /* Success Message */
+          <div className="simple-success-message">
+            <div className="success-checkmark">✓</div>
+            <h2>Payment Initiated!</h2>
+            <p>Complete payment of ₹{amount} in your UPI app</p>
+            <div className="success-details">
+              <div>Paid to: <strong>{upiName}</strong></div>
+              <div>UPI ID: <strong>{upiId}</strong></div>
+            </div>
+            <button className="new-payment-btn" onClick={resetPayment}>
+              Make Another Payment
+            </button>
+          </div>
         )}
-        
-        <div className="payment-instructions">
-          <h4>Payment Instructions:</h4>
+
+        {/* Simple Instructions */}
+        <div className="simple-instructions">
+          <h3>How to Pay:</h3>
           <ol>
-            <li>Enter the amount you want to pay</li>
-            <li>Add an optional note for reference</li>
-            <li>Select your preferred UPI app</li>
-            <li>Complete the payment in your UPI app</li>
-            <li>Return to this page to see confirmation</li>
+            <li>Enter amount above</li>
+            <li>Click "Pay Now"</li>
+            <li>Complete payment in UPI app</li>
+            <li>Return here for confirmation</li>
           </ol>
         </div>
       </div>
@@ -211,4 +134,4 @@ const UpiPaymentPage = () => {
   );
 };
 
-export default UpiPaymentPage;
+export default SimpleUpiPayment;
