@@ -10,7 +10,8 @@ const Navbar = () => {
     { name: "About", path: "/about" },
     { name: "Collection", path: "/collection" },
     { name: "Gallery", path: "/gallery" },
-    { name: "Your Chitti", path: "/chitti" }
+    { name: "Your Chitti", path: "/chitti" },
+    {name: "Payment", path: "/payment" }
   ];
 
   const handleLinkClick = () => {
