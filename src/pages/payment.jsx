@@ -16,7 +16,7 @@ import {
 const PaymentForm = () => {
   const [formData, setFormData] = useState({
     paidAmount: "",
-    upiId: "",
+    upiId: "8431497802-2@ybl",
   });
   const [message, setMessage] = useState({ text: "", type: "" });
   const [loading, setLoading] = useState(false);
