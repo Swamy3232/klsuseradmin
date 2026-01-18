@@ -1,5 +1,5 @@
 import React from "react";
-import upiQr from "../assets/upi_qr.jpeg";
+import upiQr from "../assets/upi_id1.jpeg";
 
 const UpiPayment = () => {
   const upiId = "niru1997.bank-3@okaxis";
