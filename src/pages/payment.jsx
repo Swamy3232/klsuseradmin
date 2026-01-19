@@ -9,7 +9,7 @@ export default function UPITest() {
       return;
     }
 
-    const upiUrl = `upi://pay?pa=901904523@ybl&pn=Swamy&am=${amount}&cu=INR&tn=Test Payment`;
+    const upiUrl = `upi://pay?pa=9019740523@ybl&pn=Swamy&am=${amount}&cu=INR&tn=Test Payment`;
 
     window.location.href = upiUrl;
   };
