@@ -22,28 +22,30 @@ const Contact = () => {
   };
 
   const buildMessage = (data) => {
-    return [
+    const safe = (val) => (val && String(val).trim()) || "-";
+    const message = [
       "New Design Inquiry",
-      `Name: ${data.name || "-"}`,
-      `Email: ${data.email || "-"}`,
-      `Phone: ${data.phone || "-"}`,
-      `Jewellery Type: ${data.jewelleryType || "-"}`,
-      `Weight: ${data.weight || "-"}`,
-      `Requirements: ${data.requirements || "-"}`,
+      `Name: ${safe(data.name)}`,
+      `Email: ${safe(data.email)}`,
+      `Phone: ${safe(data.phone)}`,
+      `Jewellery Type: ${safe(data.jewelleryType)}`,
+      `Weight: ${safe(data.weight)}`,
+      `Requirements: ${safe(data.requirements)}`,
     ].join("\n");
+    return message || "New Design Inquiry";
   };
 
   const shareWhatsApp = () => {
-    if (!shareMessage) return;
-    const url = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
+    const text = shareMessage || buildMessage(formData);
+    const url = `https://wa.me/919448866788?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const shareEmail = () => {
-    if (!shareMessage) return;
+    const text = shareMessage || buildMessage(formData);
     const subject = encodeURIComponent("Design Inquiry - KLS Jewellers");
-    const body = encodeURIComponent(shareMessage);
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    const body = encodeURIComponent(text);
+    window.location.href = `mailto:korarlajewellerypalace@gmail.com?subject=${subject}&body=${body}`;
   };
 
   const handleSubmit = (e) => {
@@ -72,7 +74,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white py-12 md:py-20 px-4 sm:px-6 lg:px-8">
+    <div className="bg-gradient-to-b from-gray-50 to-white py-8 sm:py-12 md:py-18 px-4 sm:px-5 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-12 md:mb-16">
@@ -225,8 +227,8 @@ const Contact = () => {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
-              <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+            <form onSubmit={handleSubmit} className="p-5 sm:p-6 md:p-8 space-y-5 md:space-y-6">
+              <div className="grid md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Full Name
@@ -307,7 +309,7 @@ const Contact = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Design Requirements
                 </label>
