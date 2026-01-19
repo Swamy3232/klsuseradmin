@@ -11,7 +11,8 @@ const Navbar = () => {
     { name: "Collection", path: "/collection" },
     { name: "Gallery", path: "/gallery" },
     { name: "Your Chitti", path: "/chitti" },
-    {name: "Contact", path:"/contact"}
+    {name: "Contact", path:"/contact"},
+    {name: "Jewelry calculator", path:"/metal-calculator"}
     
   ];
 

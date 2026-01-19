@@ -21,6 +21,7 @@ const KLSGoldCollections = () => {
   const [collections, setCollections] = useState([]);
   const [filteredCollections, setFilteredCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [metalRates, setMetalRates] = useState({}); // { metalKey: { ratePerGram, updatedAt } }
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTypes, setSelectedTypes] = useState([]);
@@ -47,6 +48,83 @@ const KLSGoldCollections = () => {
   useEffect(() => {
     fetchCollections();
   }, []);
+
+  // Fetch metal rates periodically so prices are "live"
+  useEffect(() => {
+    fetchMetalRates();
+    const id = setInterval(fetchMetalRates, 5 * 60 * 1000); // every 5 mins
+    return () => clearInterval(id);
+  }, []);
+
+  const METAL_RATE_ENDPOINT = 'https://klsbackend.onrender.com/get-metal-rates';
+
+  const normalizeMetalKey = (type) => {
+    if (!type) return null;
+    const t = String(type).toLowerCase().trim();
+    if (t.includes('gold')) return 'gold';
+    if (t.includes('silver')) return 'silver';
+    if (t.includes('platinum')) return 'platinum';
+    return null; // diamond/others not supported by metal-rate endpoint
+  };
+
+  const extractRatePerGram = (payload) => {
+    if (!payload) return null;
+    // Try common shapes: { rate_per_gram }, { ratePerGram }, { rate }, { data: { ... } }
+    const candidates = [
+      payload?.rate_per_gram,
+      payload?.ratePerGram,
+      payload?.rate,
+      payload?.price_per_gram,
+      payload?.pricePerGram,
+      payload?.data?.rate_per_gram,
+      payload?.data?.ratePerGram,
+      payload?.data?.rate,
+      payload?.data?.price_per_gram,
+      payload?.data?.pricePerGram,
+    ];
+    const val = candidates.find(v => v !== undefined && v !== null);
+    const num = typeof val === 'string' ? Number(val) : val;
+    return Number.isFinite(num) ? num : null;
+  };
+
+  const fetchMetalRate = async (metalKey) => {
+    try {
+      const res = await fetch(`${METAL_RATE_ENDPOINT}?metal_type=${encodeURIComponent(metalKey)}`);
+      const json = await res.json();
+      const ratePerGram = extractRatePerGram(json);
+      if (ratePerGram == null) return null;
+      return { metalKey, ratePerGram, updatedAt: Date.now() };
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const fetchMetalRates = async () => {
+    // Fetch only metals we can price and that exist in our type list
+    const keys = ['gold', 'silver', 'platinum'];
+    const results = await Promise.all(keys.map(fetchMetalRate));
+    const next = {};
+    results.filter(Boolean).forEach(r => {
+      next[r.metalKey] = { ratePerGram: r.ratePerGram, updatedAt: r.updatedAt };
+    });
+    if (Object.keys(next).length > 0) setMetalRates(prev => ({ ...prev, ...next }));
+  };
+
+  const formatINR = (value) => {
+    try {
+      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
+    } catch {
+      return `₹${Math.round(value).toLocaleString('en-IN')}`;
+    }
+  };
+
+  const getEstimatedPrice = (item) => {
+    const metalKey = normalizeMetalKey(item?.type);
+    const ratePerGram = metalKey ? metalRates?.[metalKey]?.ratePerGram : null;
+    const weight = Number(item?.weight_gm);
+    if (!metalKey || !Number.isFinite(ratePerGram) || !Number.isFinite(weight)) return null;
+    return ratePerGram * weight;
+  };
 
   const fetchCollections = async () => {
     try {
@@ -537,6 +615,12 @@ const KLSGoldCollections = () => {
                           <span className="font-semibold">{item.weight_gm} gm</span>
                         </div>
                         <div className="flex items-center justify-between">
+                          <span className="text-gray-600">Est. Price</span>
+                          <span className="font-semibold text-amber-700">
+                            {getEstimatedPrice(item) != null ? formatINR(getEstimatedPrice(item)) : '—'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
                           <span className="text-gray-600 flex items-center gap-2">
                             {getGenderIcon(item.gender)}
                             Gender
@@ -632,6 +716,11 @@ const KLSGoldCollections = () => {
                           <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
                             <Scale className="w-4 h-4 text-gray-500" />
                             <span className="text-sm text-gray-700">Weight: {item.weight_gm}gm</span>
+                          </div>
+                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 rounded-lg border border-amber-100">
+                            <span className="text-sm text-amber-900 font-medium">
+                              Est. Price: {getEstimatedPrice(item) != null ? formatINR(getEstimatedPrice(item)) : '—'}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
                             <Calendar className="w-4 h-4 text-gray-500" />
@@ -750,6 +839,12 @@ const KLSGoldCollections = () => {
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <div className="text-sm text-gray-600 mb-1">Weight</div>
                       <div className="text-xl font-semibold text-gray-900">{selectedItem.weight_gm} gm</div>
+                    </div>
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                      <div className="text-sm text-amber-800 mb-1">Est. Price</div>
+                      <div className="text-xl font-semibold text-amber-900">
+                        {getEstimatedPrice(selectedItem) != null ? formatINR(getEstimatedPrice(selectedItem)) : '—'}
+                      </div>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <div className="text-sm text-gray-600 mb-1">Added Date</div>
