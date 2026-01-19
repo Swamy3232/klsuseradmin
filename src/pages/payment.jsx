@@ -4,56 +4,58 @@ import qrImage from "../assets/upi_id1.jpeg";
 export default function UPITest() {
   const [amount, setAmount] = useState("");
 
+  const payOnThisPhone = () => {
+    if (!amount || Number(amount) <= 0) {
+      alert("Enter valid amount");
+      return;
+    }
+
+    const upiUrl = `upi://pay?pa=901904523@ybl&pn=Swamy&am=${amount}&cu=INR&tn=Payment`;
+
+    window.location.href = upiUrl;
+  };
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f8fafc",
-        fontFamily: "Arial",
-      }}
-    >
-      <div
+    <div style={{ padding: 20, maxWidth: 360, margin: "auto" }}>
+      <h3>Pay via UPI</h3>
+
+      <input
+        type="number"
+        placeholder="Enter amount"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        style={{ width: "100%", padding: 10, marginBottom: 12 }}
+      />
+
+      {/* SAME PHONE PAYMENT */}
+      <button
+        onClick={payOnThisPhone}
         style={{
-          background: "#fff",
-          padding: 20,
-          borderRadius: 12,
-          width: 320,
-          textAlign: "center",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+          width: "100%",
+          padding: 12,
+          background: "#16a34a",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6,
         }}
       >
-        <h3 style={{ marginBottom: 10 }}>Pay via UPI</h3>
+        Pay on this phone
+      </button>
 
-        <img
-          src={qrImage}
-          alt="UPI QR Code"
-          style={{ width: 220, margin: "10px auto" }}
-        />
+      <p style={{ textAlign: "center", margin: "12px 0", color: "#777" }}>
+        OR
+      </p>
 
-        <input
-          type="number"
-          placeholder="Enter amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          style={{
-            width: "100%",
-            padding: 10,
-            marginTop: 12,
-            fontSize: 16,
-            borderRadius: 6,
-            border: "1px solid #ccc",
-          }}
-        />
+      {/* OTHER PHONE PAYMENT */}
+      <img
+        src={qrImage}
+        alt="Scan to Pay"
+        style={{ width: 220, display: "block", margin: "auto" }}
+      />
 
-        <p style={{ fontSize: 12, marginTop: 10, color: "#555" }}>
-          Scan the QR using PhonePe / GPay / Paytm  
-          <br />
-          Enter amount inside the UPI app
-        </p>
-      </div>
+      <p style={{ fontSize: 12, textAlign: "center", marginTop: 8 }}>
+        Scan using another phone
+      </p>
     </div>
   );
 }
