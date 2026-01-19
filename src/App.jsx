@@ -1,17 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/nav";
 import YourChitti from "./pages/yourchitti";
-import UPITest from "./pages/payment";
-
+import PaymentUpdateForm from "./pages/payment";
+// import KlsGoldSlider from "./pages/fslider";
+// import KlsGoldSlider from "../public/fslider";
+// import KlsGoldSlider from "./pages/fsliders";
+// import HomePage from "./pages/HomePage";
 function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
-        {/* Add your /chitti route */}
+        {/* Home page */}
+        <Route path="/" element={<YourChitti />} />
+
+        {/* Other pages */}
         <Route path="/chitti" element={<YourChitti />} />
-        <Route path="/payment" element={<UPITest />} />
-        {/* You can add other routes here */}
+        <Route path="/update-your-payment" element={<PaymentUpdateForm />} />
       </Routes>
     </Router>
   );

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const YourChitti = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('register');
   const [registerData, setRegisterData] = useState({
     phone: '',
@@ -79,6 +81,9 @@ const YourChitti = () => {
         }
       });
       
+      // Save phone so Payment page can auto-fill it
+      localStorage.setItem('kls_phone', loginData.phone);
+
       setLoginResponse(response.data);
       setMessage('Login successful!');
     } catch (error) {
@@ -348,6 +353,19 @@ const YourChitti = () => {
                     <h3 className="text-2xl font-bold text-amber-800 mb-6 pb-3 border-b border-amber-200">
                       Your Chitti Summary
                     </h3>
+
+                    <div className="mb-6 flex flex-col sm:flex-row gap-3">
+                      <button
+                        type="button"
+                        onClick={() => navigate('/update-your-payment')}
+                        className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all touch-manipulation min-h-[48px]"
+                      >
+                        Update Your Payment
+                      </button>
+                      <p className="text-sm text-amber-700 flex items-center">
+                        Phone will be auto-filled in the payment form.
+                      </p>
+                    </div>
                     
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                       {/* User Info Card */}
