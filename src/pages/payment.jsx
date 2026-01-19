@@ -1,50 +1,59 @@
-import React from "react";
+import React, { useState } from "react";
 
-const PaymentPage = () => {
-  const name = "KLS Gold";
-  const amount = 10;
-  const upiNumber = "8431497802"; // your number
+export default function UPITest() {
+  const [amount, setAmount] = useState("");
 
-  const payWithNumber = () => {
-    const upiUrl = `upi://pay?pa=${upiNumber}@ybl&pn=${encodeURIComponent(
-      name
-    )}&am=${amount}&cu=INR`;
+  const payNow = () => {
+    if (!amount || Number(amount) <= 0) {
+      alert("Enter valid amount");
+      return;
+    }
+
+    const upiUrl = `upi://pay?pa=901904523@ybl&pn=Swamy&am=${amount}&cu=INR&tn=Test Payment`;
 
     window.location.href = upiUrl;
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="bg-white w-full max-w-sm rounded-2xl shadow-lg p-6 text-center">
-        <h1 className="text-xl font-bold mb-2">UPI Payment</h1>
+    <div style={{
+      padding: 20,
+      maxWidth: 320,
+      margin: "auto",
+      fontFamily: "Arial"
+    }}>
+      <h3>Pay via UPI</h3>
 
-        <p className="text-gray-600 mb-4">
-          Pay ₹{amount} using your UPI app
-        </p>
+      <input
+        type="number"
+        placeholder="Enter amount"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        style={{
+          width: "100%",
+          padding: 10,
+          fontSize: 16,
+          marginBottom: 12
+        }}
+      />
 
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          <p className="text-sm text-gray-500">Pay to Mobile Number</p>
-          <p className="text-lg font-semibold">{upiNumber}</p>
-        </div>
+      <button
+        onClick={payNow}
+        style={{
+          width: "100%",
+          padding: 12,
+          fontSize: 16,
+          background: "#16a34a",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6
+        }}
+      >
+        Pay Now
+      </button>
 
-        <button
-          onClick={payWithNumber}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-lg"
-        >
-          Pay ₹10 via UPI Number
-        </button>
-
-        <div className="mt-4 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg text-left">
-          ⚠️ <strong>Note:</strong>
-          <ul className="list-disc pl-4 mt-1">
-            <li>The mobile number must be registered with UPI</li>
-            <li>If payment fails, the number is not UPI-enabled</li>
-            <li>No QR or gallery upload is used</li>
-          </ul>
-        </div>
-      </div>
+      <p style={{ fontSize: 12, marginTop: 10, color: "#555" }}>
+        Opens GPay / PhonePe / Paytm
+      </p>
     </div>
   );
-};
-
-export default PaymentPage;
+}
