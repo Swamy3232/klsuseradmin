@@ -33,6 +33,36 @@ const PaymentUpdateForm = () => {
   const [formErrors, setFormErrors] = useState({});
   const [lastSubmittedFormData, setLastSubmittedFormData] = useState(null);
 
+  const buildShareMessage = (data) => {
+    if (!data) return "";
+    return [
+      `KLS Payment Update`,
+      `Phone: ${data.phone || "-"}`,
+      `Amount: ₹${data.paidAmount || "-"}`,
+      `Method: ${data.paymentMethod || "-"}`,
+      `Reference/UTR: ${data.referenceNumber || "CASH_PAYMENT"}`,
+      `Date: ${data.paymentDate || new Date().toISOString().split("T")[0]}`
+    ].join("\n");
+  };
+
+  const shareViaWhatsApp = () => {
+    const payload = lastSubmittedFormData || formData;
+    const text = buildShareMessage(payload);
+    if (!text) return;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const shareViaEmail = () => {
+    const payload = lastSubmittedFormData || formData;
+    const text = buildShareMessage(payload);
+    if (!text) return;
+    const subject = encodeURIComponent("Payment Update - KLS");
+    const body = encodeURIComponent(text);
+    const url = `mailto:?subject=${subject}&body=${body}`;
+    window.location.href = url;
+  };
+
   // Prefill phone from login page so users don't need to enter it twice
   useEffect(() => {
     const savedPhone = localStorage.getItem("kls_phone");
