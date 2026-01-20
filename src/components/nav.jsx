@@ -120,6 +120,19 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <div className="lg:hidden flex items-center space-x-2">
             {/* Download APK Mobile */}
+             <button
+              onClick={() => setOpen(!open)}
+              className={`p-2.5 rounded-lg transition-all duration-300 ${
+                open ? "bg-yellow-50 text-yellow-600" : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+              }`}
+              aria-label="Toggle menu"
+            >
+              {open ? (
+                <X size={24} className="transform rotate-180 transition-transform duration-300" />
+              ) : (
+                <Menu size={24} />
+              )}
+            </button>
             <button
               onClick={handleDownloadClick}
               className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold text-sm hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md flex items-center space-x-2"
@@ -136,19 +149,7 @@ const Navbar = () => {
             </Link>
 
             {/* Hamburger */}
-            <button
-              onClick={() => setOpen(!open)}
-              className={`p-2.5 rounded-lg transition-all duration-300 ${
-                open ? "bg-yellow-50 text-yellow-600" : "bg-gray-50 text-gray-700 hover:bg-gray-100"
-              }`}
-              aria-label="Toggle menu"
-            >
-              {open ? (
-                <X size={24} className="transform rotate-180 transition-transform duration-300" />
-              ) : (
-                <Menu size={24} />
-              )}
-            </button>
+           
           </div>
         </div>
 
