@@ -161,13 +161,19 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile Menu Dropdown - FIXED */}
         <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            open ? "max-h-96 opacity-100 mt-4" : "max-h-0 opacity-0"
+          className={`lg:hidden absolute left-4 right-4 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 transform transition-all duration-300 ease-in-out z-50 ${
+            open 
+              ? "opacity-100 visible translate-y-0" 
+              : "opacity-0 invisible -translate-y-4"
           }`}
+          style={{
+            maxHeight: open ? "calc(100vh - 100px)" : "0",
+            overflowY: "auto"
+          }}
         >
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 py-3">
+          <div className="py-3">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
@@ -181,10 +187,10 @@ const Navbar = () => {
               >
                 <span className="flex-1">{item.name}</span>
                 {item.highlight && (
-                  <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                  <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse ml-2"></span>
                 )}
                 {location.pathname === item.path && (
-                  <ChevronDown size={16} className="text-yellow-500 rotate-270" />
+                  <ChevronDown size={16} className="text-yellow-500 transform -rotate-90 ml-2" />
                 )}
               </Link>
             ))}
@@ -201,8 +207,8 @@ const Navbar = () => {
           </div>
           
           {/* Mobile Footer */}
-          <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-500">
+          <div className="px-6 py-4 border-t border-gray-100">
+            <p className="text-sm text-gray-500 text-center">
               KLS Gold &copy; {new Date().getFullYear()}
             </p>
           </div>
