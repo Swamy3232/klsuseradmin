@@ -127,23 +127,32 @@ const KLSGoldCollections = () => {
   };
 
   const fetchCollections = async () => {
-    try {
-      const response = await fetch('https://test-check-q5kj.onrender.com/gold');
-      const result = await response.json();
-      if (result.status === 'success') {
-        setCollections(result.data);
-        setFilteredCollections(result.data);
-        // Calculate weight range
-        const weights = result.data.map(item => item.weight_gm);
+  try {
+    const response = await fetch('https://test-check-q5kj.onrender.com/gold');
+    const result = await response.json();
+
+    // ✅ FIX: don't check result.status
+    if (Array.isArray(result.data)) {
+      setCollections(result.data);
+      setFilteredCollections(result.data);
+
+      // Calculate weight range safely
+      const weights = result.data
+        .map(item => Number(item.weight_gm))
+        .filter(w => Number.isFinite(w));
+
+      if (weights.length > 0) {
         const maxWeight = Math.max(...weights);
         setWeightRange({ min: 0, max: Math.ceil(maxWeight / 100) * 100 });
       }
-    } catch (error) {
-      console.error('Error fetching collections:', error);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching collections:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Apply filters whenever filter criteria change
   useEffect(() => {
