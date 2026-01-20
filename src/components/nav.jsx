@@ -9,13 +9,12 @@ const Navbar = () => {
   const location = useLocation();
 
   // APK download link
-  const apkDownloadLink = "https://drive.google.com/file/d/1v7xpcBh5YDqwXIpa8WyFmqQM6kqZEI9z/view?usp=drivesdk";
+  const apkDownloadLink =
+    "https://drive.google.com/file/d/1v7xpcBh5YDqwXIpa8WyFmqQM6kqZEI9z/view?usp=drivesdk";
 
-  // Add scroll effect for navbar
+  // Scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -30,12 +29,9 @@ const Navbar = () => {
     { name: "Jewelry Calculator", path: "/metal-calculator" },
   ];
 
-  const handleLinkClick = () => {
-    setOpen(false);
-  };
+  const handleLinkClick = () => setOpen(false);
 
   const handleDownloadClick = () => {
-    // Open the download link in a new tab
     window.open(apkDownloadLink, "_blank");
     setOpen(false);
   };
@@ -50,12 +46,8 @@ const Navbar = () => {
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          {/* Logo Section */}
-          <Link
-            to="/"
-            className="flex items-center space-x-3 group"
-            onClick={() => setOpen(false)}
-          >
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3 group" onClick={() => setOpen(false)}>
             <div className="relative w-12 h-12 flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
               <img
@@ -77,8 +69,8 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-1">
+          {/* Desktop Menu */}
+          <div className="hidden lg:flex items-center space-x-2">
             {menuItems.map((item) => (
               <div key={item.path} className="relative group">
                 <Link
@@ -106,28 +98,28 @@ const Navbar = () => {
                 )}
               </div>
             ))}
-            
-            {/* Download APK Button */}
+
+            {/* APK Button */}
             <button
               onClick={handleDownloadClick}
-              className="ml-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center space-x-2"
+              className="ml-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2"
             >
               <Download size={18} />
               <span>Download App</span>
             </button>
-            
-            {/* Special Button for Your Chitti */}
+
+            {/* Your Chitti */}
             <Link
               to="/chitti"
-              className="ml-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              className="ml-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 shadow-md hover:shadow-lg"
             >
               Your Chitti
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden flex items-center space-x-4">
-            {/* Mobile Download Button */}
+          <div className="lg:hidden flex items-center space-x-2">
+            {/* Download APK Mobile */}
             <button
               onClick={handleDownloadClick}
               className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold text-sm hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md flex items-center space-x-2"
@@ -135,20 +127,19 @@ const Navbar = () => {
               <Download size={16} />
               <span>App</span>
             </button>
-            
+
             <Link
               to="/chitti"
               className="px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold text-sm hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 shadow-md"
             >
-              Your Chitti
+              Chitti
             </Link>
-            
+
+            {/* Hamburger */}
             <button
               onClick={() => setOpen(!open)}
               className={`p-2.5 rounded-lg transition-all duration-300 ${
-                open
-                  ? "bg-yellow-50 text-yellow-600"
-                  : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                open ? "bg-yellow-50 text-yellow-600" : "bg-gray-50 text-gray-700 hover:bg-gray-100"
               }`}
               aria-label="Toggle menu"
             >
@@ -161,17 +152,12 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu Dropdown - FIXED */}
+        {/* Mobile Menu Dropdown */}
         <div
-          className={`lg:hidden absolute left-4 right-4 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 transform transition-all duration-300 ease-in-out z-50 ${
-            open 
-              ? "opacity-100 visible translate-y-0" 
-              : "opacity-0 invisible -translate-y-4"
-          }`}
-          style={{
-            maxHeight: open ? "calc(100vh - 100px)" : "0",
-            overflowY: "auto"
-          }}
+          className={`lg:hidden absolute left-4 right-4 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 transform transition-all duration-300 ease-in-out z-50
+            ${open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-4"}
+            max-h-[80vh] overflow-y-auto
+          `}
         >
           <div className="py-3">
             {menuItems.map((item) => (
@@ -190,12 +176,15 @@ const Navbar = () => {
                   <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse ml-2"></span>
                 )}
                 {location.pathname === item.path && (
-                  <ChevronDown size={16} className="text-yellow-500 transform -rotate-90 ml-2" />
+                  <ChevronDown
+                    size={16}
+                    className="text-yellow-500 transform -rotate-90 ml-2"
+                  />
                 )}
               </Link>
             ))}
-            
-            {/* Download APK in Mobile Menu */}
+
+            {/* APK Download */}
             <button
               onClick={handleDownloadClick}
               className="flex items-center w-full px-6 py-3.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200"
@@ -205,7 +194,7 @@ const Navbar = () => {
               <span className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded-full">APK</span>
             </button>
           </div>
-          
+
           {/* Mobile Footer */}
           <div className="px-6 py-4 border-t border-gray-100">
             <p className="text-sm text-gray-500 text-center">
