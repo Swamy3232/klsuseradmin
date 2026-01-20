@@ -259,17 +259,7 @@ const MetalRateCalculator = () => {
                 </>
               )}
             </div>
-            <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl mb-4">
-          <Calculator className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-          KLS Jewellers Metal Rate Calculator
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Calculate the estimated value of your precious metals based on current market rates
-        </p>
-      </div>
+            
           </div>
           
           {/* Disclaimer */}
