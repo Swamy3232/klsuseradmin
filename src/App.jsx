@@ -4,7 +4,7 @@ import YourChitti from "./pages/yourchitti";
 import PaymentUpdateForm from "./pages/payment";
 import Contact from "./pages/contact";
 import KLSGoldCollections from "./pages/Collections";
-import MetalCalculator from "./pages/MetalCalculator";
+import MetalRateCalculator from "./pages/MetalCalculator";
 // import KlsGoldSlider from "./pages/fslider";
 // import KlsGoldSlider from "../public/fslider";
 // import KlsGoldSlider from "./pages/fsliders";
@@ -22,7 +22,7 @@ function App() {
         <Route path="/update-your-payment" element={<PaymentUpdateForm />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/collection" element={<KLSGoldCollections />} />
-        <Route path="/metal-calculator" element={<MetalCalculator />} />
+        <Route path="/metal-calculator" element={<MetalRateCalculator />} />
       </Routes>
     </Router>
   );
