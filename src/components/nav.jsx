@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Download } from "lucide-react";
 import logo from "../assets/image/logo.png";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+
+  // APK download link
+  const apkDownloadLink = "https://drive.google.com/file/d/1v7xpcBh5YDqwXIpa8WyFmqQM6kqZEI9z/view?usp=drivesdk";
 
   // Add scroll effect for navbar
   useEffect(() => {
@@ -28,6 +31,12 @@ const Navbar = () => {
   ];
 
   const handleLinkClick = () => {
+    setOpen(false);
+  };
+
+  const handleDownloadClick = () => {
+    // Open the download link in a new tab
+    window.open(apkDownloadLink, "_blank");
     setOpen(false);
   };
 
@@ -98,6 +107,15 @@ const Navbar = () => {
               </div>
             ))}
             
+            {/* Download APK Button */}
+            <button
+              onClick={handleDownloadClick}
+              className="ml-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center space-x-2"
+            >
+              <Download size={18} />
+              <span>Download App</span>
+            </button>
+            
             {/* Special Button for Your Chitti */}
             <Link
               to="/chitti"
@@ -109,12 +127,22 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <div className="lg:hidden flex items-center space-x-4">
+            {/* Mobile Download Button */}
+            <button
+              onClick={handleDownloadClick}
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold text-sm hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md flex items-center space-x-2"
+            >
+              <Download size={16} />
+              <span>App</span>
+            </button>
+            
             <Link
               to="/chitti"
               className="px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold text-sm hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 shadow-md"
             >
               Your Chitti
             </Link>
+            
             <button
               onClick={() => setOpen(!open)}
               className={`p-2.5 rounded-lg transition-all duration-300 ${
@@ -160,6 +188,16 @@ const Navbar = () => {
                 )}
               </Link>
             ))}
+            
+            {/* Download APK in Mobile Menu */}
+            <button
+              onClick={handleDownloadClick}
+              className="flex items-center w-full px-6 py-3.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200"
+            >
+              <Download size={18} className="mr-3" />
+              <span className="flex-1 text-left font-medium">Download App</span>
+              <span className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded-full">APK</span>
+            </button>
           </div>
           
           {/* Mobile Footer */}
