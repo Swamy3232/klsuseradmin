@@ -116,17 +116,7 @@ const MetalRateCalculator = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl mb-4">
-          <Calculator className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-          KLS Jewellers Metal Rate Calculator
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Calculate the estimated value of your precious metals based on current market rates
-        </p>
-      </div>
+      
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Calculator Panel */}
@@ -269,57 +259,27 @@ const MetalRateCalculator = () => {
                 </>
               )}
             </div>
+            <div className="text-center mb-12">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl mb-4">
+          <Calculator className="w-8 h-8 text-white" />
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+          KLS Jewellers Metal Rate Calculator
+        </h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Calculate the estimated value of your precious metals based on current market rates
+        </p>
+      </div>
           </div>
-
+          
           {/* Disclaimer */}
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-blue-800">
-              <span className="font-semibold">Note:</span> This calculator provides an estimate based on current market rates. 
-              Final pricing may vary based on craftsmanship, design complexity, making charges, and current market conditions. 
-              Please visit our store or contact us for exact pricing.
-            </p>
-          </div>
+          
         </div>
 
         {/* Results & Current Rates Panel */}
         <div className="space-y-6">
           {/* Current Rates */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-600" />
-              Current Metal Rates
-            </h3>
-            <div className="space-y-4">
-              {metals.slice(0, 4).map((metal, index) => (
-                <div 
-                  key={index} 
-                  className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    {getMetalIcon(metal.metal_type)}
-                    <div>
-                      <p className="font-medium text-gray-900">{metal.metal_type}</p>
-                      <p className="text-sm text-gray-600">{metal.purity}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-gray-900">
-                      ₹{metal.rate_per_gram?.toLocaleString('en-IN') || 'N/A'}
-                    </p>
-                    <p className="text-xs text-gray-600">per gram</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={fetchMetalRates}
-              className="w-full mt-4 py-2 text-amber-600 hover:text-amber-700 font-medium text-sm flex items-center justify-center gap-2"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Refresh Rates
-            </button>
-          </div>
+         
 
           {/* Results Display */}
           {calculatedPrice !== null && (
@@ -378,6 +338,41 @@ const MetalRateCalculator = () => {
               </div>
             </div>
           )}
+           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-amber-600" />
+              Current Metal Rates
+            </h3>
+            <div className="space-y-4">
+              {metals.slice(0, 4).map((metal, index) => (
+                <div 
+                  key={index} 
+                  className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    {getMetalIcon(metal.metal_type)}
+                    <div>
+                      <p className="font-medium text-gray-900">{metal.metal_type}</p>
+                      <p className="text-sm text-gray-600">{metal.purity}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-gray-900">
+                      ₹{metal.rate_per_gram?.toLocaleString('en-IN') || 'N/A'}
+                    </p>
+                    <p className="text-xs text-gray-600">per gram</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={fetchMetalRates}
+              className="w-full mt-4 py-2 text-amber-600 hover:text-amber-700 font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh Rates
+            </button>
+          </div>
 
           {/* Quick Tips */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
@@ -402,7 +397,14 @@ const MetalRateCalculator = () => {
     </div>
   );
 };
-
+<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-800">
+              <span className="font-semibold">Note:</span> This calculator provides an estimate based on current market rates. 
+              Final pricing may vary based on craftsmanship, design complexity, making charges, and current market conditions. 
+              Please visit our store or contact us for exact pricing.
+            </p>
+          </div>
 // Add missing icons
 const RefreshCw = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
