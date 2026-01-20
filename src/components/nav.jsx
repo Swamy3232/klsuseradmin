@@ -1,19 +1,30 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X, ChevronDown } from "lucide-react";
+import logo from "../assets/image/logo.png";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  // Add scroll effect for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const menuItems = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
     { name: "Collection", path: "/collection" },
     { name: "Gallery", path: "/gallery" },
-    { name: "Your Chitti", path: "/chitti" },
-    {name: "Contact", path:"/contact"},
-    {name: "Jewelry calculator", path:"/metal-calculator"}
-    
+    { name: "Your Chitti", path: "/chitti", highlight: true },
+    { name: "Contact", path: "/contact" },
+    { name: "Jewelry Calculator", path: "/metal-calculator" },
   ];
 
   const handleLinkClick = () => {
@@ -21,65 +32,143 @@ const Navbar = () => {
   };
 
   return (
-    <header className="w-full bg-white shadow-md sticky top-0 z-50">
-      <nav className="max-w-7xl mx-auto px-6">
-        <div className="flex justify-between items-center h-16">
-
-          {/* Logo */}
-          <Link to="/" className="text-2xl font-bold text-yellow-600">
-            KLS <span className="text-gray-900">Gold</span>
+    <header
+      className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/95 backdrop-blur-md shadow-lg py-2"
+          : "bg-white py-3"
+      }`}
+    >
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center">
+          {/* Logo Section */}
+          <Link
+            to="/"
+            className="flex items-center space-x-3 group"
+            onClick={() => setOpen(false)}
+          >
+            <div className="relative w-12 h-12 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
+              <img
+                src={logo}
+                alt="KLS Gold Logo"
+                className="w-10 h-10 object-contain drop-shadow-md"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold text-gray-900 leading-tight tracking-tight">
+                KLS
+                <span className="bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent ml-1">
+                  Gold
+                </span>
+              </span>
+              <span className="text-xs text-gray-500 font-light tracking-wider">
+                Trusted Since 1995
+              </span>
+            </div>
           </Link>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8 text-gray-700 font-medium">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-1">
             {menuItems.map((item) => (
-              item.name === "Your Chitti" ? (
+              <div key={item.path} className="relative group">
                 <Link
-                  key={item.path}
                   to={item.path}
-                  className="ml-4 px-4 py-1 rounded-full bg-yellow-600 text-white hover:bg-yellow-700 transition"
+                  className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium ${
+                    location.pathname === item.path
+                      ? "text-yellow-600"
+                      : "text-gray-700 hover:text-yellow-600"
+                  } ${item.highlight ? "font-semibold" : ""}`}
                 >
-                  {item.name}
+                  <span className="relative">
+                    {item.name}
+                    {location.pathname === item.path && (
+                      <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-yellow-500"></span>
+                    )}
+                  </span>
                 </Link>
-              ) : (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="hover:text-yellow-600 transition"
-                >
-                  {item.name}
-                </Link>
-              )
+                {item.highlight && (
+                  <div className="absolute -top-1 -right-1">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                    </span>
+                  </div>
+                )}
+              </div>
             ))}
+            
+            {/* Special Button for Your Chitti */}
+            <Link
+              to="/chitti"
+              className="ml-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            >
+              Your Chitti
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button 
-              onClick={() => setOpen(!open)} 
-              className="text-gray-800 p-2 touch-manipulation"
+          <div className="lg:hidden flex items-center space-x-4">
+            <Link
+              to="/chitti"
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold text-sm hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 shadow-md"
+            >
+              Your Chitti
+            </Link>
+            <button
+              onClick={() => setOpen(!open)}
+              className={`p-2.5 rounded-lg transition-all duration-300 ${
+                open
+                  ? "bg-yellow-50 text-yellow-600"
+                  : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+              }`}
               aria-label="Toggle menu"
             >
-              {open ? <X size={26} /> : <Menu size={26} />}
+              {open ? (
+                <X size={24} className="transform rotate-180 transition-transform duration-300" />
+              ) : (
+                <Menu size={24} />
+              )}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {open && (
-          <div className="md:hidden mt-2 flex flex-col bg-white border-t">
+        {/* Mobile Menu Dropdown */}
+        <div
+          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            open ? "max-h-96 opacity-100 mt-4" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 py-3">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={handleLinkClick}
-                className="block px-4 py-3 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 transition touch-manipulation min-h-[44px] flex items-center"
+                className={`flex items-center px-6 py-3.5 transition-all duration-200 ${
+                  location.pathname === item.path
+                    ? "bg-yellow-50 text-yellow-600 border-l-4 border-yellow-500"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-yellow-600"
+                } ${item.highlight ? "font-semibold" : ""}`}
               >
-                {item.name}
+                <span className="flex-1">{item.name}</span>
+                {item.highlight && (
+                  <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                )}
+                {location.pathname === item.path && (
+                  <ChevronDown size={16} className="text-yellow-500 rotate-270" />
+                )}
               </Link>
             ))}
           </div>
-        )}
+          
+          {/* Mobile Footer */}
+          <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+            <p className="text-sm text-gray-500">
+              KLS Gold &copy; {new Date().getFullYear()}
+            </p>
+          </div>
+        </div>
       </nav>
     </header>
   );
