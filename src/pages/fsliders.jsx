@@ -98,12 +98,12 @@ const KlsGoldSlider = () => {
         gold: [{
           metal_type: "gold",
           purity: "24K",
-          rate_per_gram: 145900,
+          rate_per_gram: 14590,
           currency: "INR"
         }],
         silver: [{
           metal_type: "silver",
-          purity: "24",
+          purity: "",
           rate_per_gram: 295.75,
           currency: "INR"
         }]
@@ -449,7 +449,7 @@ const KlsGoldSlider = () => {
                           <h3 className="text-lg font-semibold text-blue-200">Diamond</h3>
                         </div>
                         <span className="text-green-400 text-xs font-medium bg-green-400/10 px-2 py-1 rounded-full">
-                          LIVE
+                          CLICK TO VIEW LIVE PRICES
                         </span>
                       </div>
                       <div className="flex items-center justify-between py-2">
