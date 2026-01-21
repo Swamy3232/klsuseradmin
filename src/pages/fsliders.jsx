@@ -98,7 +98,7 @@ const KlsGoldSlider = () => {
         gold: [{
           metal_type: "gold",
           purity: "24K",
-          rate_per_gram: 14590,
+          rate_per_gram: 145900,
           currency: "INR"
         }],
         silver: [{
