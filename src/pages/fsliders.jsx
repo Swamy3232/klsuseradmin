@@ -43,12 +43,41 @@ const images = [
   { src: img17, title: "Exclusive Edition", description: "Limited Series" },
 ];
 
+// Metal icon mapping
+const metalIcons = {
+  gold: {
+    icon: "M12 2L8 6l-4-4-2 2 6 6 6-6-2-2z",
+    gradient: "from-yellow-300 to-yellow-600",
+    bgGradient: "from-yellow-600/90 to-yellow-800/90",
+    border: "border-yellow-400/30",
+    text: "text-yellow-400",
+    color: "text-yellow-300"
+  },
+  silver: {
+    icon: "M12 2L8 6l-4-4-2 2 6 6 6-6-2-2z",
+    gradient: "from-gray-300 to-gray-500",
+    bgGradient: "from-gray-700/90 to-gray-900/90",
+    border: "border-gray-400/30",
+    text: "text-gray-400",
+    color: "text-gray-300"
+  },
+  diamond: {
+    icon: "M12 2l4 4 4-4-2-2-2 2-2-2-2 2-2-2-2 2z",
+    gradient: "from-blue-300 to-blue-500",
+    bgGradient: "from-blue-600/90 to-blue-800/90",
+    border: "border-blue-400/30",
+    text: "text-blue-400",
+    color: "text-blue-300"
+  }
+};
+
 const KlsGoldSlider = () => {
-  const [goldPrice, setGoldPrice] = useState(null);
-  const [silverPrice, setSilverPrice] = useState(null);
+  const [allMetalPrices, setAllMetalPrices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [showAllPrices, setShowAllPrices] = useState(false);
+  const [showPricesModal, setShowPricesModal] = useState(false);
 
   useEffect(() => {
     // Check if mobile on mount and resize
@@ -59,9 +88,9 @@ const KlsGoldSlider = () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    fetchMetalPrices();
+    fetchAllMetalPrices();
     // Refresh prices every 5 minutes
-    const interval = setInterval(fetchMetalPrices, 300000);
+    const interval = setInterval(fetchAllMetalPrices, 300000);
     
     return () => {
       clearInterval(interval);
@@ -69,24 +98,25 @@ const KlsGoldSlider = () => {
     };
   }, []);
 
-  const fetchMetalPrices = async () => {
+  const fetchAllMetalPrices = async () => {
     try {
       setLoading(true);
       
-      // Fetch gold price
-      const goldResponse = await fetch('https://klsbackend.onrender.com/get-metal-rates?metal_type=gold');
-      const goldData = await goldResponse.json();
+      // Fetch all metal prices from single endpoint
+      const response = await fetch('https://klsbackend.onrender.com/get-metal-rates');
+      const data = await response.json();
       
-      // Fetch silver price
-      const silverResponse = await fetch('https://klsbackend.onrender.com/get-metal-rates?metal_type=silver');
-      const silverData = await silverResponse.json();
-      
-      if (goldData.data && goldData.data.length > 0) {
-        setGoldPrice(goldData.data[0]);
-      }
-      
-      if (silverData.data && silverData.data.length > 0) {
-        setSilverPrice(silverData.data[0]);
+      if (data.data && data.data.length > 0) {
+        // Group by metal type and purity
+        const groupedPrices = data.data.reduce((acc, price) => {
+          if (!acc[price.metal_type]) {
+            acc[price.metal_type] = [];
+          }
+          acc[price.metal_type].push(price);
+          return acc;
+        }, {});
+        
+        setAllMetalPrices(groupedPrices);
       }
       
       setError(null);
@@ -94,17 +124,41 @@ const KlsGoldSlider = () => {
       console.error('Error fetching metal prices:', err);
       setError('Unable to fetch live prices');
       // Set fallback prices
-      setGoldPrice({
-        metal_type: "gold",
-        rate_per_gram: 5000,
-        currency: "INR",
-        effective_date: new Date().toISOString().split('T')[0]
-      });
-      setSilverPrice({
-        metal_type: "silver",
-        rate_per_gram: 600,
-        currency: "INR",
-        effective_date: new Date().toISOString().split('T')[0]
+      setAllMetalPrices({
+        gold: [
+          {
+            metal_type: "gold",
+            purity: "24k",
+            rate_per_gram: 14590,
+            currency: "INR",
+            effective_date: new Date().toISOString().split('T')[0]
+          },
+          {
+            metal_type: "gold",
+            purity: "22k",
+            rate_per_gram: 2500,
+            currency: "INR",
+            effective_date: new Date().toISOString().split('T')[0]
+          }
+        ],
+        silver: [
+          {
+            metal_type: "silver",
+            purity: "24",
+            rate_per_gram: 295.75,
+            currency: "INR",
+            effective_date: new Date().toISOString().split('T')[0]
+          }
+        ],
+        diamond: [
+          {
+            metal_type: "diamond",
+            purity: "24",
+            rate_per_carat: 1000,
+            currency: "INR",
+            effective_date: new Date().toISOString().split('T')[0]
+          }
+        ]
       });
     } finally {
       setLoading(false);
@@ -119,13 +173,13 @@ const KlsGoldSlider = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 2000,
-    arrows: !isMobile, // Hide arrows on mobile
+    arrows: !isMobile,
     fade: true,
     cssEase: 'cubic-bezier(0.7, 0, 0.3, 1)',
     pauseOnHover: false,
     pauseOnFocus: false,
-    swipe: isMobile, // Enable swipe on mobile
-    touchMove: isMobile, // Enable touch move on mobile
+    swipe: isMobile,
+    touchMove: isMobile,
     adaptiveHeight: true,
     dotsClass: "slick-dots custom-dots",
     appendDots: dots => (
@@ -146,6 +200,23 @@ const KlsGoldSlider = () => {
     }).format(price);
   };
 
+  // Get primary gold price (24k)
+  const getPrimaryGoldPrice = () => {
+    if (!allMetalPrices.gold) return null;
+    return allMetalPrices.gold.find(price => price.purity === "24k") || allMetalPrices.gold[0];
+  };
+
+  // Get primary silver price
+  const getPrimarySilverPrice = () => {
+    if (!allMetalPrices.silver) return null;
+    return allMetalPrices.silver[0];
+  };
+
+  // Get metal icon config
+  const getMetalIcon = (metalType) => {
+    return metalIcons[metalType.toLowerCase()] || metalIcons.gold;
+  };
+
   return (
     <div className="relative w-full overflow-hidden">
       {/* Top Section with Branding - Adjusted for mobile */}
@@ -162,165 +233,105 @@ const KlsGoldSlider = () => {
         </div>
       </div>
 
-      {/* Live Price Indicators - Reorganized for mobile */}
-      {/* Mobile: Show compact version at top-right */}
-      {isMobile && (
-        <div className="absolute top-20 right-2 z-40">
-          <div className="bg-black/70 backdrop-blur-sm rounded-xl p-2 shadow-xl border border-yellow-500/20">
-            <div className="flex items-center space-x-2 mb-1">
-              <span className="text-yellow-400 text-xs font-bold">LIVE</span>
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+      {/* View Live Prices Button - Desktop & Mobile */}
+      <div className={`absolute ${isMobile ? 'top-16 left-1/2 transform -translate-x-1/2' : 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'} z-40`}>
+        <button
+          onClick={() => setShowPricesModal(true)}
+          className="group relative"
+        >
+          <div className="bg-gradient-to-r from-yellow-600/90 to-yellow-800/90 backdrop-blur-sm px-6 py-3 md:px-8 md:py-4 rounded-2xl shadow-2xl border border-yellow-400/30 transform transition-all duration-300 hover:scale-105 hover:shadow-yellow-500/30 flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+              <svg className="w-6 h-6 text-yellow-800" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-yellow-300 text-xs">Gold:</span>
-                <span className="text-yellow-400 font-bold text-sm">₹ {formatPrice(goldPrice?.rate_per_gram)}</span>
+            <div className="text-left">
+              <div className="flex items-center space-x-2">
+                <h3 className="text-white font-bold text-lg">VIEW LIVE PRICES</h3>
+                <span className="text-green-400 text-xs animate-pulse">● LIVE</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300 text-xs">Silver:</span>
-                <span className="text-gray-300 font-bold text-sm">₹ {formatPrice(silverPrice?.rate_per_gram)}</span>
-              </div>
+              <p className="text-yellow-200/80 text-sm">
+                Gold, Silver & Diamond
+              </p>
             </div>
           </div>
-        </div>
-      )}
+          
+          {/* Animated ring effect */}
+          <div className="absolute inset-0 rounded-2xl border-2 border-yellow-500/30 animate-ping opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </button>
+      </div>
 
-      {/* Desktop: Show side panels */}
+      {/* Live Price Indicators - Desktop Only */}
       {!isMobile && (
-        <>
-          {/* Live Price Indicators - Left Side */}
-          <div className="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 z-40">
-            <div className="flex flex-col space-y-4">
-              {/* Gold Price */}
-              <div className="relative group">
-                <div className="bg-gradient-to-r from-yellow-600/90 to-yellow-800/90 backdrop-blur-sm p-4 rounded-2xl shadow-2xl border border-yellow-400/30 transform transition-all duration-300 hover:scale-105 hover:shadow-yellow-500/30">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
-                      <svg className="w-6 h-6 text-yellow-800" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <h3 className="text-white font-bold text-lg">GOLD</h3>
-                        {loading ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-400"></div>
-                        ) : error ? (
-                          <span className="text-red-300 text-xs">Offline</span>
-                        ) : (
-                          <span className="text-green-400 text-xs animate-pulse">● LIVE</span>
-                        )}
-                      </div>
-                      <div className="text-yellow-300 font-bold text-xl">
-                        ₹ {formatPrice(goldPrice?.rate_per_gram)}
-                        <span className="text-white text-sm font-normal ml-1">/g</span>
-                      </div>
-                      <p className="text-yellow-200/80 text-xs mt-1">
-                        {goldPrice?.effective_date || 'Today'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Silver Price */}
-              <div className="relative group">
-                <div className="bg-gradient-to-r from-gray-700/90 to-gray-900/90 backdrop-blur-sm p-4 rounded-2xl shadow-2xl border border-gray-400/30 transform transition-all duration-300 hover:scale-105 hover:shadow-gray-400/30">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-500 rounded-full flex items-center justify-center shadow-lg">
-                      <svg className="w-6 h-6 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <h3 className="text-white font-bold text-lg">SILVER</h3>
-                        {loading ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
-                        ) : error ? (
-                          <span className="text-red-300 text-xs">Offline</span>
-                        ) : (
-                          <span className="text-green-400 text-xs animate-pulse">● LIVE</span>
-                        )}
-                      </div>
-                      <div className="text-gray-300 font-bold text-xl">
-                        ₹ {formatPrice(silverPrice?.rate_per_gram)}
-                        <span className="text-white text-sm font-normal ml-1">/g</span>
-                      </div>
-                      <p className="text-gray-300/80 text-xs mt-1">
-                        {silverPrice?.effective_date || 'Today'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+        <div className="absolute right-4 md:right-6 top-1/2 transform -translate-y-1/2 z-40">
+          <div className="bg-black/60 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border border-yellow-500/20 transform hover:scale-105 transition-transform duration-300">
+            <div className="text-center mb-3">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 bg-yellow-600/30 rounded-full">
+                <span className="text-yellow-400 text-sm font-bold tracking-wider">LIVE PRICES</span>
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               </div>
             </div>
-          </div>
-
-          {/* Live Prices Banner - Right Side */}
-          <div className="absolute right-4 md:right-6 top-1/2 transform -translate-y-1/2 z-40">
-            <div className="bg-black/60 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border border-yellow-500/20 transform hover:scale-105 transition-transform duration-300">
-              <div className="text-center mb-3">
-                <div className="inline-flex items-center space-x-2 px-3 py-1 bg-yellow-600/30 rounded-full">
-                  <span className="text-yellow-400 text-sm font-bold tracking-wider">LIVE PRICES</span>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 text-sm">24K Gold:</span>
+            
+            <div className="space-y-3">
+              {/* Gold Prices */}
+              {allMetalPrices.gold && allMetalPrices.gold.map((price, index) => (
+                <div key={index} className="flex justify-between items-center">
+                  <span className="text-gray-300 text-sm">{price.purity} Gold:</span>
                   <div className="flex items-center space-x-1">
-                    <span className="text-yellow-400 font-bold">₹ {formatPrice(goldPrice?.rate_per_gram)}</span>
+                    <span className="text-yellow-400 font-bold">₹ {formatPrice(price.rate_per_gram)}</span>
                     <span className="text-gray-400 text-xs">/g</span>
                   </div>
                 </div>
-                
-                <div className="flex justify-between items-center">
+              ))}
+              
+              {/* Silver Price */}
+              {allMetalPrices.silver && allMetalPrices.silver.map((price, index) => (
+                <div key={index} className="flex justify-between items-center">
                   <span className="text-gray-300 text-sm">Silver:</span>
                   <div className="flex items-center space-x-1">
-                    <span className="text-gray-300 font-bold">₹ {formatPrice(silverPrice?.rate_per_gram)}</span>
+                    <span className="text-gray-300 font-bold">₹ {formatPrice(price.rate_per_gram)}</span>
                     <span className="text-gray-400 text-xs">/g</span>
                   </div>
                 </div>
-                
-                <div className="pt-2 border-t border-gray-700/50">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-400">Updated:</span>
-                    <span className="text-gray-300">
-                      {goldPrice?.effective_date ? 
-                        new Date(goldPrice.effective_date).toLocaleDateString('en-IN', {
-                          day: 'numeric',
-                          month: 'short'
-                        }) : 'Today'}
-                    </span>
+              ))}
+              
+              {/* Diamond Price */}
+              {allMetalPrices.diamond && allMetalPrices.diamond.map((price, index) => (
+                <div key={index} className="flex justify-between items-center">
+                  <span className="text-gray-300 text-sm">Diamond:</span>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-blue-400 font-bold">₹ {formatPrice(price.rate_per_carat)}</span>
+                    <span className="text-gray-400 text-xs">/ct</span>
                   </div>
                 </div>
-              </div>
+              ))}
               
-              {/* Refresh Button */}
-              <button 
-                onClick={fetchMetalPrices}
-                disabled={loading}
-                className="mt-4 w-full py-2 bg-gradient-to-r from-yellow-700 to-yellow-900 text-white text-sm font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Updating...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>Refresh Rates</span>
-                  </>
-                )}
-              </button>
+              <div className="pt-2 border-t border-gray-700/50">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-400">Updated:</span>
+                  <span className="text-gray-300">
+                    {allMetalPrices.gold?.[0]?.effective_date ? 
+                      new Date(allMetalPrices.gold[0].effective_date).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short'
+                      }) : 'Today'}
+                  </span>
+                </div>
+              </div>
             </div>
+            
+            {/* View All Button */}
+            <button 
+              onClick={() => setShowPricesModal(true)}
+              className="mt-4 w-full py-2 bg-gradient-to-r from-yellow-700 to-yellow-900 text-white text-sm font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 flex items-center justify-center space-x-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>View All Prices</span>
+            </button>
           </div>
-        </>
+        </div>
       )}
 
       {/* Main Slider */}
@@ -377,20 +388,11 @@ const KlsGoldSlider = () => {
         ))}
       </Slider>
 
-      {/* Navigation Hint - Hidden on mobile */}
-      {!isMobile && (
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 opacity-70 animate-pulse">
-          <p className="text-white text-sm tracking-widest uppercase">
-            Auto-rotating every 2 seconds
-          </p>
-        </div>
-      )}
-
       {/* Refresh Button for Mobile - Bottom Center */}
       {isMobile && (
         <div className="absolute bottom-4 right-4 z-40">
           <button 
-            onClick={fetchMetalPrices}
+            onClick={fetchAllMetalPrices}
             disabled={loading}
             className="bg-black/70 backdrop-blur-sm p-2 rounded-full border border-yellow-500/30 hover:bg-black/90 transition-all duration-300 disabled:opacity-50"
             title="Refresh Prices"
@@ -403,6 +405,195 @@ const KlsGoldSlider = () => {
               </svg>
             )}
           </button>
+        </div>
+      )}
+
+      {/* Navigation Hint - Hidden on mobile */}
+      {!isMobile && (
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 opacity-70 animate-pulse">
+          <p className="text-white text-sm tracking-widest uppercase">
+            Auto-rotating every 2 seconds
+          </p>
+        </div>
+      )}
+
+      {/* All Prices Modal */}
+      {showPricesModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl border border-yellow-500/30 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-yellow-800/90 to-yellow-900/90 backdrop-blur-sm p-6 rounded-t-2xl border-b border-yellow-500/30">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+                    <svg className="w-7 h-7 text-yellow-800" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Live Metal Prices</h2>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-green-400 text-sm animate-pulse">● REAL-TIME UPDATES</span>
+                      <span className="text-yellow-200/80 text-sm">
+                        {allMetalPrices.gold?.[0]?.effective_date || new Date().toLocaleDateString('en-IN')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowPricesModal(false)}
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              {loading ? (
+                <div className="flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500"></div>
+                </div>
+              ) : error ? (
+                <div className="text-center py-12">
+                  <p className="text-red-400">{error}</p>
+                  <button
+                    onClick={fetchAllMetalPrices}
+                    className="mt-4 px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Gold Section */}
+                  {allMetalPrices.gold && allMetalPrices.gold.length > 0 && (
+                    <div className="bg-gradient-to-r from-yellow-900/30 to-yellow-950/20 backdrop-blur-sm rounded-xl p-5 border border-yellow-500/20">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+                          <svg className="w-6 h-6 text-yellow-800" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-yellow-300">Gold Prices</h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {allMetalPrices.gold.map((price, index) => (
+                          <div key={index} className="bg-black/40 backdrop-blur-sm rounded-lg p-4 border border-yellow-500/10">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-yellow-200 font-semibold">{price.purity}</span>
+                              <span className="text-green-400 text-xs font-medium">LIVE</span>
+                            </div>
+                            <div className="text-2xl font-bold text-yellow-300">
+                              ₹ {formatPrice(price.rate_per_gram)}
+                              <span className="text-yellow-200/80 text-sm ml-1">/ gram</span>
+                            </div>
+                            {price.rate_per_carat > 0 && (
+                              <div className="mt-2 text-sm text-yellow-200/70">
+                                ₹ {formatPrice(price.rate_per_carat)} / carat
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Silver Section */}
+                  {allMetalPrices.silver && allMetalPrices.silver.length > 0 && (
+                    <div className="bg-gradient-to-r from-gray-800/30 to-gray-900/20 backdrop-blur-sm rounded-xl p-5 border border-gray-500/20">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-500 rounded-full flex items-center justify-center shadow-lg">
+                          <svg className="w-6 h-6 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-300">Silver Prices</h3>
+                      </div>
+                      <div className="bg-black/40 backdrop-blur-sm rounded-lg p-4 border border-gray-500/10">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-200 font-semibold">
+                            {allMetalPrices.silver[0].purity} Purity
+                          </span>
+                          <span className="text-green-400 text-xs font-medium">LIVE</span>
+                        </div>
+                        <div className="text-2xl font-bold text-gray-300">
+                          ₹ {formatPrice(allMetalPrices.silver[0].rate_per_gram)}
+                          <span className="text-gray-200/80 text-sm ml-1">/ gram</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Diamond Section */}
+                  {allMetalPrices.diamond && allMetalPrices.diamond.length > 0 && (
+                    <div className="bg-gradient-to-r from-blue-900/30 to-blue-950/20 backdrop-blur-sm rounded-xl p-5 border border-blue-500/20">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-300 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                          <svg className="w-6 h-6 text-blue-700" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 2l4 4 4-4-2-2-2 2-2-2-2 2-2-2-2 2z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-blue-300">Diamond Prices</h3>
+                      </div>
+                      <div className="bg-black/40 backdrop-blur-sm rounded-lg p-4 border border-blue-500/10">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-blue-200 font-semibold">
+                            {allMetalPrices.diamond[0].purity} Quality
+                          </span>
+                          <span className="text-green-400 text-xs font-medium">LIVE</span>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-300">
+                          ₹ {formatPrice(allMetalPrices.diamond[0].rate_per_carat)}
+                          <span className="text-blue-200/80 text-sm ml-1">/ carat</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Disclaimer */}
+                  <div className="text-center text-gray-400 text-sm pt-4 border-t border-gray-800/50">
+                    <p>Prices are updated every 5 minutes. Rates may vary for different jewelry types.</p>
+                    <p className="mt-1">Last updated: {new Date().toLocaleTimeString('en-IN')}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="sticky bottom-0 bg-gradient-to-t from-black/90 to-transparent p-6 rounded-b-2xl">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={fetchAllMetalPrices}
+                  disabled={loading}
+                  className="flex-1 py-3 bg-gradient-to-r from-yellow-700 to-yellow-900 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 disabled:opacity-50 flex items-center justify-center space-x-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Updating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      <span>Refresh Prices</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowPricesModal(false)}
+                  className="flex-1 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
