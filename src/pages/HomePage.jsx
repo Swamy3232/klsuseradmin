@@ -148,7 +148,7 @@ const HomePage = () => {
   return (
     <div className="bg-white">
       {/* Hero Slider */}
-      <section className="relative overflow-hidden">
+      {/* <section className="relative overflow-hidden">
         <KlsGoldSlider />
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -162,7 +162,7 @@ const HomePage = () => {
             </p>
           </div>
         </motion.div>
-      </section>
+      </section> */}
 
       {/* Our Values Section */}
       <section className="py-16 bg-gradient-to-b from-white to-gray-50">
