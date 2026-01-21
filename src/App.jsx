@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/nav";
 
 import Footer from "./components/footer";
+import HomePage from "./pages/HomePage";
 import YourChitti from "./pages/yourchitti";
 import PaymentUpdateForm from "./pages/payment";
 import Contact from "./pages/contact";
@@ -20,7 +21,7 @@ function App() {
       <div className="pt-20 min-h-screen"> {/* Adjust pt-20 to match navbar height */}
         <Routes>
           {/* Home page */}
-          <Route path="/" element={<YourChitti />} />
+          <Route path="/" element={<HomePage />} />
 
           {/* Other pages */}
           <Route path="/chitti" element={<YourChitti />} />

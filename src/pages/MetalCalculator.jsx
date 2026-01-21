@@ -122,17 +122,7 @@ const MetalRateCalculator = () => {
         {/* Calculator Panel */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            {/* <div className="bg-gradient-to-r from-amber-700 to-amber-800 p-6">
-              <h2 className="text-xl font-bold text-white flex items-center gap-3">
-                <Calculator className="w-6 h-6" />
-                Calculate Metal Value
-              </h2>
-              {ratesLastUpdated && (
-                <p className="text-amber-100 text-sm mt-2">
-                  Rates updated: {ratesLastUpdated}
-                </p>
-              )}
-            </div> */}
+           
 
             <div className="p-6 md:p-8">
               {loading ? (
