@@ -74,11 +74,11 @@ const KlsGoldSlider = () => {
       setLoading(true);
       
       // Fetch gold price
-      const goldResponse = await fetch('http://127.0.0.1:8000/get-metal-rates?metal_type=gold');
+      const goldResponse = await fetch('https://klsbackend.onrender.com/get-metal-rates?metal_type=gold');
       const goldData = await goldResponse.json();
       
       // Fetch silver price
-      const silverResponse = await fetch('http://127.0.0.1:8000/get-metal-rates?metal_type=silver');
+      const silverResponse = await fetch('https://klsbackend.onrender.com/get-metal-rates?metal_type=silver');
       const silverData = await silverResponse.json();
       
       if (goldData.data && goldData.data.length > 0) {
