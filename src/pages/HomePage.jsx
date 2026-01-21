@@ -148,7 +148,7 @@ const HomePage = () => {
   return (
     <div className="bg-white">
       {/* Hero Slider */}
-      {/* <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden">
         <KlsGoldSlider />
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -156,13 +156,13 @@ const HomePage = () => {
           transition={{ duration: 0.8 }}
           className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-center"
         >
-          <div className="bg-black/70 backdrop-blur-sm px-8 py-3 rounded-full border border-yellow-600/30">
+          {/* <div className="bg-black/70 backdrop-blur-sm px-8 py-3 rounded-full border border-yellow-600/30">
             <p className="text-white text-sm font-light tracking-wider">
               EST. 1975 • TRADITION • EXCELLENCE • TRUST
             </p>
-          </div>
+          </div> */}
         </motion.div>
-      </section> */}
+      </section>
 
       {/* Our Values Section */}
       <section className="py-16 bg-gradient-to-b from-white to-gray-50">
