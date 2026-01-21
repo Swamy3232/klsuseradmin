@@ -294,7 +294,7 @@ const KlsGoldSlider = () => {
               <div className="flex items-center space-x-2">
                 <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`}></div>
                 <span className="text-gray-300 text-xs">
-                  {loading ? 'Updating...' : 'Live'}
+                  {loading ? 'Updating...' : 'Click to view Live Prices'}
                 </span>
               </div>
             </div>
