@@ -121,7 +121,7 @@ const KlsGoldSlider = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 1000,
+    autoplaySpeed: 2000,
     arrows: !isMobile,
     fade: true,
     cssEase: 'cubic-bezier(0.7, 0, 0.3, 1)',
