@@ -16,9 +16,9 @@ import {
 } from "react-icons/fa";
 
 // Import your images
-import img15 from "../assets/image/15.JPG";
-import img16 from "../assets/image/16.JPG";
-import img17 from "../assets/image/17.JPG";
+import img15 from "../assets/collections/15.webp";
+import img16 from "../assets/collections/5.webp";
+import img17 from "../assets/collections/17.jpg";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -81,15 +81,15 @@ const HomePage = () => {
     { 
       title: "New Collection", 
       path: "/collection", 
-      icon: <FaRegGem className="text-3xl mb-4 text-gray-600" />,
+      icon: <FaRegGem className="text-3xl mb-4 text-blue-600" />,
       description: "Discover our latest contemporary jewellery collections",
       image: img16,
-      gradient: "from-gray-700/90 to-gray-900/90",
+      gradient: "from-blue-600/90 to-purple-700/90",
       features: ["Seasonal Launch", "Limited Edition", "Trending Styles"]
     },
     { 
       title: "Store Location", 
-      path: "/location", 
+      path: "/contact", 
       icon: <FaStore className="text-3xl mb-4 text-yellow-600" />,
       description: "Visit our flagship store for personalized luxury experience",
       image: img17,
@@ -165,8 +165,8 @@ const HomePage = () => {
       </section>
 
       {/* Our Values Section */}
-      <section className="py-16 bg-gradient-to-b from-white to-gray-50">
-        <div className="container mx-auto px-4">
+      <section className="py-12 md:py-16 bg-gradient-to-b from-white to-gray-50">
+        <div className="container mx-auto px-4 md:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -174,10 +174,10 @@ const HomePage = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               The KLS Gold Promise
             </h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto">
               Three generations of trust, purity, and exceptional craftsmanship
             </p>
           </motion.div>
@@ -193,13 +193,13 @@ const HomePage = () => {
                 whileHover={{ y: -5 }}
                 className="text-center"
               >
-                <div className={`${value.bgColor} w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-gray-100 shadow-sm`}>
+                <div className={`${value.bgColor} w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 border border-gray-100 shadow-sm`}>
                   <div className={value.color}>
                     {value.icon}
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{value.title}</h3>
+                <p className="text-gray-600 text-sm md:text-base">{value.description}</p>
               </motion.div>
             ))}
           </div>
@@ -207,8 +207,8 @@ const HomePage = () => {
       </section>
 
       {/* Quick Navigation */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4 md:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -218,11 +218,11 @@ const HomePage = () => {
           >
             <div className="inline-block mb-4">
               <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-amber-500 mx-auto mb-4"></div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">
                 Explore Our World
               </h2>
             </div>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto">
               Discover excellence in every piece, crafted with generations of expertise
             </p>
           </motion.div>
@@ -240,7 +240,7 @@ const HomePage = () => {
                 className="group cursor-pointer relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-white"
               >
                 {/* Background Image with Overlay */}
-                <div className="relative h-64 overflow-hidden">
+                <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
                   <img 
                     src={item.image} 
                     alt={item.title}
@@ -263,9 +263,9 @@ const HomePage = () => {
                   </div>
                 </div>
                 
-                <div className="p-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">{item.description}</p>
+                <div className="p-6 md:p-8">
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                  <p className="text-gray-600 mb-4 md:mb-6 leading-relaxed text-sm md:text-base">{item.description}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center text-yellow-600 font-semibold group-hover:translate-x-2 transition-transform duration-300">
                       <span>Explore</span>
@@ -284,21 +284,21 @@ const HomePage = () => {
       </section>
 
       {/* Gold Mine Plan */}
-      <section ref={planRef} className="py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
-        <div className="container mx-auto px-4">
+      <section ref={planRef} className="py-16 md:py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-3 mb-4">
-              <FaCalendarAlt className="text-3xl text-yellow-600" />
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
+            <div className="inline-flex items-center gap-2 md:gap-3 mb-4">
+              <FaCalendarAlt className="text-2xl md:text-3xl text-yellow-600" />
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">
                 KLS Gold Investment Plans
               </h2>
             </div>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto">
               Secure your future with our exclusive gold savings schemes
             </p>
           </motion.div>
@@ -314,20 +314,20 @@ const HomePage = () => {
                 className={`relative rounded-2xl p-8 border ${plan.borderColor} bg-gradient-to-br ${plan.color} shadow-xl hover:shadow-2xl transition-all duration-300 group`}
               >
                 {/* Header */}
-                <div className="flex items-start justify-between mb-8">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-6 md:mb-8">
+                  <div className="flex items-center gap-3 md:gap-4 mb-4 sm:mb-0">
+                    <div className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-xl flex items-center justify-center shadow-sm">
                       {plan.icon}
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900">{plan.title}</h3>
-                      <p className="text-gray-600">{plan.months} Months • Secure Investment</p>
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-900">{plan.title}</h3>
+                      <p className="text-gray-600 text-sm md:text-base">{plan.months} Months • Secure Investment</p>
                     </div>
                   </div>
                   
                   {/* Benefit Badge */}
-                  <div className="bg-white px-4 py-2 rounded-full shadow-sm">
-                    <span className={`font-bold ${plan.highlightColor}`}>{plan.benefit}</span>
+                  <div className="bg-white px-3 md:px-4 py-2 rounded-full shadow-sm self-start">
+                    <span className={`font-bold text-sm md:text-base ${plan.highlightColor}`}>{plan.benefit}</span>
                   </div>
                 </div>
 
@@ -363,7 +363,7 @@ const HomePage = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate("/shema")}
+                  onClick={() => navigate("/chitti")}
                   className="w-full py-4 rounded-xl bg-gradient-to-r from-yellow-600 to-amber-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   Start {plan.months} Month Plan
@@ -383,39 +383,39 @@ const HomePage = () => {
             transition={{ delay: 0.4 }}
             className="mt-16 max-w-4xl mx-auto"
           >
-            <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
-              <h4 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-lg">
+              <h4 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 text-center">
                 Investment Benefits
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="text-center p-6 rounded-xl border border-gray-100 hover:border-yellow-200 transition-colors duration-300">
-                  <div className="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FaShieldAlt className="text-yellow-600" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                <div className="text-center p-4 md:p-6 rounded-xl border border-gray-100 hover:border-yellow-200 transition-colors duration-300">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                    <FaShieldAlt className="text-yellow-600 text-lg md:text-xl" />
                   </div>
-                  <h5 className="font-semibold text-gray-900 mb-2">100% Secure</h5>
+                  <h5 className="font-semibold text-gray-900 mb-2 text-sm md:text-base">100% Secure</h5>
                   <p className="text-sm text-gray-600">Bank-grade security for your investments</p>
                 </div>
                 
-                <div className="text-center p-6 rounded-xl border border-gray-100 hover:border-yellow-200 transition-colors duration-300">
-                  <div className="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FaHandshake className="text-yellow-600" />
+                <div className="text-center p-4 md:p-6 rounded-xl border border-gray-100 hover:border-yellow-200 transition-colors duration-300">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                    <FaHandshake className="text-yellow-600 text-lg md:text-xl" />
                   </div>
-                  <h5 className="font-semibold text-gray-900 mb-2">Easy Withdrawal</h5>
+                  <h5 className="font-semibold text-gray-900 mb-2 text-sm md:text-base">Easy Withdrawal</h5>
                   <p className="text-sm text-gray-600">Instant redemption options available</p>
                 </div>
                 
-                <div className="text-center p-6 rounded-xl border border-gray-100 hover:border-yellow-200 transition-colors duration-300">
-                  <div className="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FaAward className="text-yellow-600" />
+                <div className="text-center p-4 md:p-6 rounded-xl border border-gray-100 hover:border-yellow-200 transition-colors duration-300">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                    <FaAward className="text-yellow-600 text-lg md:text-xl" />
                   </div>
-                  <h5 className="font-semibold text-gray-900 mb-2">Bonus Value</h5>
+                  <h5 className="font-semibold text-gray-900 mb-2 text-sm md:text-base">Bonus Value</h5>
                   <p className="text-sm text-gray-600">Extra value on maturity of your plan</p>
                 </div>
               </div>
               
               <div className="mt-8 text-center">
                 <button 
-                  onClick={() => navigate("/shema")}
+                  onClick={() => navigate("/chitti")}
                   className="text-yellow-600 font-semibold hover:text-yellow-700 transition-colors duration-300"
                 >
                   View All Plans Details →
@@ -427,8 +427,8 @@ const HomePage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-yellow-50 to-amber-50">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-20 bg-gradient-to-r from-yellow-50 to-amber-50">
+        <div className="container mx-auto px-4 md:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -436,11 +436,11 @@ const HomePage = () => {
             viewport={{ once: true }}
             className="max-w-4xl mx-auto text-center"
           >
-            <div className="bg-white rounded-2xl p-12 shadow-xl border border-yellow-100">
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+            <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl border border-yellow-100">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 Begin Your Legacy
               </h2>
-              <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+              <p className="text-gray-600 text-base md:text-lg mb-8 max-w-2xl mx-auto">
                 Join thousands of families who trust KLS Gold for their most precious moments
               </p>
               
@@ -448,8 +448,8 @@ const HomePage = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate("/shema")}
-                  className="px-8 py-4 bg-gradient-to-r from-yellow-600 to-amber-600 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                  onClick={() => navigate("/chitti")}
+                  className="px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-yellow-600 to-amber-600 text-white font-bold text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   View Investment Plans
                 </motion.button>
@@ -457,7 +457,7 @@ const HomePage = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-white text-gray-700 font-bold text-lg rounded-full border border-gray-200 shadow-lg hover:shadow-xl hover:border-yellow-300 transition-all duration-300"
+                  className="px-6 md:px-8 py-3 md:py-4 bg-white text-gray-700 font-bold text-base md:text-lg rounded-full border border-gray-200 shadow-lg hover:shadow-xl hover:border-yellow-300 transition-all duration-300"
                 >
                   Book Store Visit
                 </motion.button>

@@ -2,25 +2,26 @@ import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Link } from "react-router-dom";
 
 // Import your images
-import img1 from "../assets/image/1.png";
-import img2 from "../assets/image/2.jpg";
-import img3 from "../assets/image/3.jpg";
-import img4 from "../assets/image/4.jpeg";
-import img5 from "../assets/image/5.png";
-import img6 from "../assets/image/6.PNG";
-import img7 from "../assets/image/7.PNG";
-import img8 from "../assets/image/8.PNG";
-import img9 from "../assets/image/9.PNG";
-import img10 from "../assets/image/10.JPG";
-import img11 from "../assets/image/11.JPG";
-import img12 from "../assets/image/12.JPG";
-import img13 from "../assets/image/13.JPG";
-import img14 from "../assets/image/14.JPG";
-import img15 from "../assets/image/15.JPG";
-import img16 from "../assets/image/16.JPG";
-import img17 from "../assets/image/17.JPG";
+import img1 from "../assets/collections/1.jpg";
+import img2 from "../assets/collections/2.jpg";
+import img3 from "../assets/collections/3.webp";
+import img4 from "../assets/collections/4.webp";
+import img5 from "../assets/collections/5.webp";
+import img6 from "../assets/collections/6.webp";
+import img7 from "../assets/collections/7.jpg";
+import img8 from "../assets/collections/8.jpg";
+import img9 from "../assets/collections/9.webp";
+import img10 from "../assets/collections/10.webp";
+import img11 from "../assets/collections/11.webp";
+import img12 from "../assets/collections/12.webp";
+import img13 from "../assets/collections/13.webp";
+import img14 from "../assets/collections/14.webp";
+import img15 from "../assets/collections/15.webp";
+import img16 from "../assets/collections/16.webp";
+import img17 from "../assets/collections/17.jpg";
 
 // Array of images with titles and optional descriptions
 const images = [
@@ -199,7 +200,7 @@ const KlsGoldSlider = () => {
                   <img
                     src={img.src}
                     alt={img.title}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-105"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 
@@ -231,12 +232,15 @@ const KlsGoldSlider = () => {
                       
                       {/* CTA Buttons - Stacked on mobile */}
                       <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
-                        <button className="px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white font-medium rounded-lg hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 text-sm md:text-base">
-                          Explore Collection
-                        </button>
+                       <Link to="/collection">
+  <button className="px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white font-medium rounded-lg hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 text-sm md:text-base">
+    Explore Collection
+  </button>
+</Link>                  <Link to="/contact">
                         <button className="px-4 md:px-6 py-2.5 md:py-3 bg-transparent border border-yellow-500/50 text-yellow-400 font-medium rounded-lg hover:bg-yellow-500/10 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 text-sm md:text-base">
                           Book Consultation
                         </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -289,16 +293,7 @@ const KlsGoldSlider = () => {
           </button>
           
           {/* Refresh indicator */}
-          <div className="fixed bottom-6 left-4 z-40">
-            <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-gray-700/50">
-              <div className="flex items-center space-x-2">
-                <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`}></div>
-                <span className="text-gray-300 text-xs">
-                  {loading ? 'Updating...' : 'Click to view Live Prices'}
-                </span>
-              </div>
-            </div>
-          </div>
+         
         </>
       )}
 

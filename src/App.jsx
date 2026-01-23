@@ -8,6 +8,7 @@ import PaymentUpdateForm from "./pages/payment";
 import Contact from "./pages/contact";
 import KLSGoldCollections from "./pages/Collections";
 import MetalRateCalculator from "./pages/MetalCalculator";
+import Gallery from "./pages/Gallery";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/collection" element={<KLSGoldCollections />} />
           <Route path="/metal-calculator" element={<MetalRateCalculator />} />
+          <Route path="/gallery" element={<Gallery />} />
         </Routes>
       </div>
 
