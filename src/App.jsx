@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/nav";
+import ScrollToTop from "./components/ScrollToTop";
 
 import Footer from "./components/footer";
 import HomePage from "./pages/HomePage";
@@ -13,6 +14,9 @@ import Gallery from "./pages/Gallery";
 function App() {
   return (
     <Router>
+      {/* Scroll to top on route change */}
+      <ScrollToTop />
+
       {/* Navbar */}
       <div className="fixed top-0 left-0 w-full z-50">
         <Navbar />
