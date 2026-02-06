@@ -23,7 +23,7 @@ function App() {
       </div>
 
       {/* Page Content */}
-      <div className="pt-20 min-h-screen"> {/* Adjust pt-20 to match navbar height */}
+      <div className="pt-48 min-h-screen"> {/* Adjusted to account for navbar height */}
         <Routes>
           {/* Home page */}
           <Route path="/" element={<HomePage />} />
