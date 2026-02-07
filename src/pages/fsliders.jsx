@@ -166,7 +166,19 @@ const KlsGoldSlider = () => {
               </p>
             </div>
             
-            {/* Live Price Badge - Desktop/Laptop only */}
+            {/* Live Price Badge - Mobile: compact tappable badge */}
+            {isMobile && allMetalPrices.gold?.length > 0 && (
+              <button
+                onClick={() => setShowPricesModal(true)}
+                className="flex lg:hidden items-center gap-1.5 px-2.5 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg border border-amber-200 shadow-sm text-amber-800 font-semibold text-xs"
+              >
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+                Gold ₹{allMetalPrices.gold[0]?.rate_per_gram?.toLocaleString('en-IN')}/g
+              </button>
+            )}
+            {/* Live Price Badge - Desktop/Laptop */}
             {!isMobile && allMetalPrices.gold?.length > 0 && (
               <button
                 onClick={() => setShowPricesModal(true)}
@@ -237,8 +249,8 @@ const KlsGoldSlider = () => {
         </div>
       </div>
 
-      {/* Professional Prices Modal - Desktop/Laptop only */}
-      {showPricesModal && !isMobile && (
+      {/* Professional Prices Modal - shows on both mobile and desktop */}
+      {showPricesModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-sm">
           <div className="relative bg-gradient-to-b from-gray-900 to-black w-full max-w-md sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl border border-yellow-900/50 max-h-[85vh] overflow-hidden">
             {/* Modal Header */}

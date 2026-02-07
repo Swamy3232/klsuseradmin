@@ -23,7 +23,7 @@ function App() {
       </div>
 
       {/* Page Content */}
-      <div className="pt-28 lg:pt-32 min-h-screen"> {/* Padding to clear fixed navbar */}
+      <div className="pt-20 sm:pt-24 lg:pt-32 min-h-screen"> {/* Minimal padding to clear fixed navbar on mobile */}
         <Routes>
           {/* Home page */}
           <Route path="/" element={<HomePage />} />
