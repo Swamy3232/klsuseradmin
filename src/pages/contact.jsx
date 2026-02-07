@@ -74,21 +74,21 @@ const Contact = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white py-8 sm:py-12 md:py-18 px-4 sm:px-5 lg:px-8">
+    <div className="bg-white py-6 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-12 md:mb-16">
-          <div className="inline-block p-3 md:p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl mb-6">
-            <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 flex items-center justify-center">
+        {/* Header Section - Bluestone style */}
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+          <div className="inline-block p-3 md:p-4 bg-amber-50 rounded-xl mb-4 sm:mb-6">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 mx-auto rounded-full bg-amber-600 flex items-center justify-center">
               <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
             Get In Touch
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto text-base md:text-lg">
+          <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base md:text-lg px-2">
             Visit our showroom or request a custom design consultation with our master craftsmen
           </p>
         </div>
@@ -99,7 +99,7 @@ const Contact = () => {
             {/* Brand Card */}
             <div className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-6 md:p-8 shadow-lg">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-yellow-600 to-yellow-700 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-amber-600 flex items-center justify-center flex-shrink-0">
                   <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -194,7 +194,7 @@ const Contact = () => {
             </div>
 
             {/* Quick Contact Options */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-200">
               <h3 className="font-bold text-gray-900 text-lg mb-4">Quick Contact Options</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <a href="https://wa.me/919448866788?text=Hello%20KLS%20Jewellers,%20I'm%20interested%20in%20your%20jewellery%20designs"
@@ -217,17 +217,17 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* RIGHT – DESIGN REQUEST FORM */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+          {/* RIGHT – DESIGN REQUEST FORM - Bluestone style */}
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm overflow-hidden border border-gray-200">
             {/* Form Header */}
-            <div className="bg-gradient-to-r from-yellow-600 to-yellow-700 p-6 md:p-8 text-white">
+            <div className="bg-amber-600 p-5 sm:p-6 md:p-8 text-white">
               <h3 className="text-xl md:text-2xl font-bold mb-2">Custom Jewellery Design</h3>
               <p className="text-yellow-100 opacity-90 text-sm md:text-base">
                 Share your design preferences and our experts will reach out to you
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-5 sm:p-6 md:p-8 space-y-5 md:space-y-6">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-5 md:space-y-6">
               <div className="grid md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">

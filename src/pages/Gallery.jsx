@@ -43,31 +43,31 @@ const images = [
 
 const Gallery = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
-      {/* Header Section */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-amber-900 mb-4">
-            KLS Gold Palace Gallery
+    <div className="min-h-screen bg-white">
+      {/* Header Section - Bluestone style */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+            KLS Jewels Gallery
           </h1>
-          <p className="text-lg md:text-xl text-amber-700 mb-6">
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 max-w-xl mx-auto">
             A Glimpse into Our Exquisite Collection
           </p>
         </div>
 
-        {/* CTA Section - Smaller */}
-        <div className="bg-gradient-to-br from-amber-900 to-yellow-900 rounded-2xl overflow-hidden shadow-xl mb-12 max-w-4xl mx-auto">
+        {/* CTA Section - Bluestone style */}
+        <div className="bg-amber-600 rounded-xl sm:rounded-2xl overflow-hidden mb-8 sm:mb-12 max-w-4xl mx-auto">
           <div className="relative overflow-hidden">
             {/* Decorative elements */}
             <div className="absolute -top-16 -right-16 w-32 h-32 bg-amber-500/10 rounded-full"></div>
             <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-yellow-500/10 rounded-full"></div>
             
-            <div className="relative z-10 p-6 md:p-8 text-center">
+            <div className="relative z-10 p-5 sm:p-6 md:p-8 text-center">
               <div className="max-w-2xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-serif font-bold text-white mb-4">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">
                   Discover Our Complete Collection
                 </h2>
-                <p className="text-base text-amber-100 mb-6 leading-relaxed">
+                <p className="text-sm sm:text-base text-amber-100 mb-4 sm:mb-6 leading-relaxed">
                   Explore our extensive range of premium gold, diamond, and precious stone 
                   jewelry at KLS Gold Palace.
                 </p>
@@ -75,7 +75,7 @@ const Gallery = () => {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                   <Link 
                     to="/collection" 
-                    className="group inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-semibold py-3 px-6 rounded-full text-base transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    className="group inline-flex items-center gap-2 bg-white hover:bg-amber-50 text-amber-600 font-semibold py-3 px-5 sm:px-6 rounded-lg text-sm sm:text-base transition-all duration-300"
                   >
                     <span>View Complete Collection</span>
                     <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,12 +101,12 @@ const Gallery = () => {
           </div>
         </div>
 
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-16">
+        {/* Gallery Grid - Bluestone responsive grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-12 sm:mb-16">
           {images.map((image, index) => (
             <div 
               key={index} 
-              className="group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-white"
+              className="group relative overflow-hidden rounded-xl sm:rounded-2xl border border-gray-200 hover:border-amber-200 hover:shadow-lg transition-all duration-300 bg-white"
             >
               <div className="aspect-square overflow-hidden">
                 <img 
@@ -126,15 +126,15 @@ const Gallery = () => {
               </div>
               
               {/* Title badge */}
-              <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-600 to-yellow-600 text-white px-4 py-2 rounded-full shadow-lg">
-                <span className="font-semibold text-sm">{image.title}</span>
+              <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-amber-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md sm:rounded-full">
+                <span className="font-semibold text-xs sm:text-sm">{image.title}</span>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Preview Note - Moved to Bottom */}
-        <div className="max-w-3xl mx-auto bg-gradient-to-r from-amber-100 to-yellow-50 p-6 rounded-2xl shadow-lg border border-amber-200 mb-8">
+        {/* Preview Note */}
+        <div className="max-w-3xl mx-auto bg-amber-50 p-4 sm:p-6 rounded-xl border border-amber-100 mb-8">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 mt-1">
               <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
@@ -154,11 +154,11 @@ const Gallery = () => {
         </div>
 
         {/* Footer Note */}
-        <div className="text-center">
-          <p className="text-sm text-amber-600">
-            <span className="font-semibold">KLS Gold Palace</span> • Where Tradition Meets Elegance
+        <div className="text-center px-2">
+          <p className="text-sm text-gray-600">
+            <span className="font-semibold">KLS Jewels</span> • Where Tradition Meets Elegance
           </p>
-          <p className="text-xs text-amber-500 mt-2">
+          <p className="text-xs text-gray-500 mt-2">
             All jewelry pieces are crafted with 22K & 24K gold with certified diamonds
           </p>
         </div>

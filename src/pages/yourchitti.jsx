@@ -105,20 +105,20 @@ const YourChitti = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-yellow-100 py-8 px-4">
+    <div className="min-h-screen bg-white py-6 sm:py-8 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <header className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-amber-900 mb-4">
-            YourChitti Gold KLS
+        {/* Header - Bluestone style */}
+        <header className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">
+            Your Chitti Gold
           </h1>
-          <p className="text-amber-700 text-lg">
+          <p className="text-gray-600 text-sm sm:text-base md:text-lg">
             Secure Gold Chitti Platform - Manage Your Investments
           </p>
         </header>
 
-        {/* Main Card */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        {/* Main Card - Bluestone clean card */}
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b">
             <button
@@ -463,8 +463,8 @@ const YourChitti = () => {
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 text-center text-gray-600 text-sm">
-          <p>© {new Date().getFullYear()} YourChitti Gold KLS. All rights reserved.</p>
+        <footer className="mt-8 sm:mt-12 text-center text-gray-500 text-xs sm:text-sm px-2">
+          <p>© {new Date().getFullYear()} KLS Jewels. All rights reserved.</p>
           <p className="mt-1">Secure Gold Chitti Management System</p>
         </footer>
       </div>

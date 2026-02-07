@@ -152,37 +152,30 @@ const KlsGoldSlider = () => {
   };
 
   return (
-    <div className="relative w-full overflow-hidden bg-black">
-      {/* Minimal Header for Mobile */}
+    <div className="relative w-full overflow-hidden bg-white">
+      {/* Minimal Header for Mobile - Bluestone style */}
       <div className="absolute top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-4 pt-4 md:pt-6">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <h1 className="text-xl md:text-3xl font-bold text-yellow-500 leading-tight">
-                KLS GOLD
+              <h1 className="text-xl md:text-3xl font-bold text-white leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+                KLS Jewels
               </h1>
-              <p className="text-gray-300 text-xs md:text-sm font-light uppercase tracking-wider">
+              <p className="text-white/90 text-xs md:text-sm font-light uppercase tracking-wider drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
                 Timeless Excellence
               </p>
             </div>
             
-            {/* Live Price Badge - Mobile */}
-            {isMobile && (
+            {/* Live Price Badge - Desktop/Laptop only */}
+            {!isMobile && allMetalPrices.gold?.length > 0 && (
               <button
                 onClick={() => setShowPricesModal(true)}
-                className="relative group"
+                className="hidden lg:flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg border border-amber-200 shadow-sm text-amber-800 font-medium text-sm transition-colors"
               >
-                <div className="relative">
-                  <div className="absolute inset-0 bg-yellow-600/20 blur-sm rounded-lg"></div>
-                  <div className="relative bg-gradient-to-r from-yellow-900/90 to-yellow-950/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-yellow-500/30 flex items-center space-x-2">
-                    <div className="w-5 h-5 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
-                      <svg className="w-2.5 h-2.5 text-yellow-900" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <span className="text-yellow-200 text-xs font-medium">Click to Live Prices</span>
-                  </div>
-                </div>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+                Gold ₹{allMetalPrices.gold[0]?.rate_per_gram?.toLocaleString('en-IN')}/g
               </button>
             )}
           </div>
@@ -194,52 +187,35 @@ const KlsGoldSlider = () => {
         <Slider {...settings}>
           {images.map((img, index) => (
             <div key={index} className="relative overflow-hidden">
-              <div className="relative w-full h-[60vh] md:h-[70vh] max-h-[700px]">
-                {/* Image with smooth zoom */}
-                <div className="absolute inset-0 overflow-hidden">
+              <div className="relative w-full h-[50vh] sm:h-[55vh] md:h-[65vh] max-h-[600px]">
+                <div className="absolute inset-0 overflow-hidden bg-white">
                   <img
                     src={img.src}
                     alt={img.title}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
-                
-                {/* Subtle gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent"></div>
-                
-                {/* Content overlay - Modern minimalist */}
-                <div className="absolute inset-0 flex items-end md:items-center">
-                  <div className="container mx-auto px-4 pb-8 md:pb-16 md:px-8">
-                    <div className="max-w-lg transform transition-all duration-700">
-                      {/* Subtle indicator */}
-                      <div className="flex items-center space-x-2 mb-3 md:mb-4">
-                        <div className="w-6 h-px bg-yellow-500"></div>
-                        <span className="text-yellow-400 text-xs uppercase tracking-widest">
-                          Premium Collection
-                        </span>
-                      </div>
-                      
-                      {/* Title */}
-                      <h2 className="text-2xl md:text-5xl font-bold text-white mb-2 md:mb-4 leading-tight">
+                {/* Bluestone-style: Light overlay for readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 flex items-end">
+                  <div className="w-full px-4 sm:px-6 lg:px-8 pb-8 md:pb-12">
+                    <div className="max-w-2xl">
+                      <h2 className="text-2xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
                         {img.title}
                       </h2>
-                      
-                      {/* Description */}
-                      <p className="text-gray-300 text-sm md:text-lg font-light mb-4 md:mb-6 max-w-md">
+                      <p className="text-white/90 text-sm md:text-base mb-4 max-w-md">
                         {img.description}
                       </p>
-                      
-                      {/* CTA Buttons - Stacked on mobile */}
-                      <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
-                       <Link to="/collection">
-  <button className="px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white font-medium rounded-lg hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 text-sm md:text-base">
-    Explore Collection
-  </button>
-</Link>                  <Link to="/contact">
-                        <button className="px-4 md:px-6 py-2.5 md:py-3 bg-transparent border border-yellow-500/50 text-yellow-400 font-medium rounded-lg hover:bg-yellow-500/10 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 text-sm md:text-base">
-                          Book Consultation
-                        </button>
+                      <div className="flex flex-wrap gap-3">
+                        <Link to="/collection">
+                          <button className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-md transition-colors text-sm">
+                            Explore Collection
+                          </button>
+                        </Link>
+                        <Link to="/contact">
+                          <button className="px-5 py-2.5 bg-white/90 hover:bg-white text-gray-900 font-medium rounded-md transition-colors text-sm">
+                            Book Consultation
+                          </button>
                         </Link>
                       </div>
                     </div>
@@ -250,55 +226,19 @@ const KlsGoldSlider = () => {
           ))}
         </Slider>
         
-        {/* Current slide indicator - Minimal */}
+        {/* Current slide indicator - Bluestone style */}
         <div className="absolute bottom-4 right-4 md:right-8 z-10">
-          <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1">
-            <span className="text-white text-xs font-mono">
-              <span className="text-yellow-400">{activeSlide + 1}</span>
-              <span className="text-gray-400">/{images.length}</span>
+          <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-sm">
+            <span className="text-gray-700 text-xs font-mono">
+              <span className="text-amber-600 font-semibold">{activeSlide + 1}</span>
+              <span className="text-gray-500">/{images.length}</span>
             </span>
           </div>
         </div>
       </div>
 
-      {/* Floating Action Button for Prices - Mobile */}
-      {isMobile && (
-        <>
-          {/* Fixed bottom button */}
-          <button
-            onClick={() => setShowPricesModal(true)}
-            className="fixed bottom-6 right-4 z-40 group"
-          >
-            <div className="relative">
-              {/* Animated ring */}
-              <div className="absolute inset-0 bg-yellow-500/20 rounded-full animate-ping opacity-75"></div>
-              
-              {/* Main button */}
-              <div className="relative bg-gradient-to-br from-yellow-600 to-yellow-800 backdrop-blur-sm p-3 rounded-full shadow-2xl border border-yellow-400/30 transform transition-all duration-300 hover:scale-110 hover:shadow-yellow-500/40">
-                <svg className="w-6 h-6 text-yellow-200" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                </svg>
-              </div>
-              
-              {/* Tooltip */}
-              <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                <div className="bg-black/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap border border-gray-700">
-                  View Live Prices
-                </div>
-                <div className="absolute top-1/2 left-full transform -translate-y-1/2">
-                  <div className="w-2 h-2 bg-black/90 rotate-45 border-r border-b border-gray-700"></div>
-                </div>
-              </div>
-            </div>
-          </button>
-          
-          {/* Refresh indicator */}
-         
-        </>
-      )}
-
-      {/* Professional Prices Modal */}
-      {showPricesModal && (
+      {/* Professional Prices Modal - Desktop/Laptop only */}
+      {showPricesModal && !isMobile && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-sm">
           <div className="relative bg-gradient-to-b from-gray-900 to-black w-full max-w-md sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl border border-yellow-900/50 max-h-[85vh] overflow-hidden">
             {/* Modal Header */}

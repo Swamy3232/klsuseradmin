@@ -252,17 +252,17 @@ const PaymentUpdateForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-4">
+    <div className="min-h-screen bg-white py-4 sm:py-8 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        {/* Header Section */}
+        {/* Header Section - Bluestone style */}
         <div className="text-center mb-6 sm:mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6">
-            <Wallet className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-amber-50 rounded-xl mb-4 sm:mb-6">
+            <Wallet className="w-7 h-7 sm:w-8 sm:h-8 text-amber-600" />
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">
             Update Your Payment
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 max-w-md mx-auto px-4">
+          <p className="text-sm text-gray-600 max-w-md mx-auto px-2 sm:px-4">
             Record your EMI payment with details of how you paid
           </p>
         </div>
@@ -270,10 +270,10 @@ const PaymentUpdateForm = () => {
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Left Side - Info Cards */}
           <div className="lg:col-span-1 space-y-4 sm:space-y-6">
-            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Payment Options</h3>
@@ -285,10 +285,10 @@ const PaymentUpdateForm = () => {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Instant Update</h3>
@@ -300,9 +300,9 @@ const PaymentUpdateForm = () => {
               </p>
             </div>
 
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+            <div className="bg-amber-600 rounded-xl p-4 sm:p-6 text-white">
               <h3 className="font-bold text-base sm:text-lg mb-2 sm:mb-3">Important Notes</h3>
-              <ul className="space-y-2 text-xs sm:text-sm text-blue-100">
+              <ul className="space-y-2 text-xs sm:text-sm text-amber-100">
                 <li className="flex items-start gap-2">
                   <div className="w-1 h-1 mt-1.5 rounded-full bg-white flex-shrink-0"></div>
                   <span>For cash payments, enter "CASH_PAYMENT" as reference</span>
@@ -323,8 +323,8 @@ const PaymentUpdateForm = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 shadow-lg p-4 sm:p-6 md:p-8">
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Send className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Send className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Payment Information</h2>
@@ -353,7 +353,7 @@ const PaymentUpdateForm = () => {
                       placeholder="Enter 10-digit registered number"
                       className={`w-full pl-12 sm:pl-14 pr-4 py-3 sm:py-3.5 border text-sm sm:text-base ${
                         formErrors.phone ? 'border-red-300' : 'border-gray-300'
-                      } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
+                      } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all`}
                       maxLength="10"
                     />
                   </div>
@@ -385,7 +385,7 @@ const PaymentUpdateForm = () => {
                       placeholder="0.00"
                       className={`w-full pl-10 pr-4 py-3 sm:py-3.5 border text-sm sm:text-base ${
                         formErrors.paidAmount ? 'border-red-300' : 'border-gray-300'
-                      } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
+                      } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all`}
                       step="0.01"
                       min="1"
                     />
@@ -412,17 +412,17 @@ const PaymentUpdateForm = () => {
                           key={method.id}
                           type="button"
                           onClick={() => handleMethodChange(method.id)}
-                          className={`p-3 sm:p-4 border rounded-lg sm:rounded-xl flex flex-col items-center justify-center gap-2 transition-all ${
+                          className={`p-3 sm:p-4 border rounded-lg flex flex-col items-center justify-center gap-2 transition-all ${
                             isSelected
-                              ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
-                              : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                              ? 'border-amber-500 bg-amber-50 ring-2 ring-amber-200'
+                              : 'border-gray-300 hover:border-amber-300 hover:bg-amber-50'
                           }`}
                         >
                           <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                            isSelected ? 'text-blue-600' : 'text-gray-600'
+                            isSelected ? 'text-amber-600' : 'text-gray-600'
                           }`} />
                           <span className={`text-xs font-medium ${
-                            isSelected ? 'text-blue-700' : 'text-gray-700'
+                            isSelected ? 'text-amber-700' : 'text-gray-700'
                           }`}>
                             {method.label}
                           </span>
@@ -460,7 +460,7 @@ const PaymentUpdateForm = () => {
                     disabled={formData.paymentMethod === "cash"}
                     className={`w-full px-4 py-3 sm:py-3.5 border text-sm sm:text-base ${
                       formErrors.referenceNumber ? 'border-red-300' : 'border-gray-300'
-                    } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                      } rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all ${
                       formData.paymentMethod === "cash" ? 'bg-gray-50 text-gray-500' : ''
                     }`}
                   />
@@ -574,7 +574,7 @@ const PaymentUpdateForm = () => {
                 <p className="text-xs sm:text-sm text-gray-600">
                   By submitting this payment update, you confirm that the information provided is accurate. 
                   False information may lead to account suspension.{" "}
-                  <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+                  <a href="#" className="text-amber-600 hover:text-amber-700 font-medium">
                     View payment guidelines
                   </a>
                 </p>

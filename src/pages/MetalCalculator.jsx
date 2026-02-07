@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Calculator, Scale, Gem, Sparkles, TrendingUp, Zap, Loader2, Info } from "lucide-react";
+import { Calculator, Scale, Gem, Sparkles, TrendingUp, Zap, Loader2, Info, RefreshCw, MessageCircle } from "lucide-react";
 
 const MetalRateCalculator = () => {
   const [metals, setMetals] = useState([]);
@@ -115,7 +115,7 @@ const MetalRateCalculator = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -253,7 +253,14 @@ const MetalRateCalculator = () => {
           </div>
           
           {/* Disclaimer */}
-          
+          <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+            <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-amber-800">
+              <span className="font-semibold">Note:</span> This calculator provides an estimate based on current market rates. 
+              Final pricing may vary based on craftsmanship, design complexity, making charges, and current market conditions. 
+              Please visit our store or contact us for exact pricing.
+            </p>
+          </div>
         </div>
 
         {/* Results & Current Rates Panel */}
@@ -377,25 +384,5 @@ const MetalRateCalculator = () => {
     </div>
   );
 };
-<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-blue-800">
-              <span className="font-semibold">Note:</span> This calculator provides an estimate based on current market rates. 
-              Final pricing may vary based on craftsmanship, design complexity, making charges, and current market conditions. 
-              Please visit our store or contact us for exact pricing.
-            </p>
-          </div>
-// Add missing icons
-const RefreshCw = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-  </svg>
-);
-
-const MessageCircle = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-  </svg>
-);
 
 export default MetalRateCalculator;

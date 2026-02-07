@@ -166,19 +166,19 @@ const KLSGoldCollections = () => {
     }
   };
 
-  // ----- RENDER -----
+  // ----- RENDER - Bluestone style -----
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-amber-700 to-amber-800 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+    <div className="min-h-screen bg-white">
+      {/* Header - Bluestone clean header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
             <div className="text-center sm:text-left">
-              <h1 className="text-3xl font-bold text-white mb-2">KLS Jewellers</h1>
-              <p className="text-amber-100">Premium Jewellery Collections</p>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1">KLS Jewels</h1>
+              <p className="text-gray-600 text-sm">Premium Jewellery Collections</p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-4 text-amber-100">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="hidden sm:flex items-center gap-3 sm:gap-4 text-gray-600 text-sm">
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4" />
                   <span>+91 94488 66788</span>
@@ -188,9 +188,9 @@ const KLSGoldCollections = () => {
                   <span>10 AM - 8 PM</span>
                 </div>
               </div>
-              <button className="relative p-2 text-amber-100 hover:text-white">
-                <Heart className="w-6 h-6" />
-                <span className="absolute -top-1 -right-1 bg-white text-amber-700 text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+              <button className="relative p-2 text-gray-600 hover:text-amber-600">
+                <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="absolute -top-0.5 -right-0.5 bg-amber-600 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center font-semibold">
                   {wishlist.size}
                 </span>
               </button>
@@ -200,7 +200,7 @@ const KLSGoldCollections = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Search & Controls */}
         <div className="mb-8 space-y-4">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
