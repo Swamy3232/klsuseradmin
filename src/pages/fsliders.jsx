@@ -166,8 +166,8 @@ const KlsGoldSlider = () => {
               </p>
             </div>
             
-            {/* Live Price Badge - Mobile & Desktop */}
-            {allMetalPrices.gold?.length > 0 && (
+            {/* Live Price Badge - Desktop/Laptop only */}
+            {!isMobile && allMetalPrices.gold?.length > 0 && (
               <button
                 onClick={() => setShowPricesModal(true)}
                 className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg border border-amber-200 shadow-sm text-amber-800 font-medium text-xs md:text-sm transition-colors"
@@ -237,8 +237,8 @@ const KlsGoldSlider = () => {
         </div>
       </div>
 
-      {/* Professional Prices Modal - Desktop/Laptop only */}
-      {showPricesModal && !isMobile && (
+      {/* Professional Prices Modal - shows on both mobile and desktop */}
+      {showPricesModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-sm">
           <div className="relative bg-gradient-to-b from-gray-900 to-black w-full max-w-md sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl border border-yellow-900/50 max-h-[85vh] overflow-hidden">
             {/* Modal Header */}
