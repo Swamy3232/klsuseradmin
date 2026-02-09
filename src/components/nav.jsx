@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Search, MapPin, Store, Download, ChevronDown, X, Menu } from "lucide-react";
-import logo from "../assets/image/logo.png";
+import { Search, MapPin, Store, Download, ChevronDown, X, Menu, Instagram, MessageCircle, Mail } from "lucide-react";
+import logo from "../assets/image/newlogo.jpg";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -58,7 +58,7 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="w-full bg-white border-b border-gray-100 shadow-sm">
+    <header className="w-full bg-blue-700 border-b border-blue-800 shadow-sm">
       {/* Bluestone-style: Single clean header row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 lg:h-20">
@@ -70,10 +70,10 @@ const Navbar = () => {
               className="h-10 w-10 lg:h-12 lg:w-12 object-contain"
             />
             <div className="ml-2 lg:ml-3">
-              <span className="text-lg lg:text-xl font-semibold text-gray-900 block leading-tight">
-                KLS <span className="text-amber-600">Jewels</span>
+              <span className="text-lg lg:text-xl font-semibold text-white block leading-tight">
+                KLS <span className="text-yellow-300">Jewels</span>
               </span>
-              <span className="text-[10px] lg:text-xs text-gray-500 hidden sm:block">
+              <span className="text-[10px] lg:text-xs text-blue-100 hidden sm:block">
                 Excellence Since 1995
               </span>
             </div>
@@ -87,14 +87,14 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search Collection, Gallery, Chitti..."
-                className="w-full px-4 py-2.5 pl-10 bg-gray-50 border border-gray-200 rounded-md text-gray-700 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
+                className="w-full px-4 py-2.5 pl-10 bg-blue-50 border border-blue-200 rounded-md text-blue-900 placeholder-blue-400 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300/50 focus:border-yellow-300"
               />
               <Search
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               {searchSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-blue-50 rounded-md shadow-lg border border-blue-200 py-2 z-50">
                   {searchSuggestions.map((s, i) => (
                     <button
                       key={i}
@@ -103,7 +103,7 @@ const Navbar = () => {
                         navigate(s.path);
                         setSearchQuery("");
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-blue-900 hover:bg-blue-100"
                     >
                       {s.name}
                     </button>
@@ -117,13 +117,13 @@ const Navbar = () => {
           <div className="flex items-center gap-2 lg:gap-4">
             {/* Location - Desktop */}
             <div className="hidden lg:block relative group">
-              <button className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
+              <button className="flex items-center gap-2 px-3 py-2 text-blue-100 hover:text-yellow-300 text-sm font-medium">
                 <MapPin size={18} />
                 <span>Store</span>
                 <ChevronDown size={14} />
               </button>
-              <div className="absolute top-full right-0 mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+              <div className="absolute top-full right-0 mt-1 w-72 bg-blue-50 rounded-lg shadow-xl border border-blue-200 p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
                   <Store size={16} />
                   Our Location
                 </h4>
@@ -131,10 +131,10 @@ const Navbar = () => {
                   <button
                     key={store.id}
                     onClick={() => navigate("/contact")}
-                    className="w-full text-left p-3 hover:bg-gray-50 rounded-lg"
+                    className="w-full text-left p-3 hover:bg-blue-100 rounded-lg"
                   >
-                    <p className="font-medium text-gray-900">{store.name}</p>
-                    <p className="text-sm text-gray-600 mt-0">{store.address}</p>
+                    <p className="font-medium text-blue-900">{store.name}</p>
+                    <p className="text-sm text-blue-700 mt-0">{store.address}</p>
                   </button>
                 ))}
               </div>
@@ -152,7 +152,7 @@ const Navbar = () => {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setOpen(!open)}
-              className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md"
+              className="lg:hidden p-2 text-blue-100 hover:bg-blue-800 rounded-md"
               aria-label="Menu"
             >
               {open ? <X size={24} /> : <Menu size={24} />}
@@ -161,7 +161,7 @@ const Navbar = () => {
         </div>
 
         {/* Desktop: Horizontal Nav Links - Bluestone category bar */}
-        <nav className="hidden lg:flex items-center border-t border-gray-100 overflow-x-auto">
+        <nav className="hidden lg:flex items-center border-t border-blue-800 overflow-x-auto">
           <ul className="flex items-center gap-1 py-3 min-w-0">
             {mainNavItems.map((item) => (
               <li key={item.path}>
@@ -169,8 +169,8 @@ const Navbar = () => {
                   onClick={() => navigate(item.path)}
                   className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     location.pathname === item.path
-                      ? "text-amber-600 bg-amber-50"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      ? "text-yellow-300 bg-blue-800"
+                      : "text-blue-100 hover:text-yellow-300 hover:bg-blue-800"
                   } ${item.highlight ? "flex items-center gap-1.5" : ""}`}
                 >
                   {item.name}
@@ -186,17 +186,17 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {open && (
-        <div className="lg:hidden border-t border-gray-100 bg-white">
+        <div className="lg:hidden border-t border-blue-800 bg-blue-700">
           <div className="px-4 py-4 space-y-2">
             {/* Mobile Search */}
             <form onSubmit={handleSearch} className="flex items-center gap-2 mb-4">
-              <Search size={20} className="text-gray-400" />
+              <Search size={20} className="text-blue-200" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
-                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm"
+                className="flex-1 px-3 py-2 bg-blue-600 border border-blue-500 rounded-md text-sm text-blue-50 placeholder-blue-300"
               />
             </form>
             {mainNavItems.map((item) => (
@@ -208,8 +208,8 @@ const Navbar = () => {
                 }}
                 className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium ${
                   location.pathname === item.path
-                    ? "bg-amber-50 text-amber-600"
-                    : "text-gray-700 hover:bg-gray-50"
+                    ? "bg-blue-800 text-yellow-300"
+                    : "text-blue-100 hover:bg-blue-800"
                 }`}
               >
                 {item.name}
@@ -239,6 +239,43 @@ const Navbar = () => {
           onClick={() => setOpen(false)}
         />
       )}
+
+      {/* Social Media Links - Left Side */}
+      <div className="fixed left-4 top-32 lg:top-40 z-40 flex flex-col gap-4">
+        {/* Instagram */}
+        <a
+         href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
+          aria-label="Instagram"
+          title="Follow us on Instagram"
+        >
+          <Instagram size={20} />
+        </a>
+
+        {/* WhatsApp */}
+        <a
+          href="https://wa.me/919448866788"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center w-12 h-12 rounded-full bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:scale-110 transition-all duration-300"
+          aria-label="WhatsApp"
+          title="Contact us on WhatsApp"
+        >
+          <MessageCircle size={20} />
+        </a>
+
+        {/* Email */}
+        <a
+           href="mailto:korarlajewellerypalace@gmail.com"
+          className="flex items-center justify-center w-12 h-12 rounded-full bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg hover:scale-110 transition-all duration-300"
+          aria-label="Email"
+          title="Send us an email"
+        >
+          <Mail size={20} />
+        </a>
+      </div>
     </header>
   );
 };

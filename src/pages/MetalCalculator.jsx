@@ -12,6 +12,8 @@ const MetalRateCalculator = () => {
   const [calculatedPrice, setCalculatedPrice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [ratesLastUpdated, setRatesLastUpdated] = useState("");
+  const [basePrice, setBasePrice] = useState(null); // Store base price without making charges
+  const [gold24kRate, setGold24kRate] = useState(null); // Store 24k gold rate
 
   useEffect(() => {
     fetchMetalRates();
@@ -22,6 +24,16 @@ const MetalRateCalculator = () => {
       setLoading(true);
       const res = await axios.get("https://klsbackend.onrender.com/get-metal-rates");
       setMetals(res.data.data);
+      
+      // Find gold 24k rate
+      const gold24k = res.data.data.find(
+        metal => metal.metal_type.toLowerCase().includes('gold') && 
+        (metal.purity.toLowerCase().includes('24k') || metal.purity === '24')
+      );
+      
+      if (gold24k) {
+        setGold24kRate(gold24k.rate_per_gram);
+      }
       
       // Find the latest update timestamp
       const latestDate = res.data.data.reduce((latest, metal) => {
@@ -48,32 +60,103 @@ const MetalRateCalculator = () => {
   // Update purities when metal changes
   useEffect(() => {
     if (selectedMetal) {
-      const metalPurities = metals
-        .filter((m) => m.metal_type.toLowerCase() === selectedMetal.toLowerCase())
-        .map((m) => m.purity);
-      setPurities([...new Set(metalPurities)]);
-      setSelectedPurity("");
+      const metalLower = selectedMetal.toLowerCase();
+      
+      if (metalLower.includes('gold')) {
+        // For gold, show predefined purity options
+        setPurities(['24K', '22K', '20K', '18K']);
+        setSelectedPurity("24K");
+      } else {
+        // For other metals, use existing logic
+        const metalPurities = metals
+          .filter((m) => m.metal_type.toLowerCase() === selectedMetal.toLowerCase())
+          .map((m) => m.purity);
+        setPurities([...new Set(metalPurities)]);
+        setSelectedPurity(metalPurities[0] || "");
+      }
       setCalculatedPrice(null);
+      setBasePrice(null);
     }
   }, [selectedMetal, metals]);
+
+  // Calculate purity percentage for gold
+  const getGoldPurityPercentage = (purity) => {
+    switch (purity) {
+      case '24K': return 100; // 100%
+      case '22K': return 91.6; // Approximately 91.6% (22/24)
+      case '20K': return 83.3; // Approximately 83.3% (20/24)
+      case '18K': return 75.0; // 75% (18/24)
+      default: return 100;
+    }
+  };
+
+  // Calculate making charge percentage
+  const getMakingChargePercentage = (metal, purity) => {
+    const metalLower = metal.toLowerCase();
+    if (metalLower.includes('gold') && purity === '24K') {
+      return 12; // 12% for 24K gold
+    } else if (metalLower.includes('gold')) {
+      return 3; // 3% for other gold purities
+    }
+    return 3; // Default 3% for other metals
+  };
 
   const calculatePrice = () => {
     if (!selectedMetal || !selectedPurity || !weight) return;
 
-    const metal = metals.find(
-      (m) =>
-        m.metal_type.toLowerCase() === selectedMetal.toLowerCase() &&
+    const weightNum = parseFloat(weight);
+    if (isNaN(weightNum) || weightNum <= 0) return;
+
+    let baseRate = 0;
+    let metalRate = null;
+
+    // Check if selected metal is gold
+    if (selectedMetal.toLowerCase().includes('gold')) {
+      // For gold, calculate based on 24k rate and purity percentage
+      if (gold24kRate) {
+        const purityPercentage = getGoldPurityPercentage(selectedPurity);
+        baseRate = (gold24kRate * purityPercentage) / 100;
+        metalRate = {
+          rate_per_gram: baseRate,
+          rate_per_carat: baseRate // Assuming same rate for carat for simplicity
+        };
+      } else {
+        // Fallback to finding the metal in the list
+        metalRate = metals.find(
+          (m) => m.metal_type.toLowerCase() === selectedMetal.toLowerCase() &&
+          m.purity === selectedPurity
+        );
+        if (!metalRate) return;
+        baseRate = rateType === "per_gram" ? metalRate.rate_per_gram : metalRate.rate_per_carat;
+      }
+    } else {
+      // For non-gold metals, use existing logic
+      metalRate = metals.find(
+        (m) => m.metal_type.toLowerCase() === selectedMetal.toLowerCase() &&
         m.purity === selectedPurity
-    );
+      );
+      if (!metalRate) return;
+      baseRate = rateType === "per_gram" ? metalRate.rate_per_gram : metalRate.rate_per_carat;
+    }
 
-    if (!metal) return;
+    // Calculate base price without making charges
+    const priceWithoutMakingCharge = baseRate * weightNum;
+    setBasePrice(priceWithoutMakingCharge);
 
-    const price =
-      rateType === "per_gram"
-        ? metal.rate_per_gram * parseFloat(weight)
-        : metal.rate_per_carat * parseFloat(weight);
-
-    setCalculatedPrice(price);
+    // Calculate making charge
+    const makingChargePercentage = getMakingChargePercentage(selectedMetal, selectedPurity);
+    const makingChargeAmount = (priceWithoutMakingCharge * makingChargePercentage) / 100;
+    
+    // Calculate final price with making charge
+    const finalPrice = priceWithoutMakingCharge + makingChargeAmount;
+    
+    setCalculatedPrice({
+      finalPrice: finalPrice,
+      basePrice: priceWithoutMakingCharge,
+      makingCharge: makingChargeAmount,
+      makingChargePercentage: makingChargePercentage,
+      ratePerUnit: baseRate
+    });
   };
 
   const getMetalIcon = (metal) => {
@@ -98,32 +181,15 @@ const MetalRateCalculator = () => {
     setSelectedPurity("");
     setWeight("");
     setCalculatedPrice(null);
-  };
-
-  const getRatePerUnit = () => {
-    if (!selectedMetal || !selectedPurity) return null;
-    
-    const metal = metals.find(
-      (m) =>
-        m.metal_type.toLowerCase() === selectedMetal.toLowerCase() &&
-        m.purity === selectedPurity
-    );
-
-    if (!metal) return null;
-
-    return rateType === "per_gram" ? metal.rate_per_gram : metal.rate_per_carat;
+    setBasePrice(null);
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-      
-
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Calculator Panel */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-           
-
             <div className="p-6 md:p-8">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12">
@@ -205,6 +271,11 @@ const MetalRateCalculator = () => {
                           </button>
                         ))}
                       </div>
+                      {selectedMetal.toLowerCase().includes('gold') && gold24kRate && (
+                        <p className="text-sm text-gray-500 mt-2">
+                          {selectedPurity} gold is based on 24K rate: {formatCurrency(gold24kRate)}/gm
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -249,7 +320,6 @@ const MetalRateCalculator = () => {
                 </>
               )}
             </div>
-            
           </div>
           
           {/* Disclaimer */}
@@ -257,7 +327,8 @@ const MetalRateCalculator = () => {
             <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
             <p className="text-sm text-amber-800">
               <span className="font-semibold">Note:</span> This calculator provides an estimate based on current market rates. 
-              Final pricing may vary based on craftsmanship, design complexity, making charges, and current market conditions. 
+              For gold: 24K uses 12% making charge, other purities use 3%. 
+              Final pricing may vary based on craftsmanship, design complexity, and current market conditions. 
               Please visit our store or contact us for exact pricing.
             </p>
           </div>
@@ -266,66 +337,7 @@ const MetalRateCalculator = () => {
         {/* Results & Current Rates Panel */}
         <div className="space-y-6">
           {/* Current Rates */}
-         
-
-          {/* Results Display */}
-          {calculatedPrice !== null && (
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-2xl p-6">
-              <div className="text-center mb-4">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-600 rounded-full mb-3">
-                  <Scale className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Estimated Value</h3>
-              </div>
-
-              <div className="space-y-4">
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-amber-200">
-                  <div className="text-center">
-                    <div className="text-sm text-gray-600 mb-1">Total Estimated Value</div>
-                    <div className="text-3xl font-bold text-amber-700">
-                      {formatCurrency(calculatedPrice)}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-amber-100">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Metal:</span>
-                      <span className="font-medium text-gray-900">{selectedMetal}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Purity:</span>
-                      <span className="font-medium text-gray-900">{selectedPurity}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Weight:</span>
-                      <span className="font-medium text-gray-900">
-                        {weight} {rateType === "per_gram" ? "grams" : "carats"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Rate per unit:</span>
-                      <span className="font-medium text-gray-900">
-                        {formatCurrency(getRatePerUnit())}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => window.open(`https://wa.me/919448866788?text=${encodeURIComponent(
-                    `Hello KLS Jewellers,\n\nI calculated the value of my ${selectedMetal} (${selectedPurity}) weighing ${weight} ${rateType === "per_gram" ? 'grams' : 'carats'}.\nEstimated value: ${formatCurrency(calculatedPrice)}\n\nPlease provide more details.`
-                  )}`, '_blank')}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  Contact for Exact Quote
-                </button>
-              </div>
-            </div>
-          )}
-           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Zap className="w-5 h-5 text-amber-600" />
               Current Metal Rates
@@ -361,21 +373,91 @@ const MetalRateCalculator = () => {
             </button>
           </div>
 
+          {/* Results Display */}
+          {calculatedPrice !== null && (
+            <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-2xl p-6">
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-600 rounded-full mb-3">
+                  <Scale className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Estimated Value</h3>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-amber-200">
+                  <div className="text-center">
+                    <div className="text-sm text-gray-600 mb-1">Final Price (including making charge)</div>
+                    <div className="text-3xl font-bold text-amber-700">
+                      {formatCurrency(calculatedPrice.finalPrice)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-amber-100">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Metal:</span>
+                      <span className="font-medium text-gray-900">{selectedMetal}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Purity:</span>
+                      <span className="font-medium text-gray-900">{selectedPurity}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Weight:</span>
+                      <span className="font-medium text-gray-900">
+                        {weight} {rateType === "per_gram" ? "grams" : "carats"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Rate per unit:</span>
+                      <span className="font-medium text-gray-900">
+                        {formatCurrency(calculatedPrice.ratePerUnit)}
+                      </span>
+                    </div>
+                    {selectedMetal.toLowerCase().includes('gold') && (
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Gold purity value:</span>
+                        <span className="font-medium text-gray-900">
+                          {getGoldPurityPercentage(selectedPurity)}% of 24K
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => window.open(`https://wa.me/919448866788?text=${encodeURIComponent(
+                    `Hello KLS Jewellers,\n\nI calculated the value of my ${selectedMetal} (${selectedPurity}) weighing ${weight} ${rateType === "per_gram" ? 'grams' : 'carats'}.\nEstimated value: ${formatCurrency(calculatedPrice.finalPrice)}\n\nPlease provide more details.`
+                  )}`, '_blank')}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Contact for Exact Quote
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Quick Tips */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Tips</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Gold Purity Guide</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span className="text-sm text-gray-600">Select the exact purity for accurate calculation</span>
+                <span className="text-sm text-gray-600"><strong>24K (100%):</strong> Pure gold, 12% making charge</span>
               </li>
               <li className="flex items-start gap-2">
                 <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span className="text-sm text-gray-600">Rates are updated regularly from market sources</span>
+                <span className="text-sm text-gray-600"><strong>22K (91.6%):</strong> 22 parts gold, 3% making charge</span>
               </li>
               <li className="flex items-start gap-2">
                 <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span className="text-sm text-gray-600">Making charges may apply for jewellery items</span>
+                <span className="text-sm text-gray-600"><strong>20K (83.3%):</strong> 20 parts gold, 3% making charge</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+                <span className="text-sm text-gray-600"><strong>18K (75%):</strong> 18 parts gold, 3% making charge</span>
               </li>
             </ul>
           </div>
