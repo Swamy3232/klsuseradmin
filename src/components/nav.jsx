@@ -241,7 +241,7 @@ const Navbar = () => {
       )}
 
       {/* Social Media Links - Left Side */}
-      <div className="fixed left-4 top-32 lg:top-40 z-40 flex flex-col gap-4">
+      <div className="fixed left-2 sm:left-3 lg:left-4 top-24 sm:top-28 lg:top-40 z-40 flex flex-col gap-2 sm:gap-3 lg:gap-4">
         {/* Instagram */}
         <a
          href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
