@@ -166,16 +166,16 @@ const KlsGoldSlider = () => {
               </p>
             </div>
             
-            {/* Live Price Badge - Desktop/Laptop only */}
-            {!isMobile && allMetalPrices.gold?.length > 0 && (
+            {/* Live Price Badge - Mobile and Desktop */}
+            {allMetalPrices.gold?.length > 0 && (
               <button
                 onClick={() => setShowPricesModal(true)}
-                className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg border border-amber-200 shadow-sm text-amber-800 font-medium text-xs md:text-sm transition-colors"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 md:px-4 md:py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg border border-amber-200 shadow-sm text-amber-800 font-medium text-[10px] sm:text-xs md:text-sm transition-colors"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                 </svg>
-                Gold ₹{allMetalPrices.gold[0]?.rate_per_gram?.toLocaleString('en-IN')}/g
+                <span className="hidden sm:inline">Gold ₹</span><span className="sm:hidden">₹</span>{allMetalPrices.gold[0]?.rate_per_gram?.toLocaleString('en-IN')}/g
               </button>
             )}
           </div>
