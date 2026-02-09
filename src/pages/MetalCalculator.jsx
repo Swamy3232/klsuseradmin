@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Calculator, Scale, Gem, Sparkles, TrendingUp, Zap, Loader2, Info, RefreshCw, MessageCircle } from "lucide-react";
 
 const MetalRateCalculator = () => {
+  const resultsRef = useRef(null);
   const [metals, setMetals] = useState([]);
   const [selectedMetal, setSelectedMetal] = useState("");
   const [rateType, setRateType] = useState("per_gram");
@@ -157,6 +158,13 @@ const MetalRateCalculator = () => {
       makingChargePercentage: makingChargePercentage,
       ratePerUnit: baseRate
     });
+
+    // Scroll to results on mobile after calculation
+    setTimeout(() => {
+      if (resultsRef.current) {
+        resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const getMetalIcon = (metal) => {
@@ -375,7 +383,7 @@ const MetalRateCalculator = () => {
 
           {/* Results Display */}
           {calculatedPrice !== null && (
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-2xl p-6">
+            <div ref={resultsRef} className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-2xl p-6">
               <div className="text-center mb-4">
                 <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-600 rounded-full mb-3">
                   <Scale className="w-6 h-6 text-white" />
