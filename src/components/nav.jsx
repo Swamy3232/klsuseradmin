@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, MapPin, Store, Download, ChevronDown, X, Menu, Instagram, MessageCircle, Mail } from "lucide-react";
-import logo from "../assets/image/newlogo.jpg";
+import logo from "../assets/image/newlogo.png";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -67,7 +67,7 @@ const Navbar = () => {
             <img
               src={logo}
               alt="KLS Jewels"
-              className="h-10 w-10 lg:h-12 lg:w-12 object-contain"
+              className="h-15 w-15 lg:h-16 lg:w-16 object-contain"
             />
             <div className="ml-2 lg:ml-3">
               <span className="text-lg lg:text-xl font-semibold text-white block leading-tight">
