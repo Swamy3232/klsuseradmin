@@ -228,6 +228,40 @@ const Navbar = () => {
               <Download size={16} />
               Download App
             </button>
+            
+            {/* Social Media Links - Mobile */}
+            <div className="flex items-center justify-center gap-3 pt-4 border-t border-blue-600 mt-4">
+              <a
+                href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
+                aria-label="Instagram"
+                title="Follow us on Instagram"
+              >
+                <Instagram size={16} />
+              </a>
+
+              <a
+                href="https://wa.me/919448866788"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:scale-110 transition-all duration-300"
+                aria-label="WhatsApp"
+                title="Contact us on WhatsApp"
+              >
+                <MessageCircle size={16} />
+              </a>
+
+              <a
+                href="mailto:korarlajewellerypalace@gmail.com"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg hover:scale-110 transition-all duration-300"
+                aria-label="Email"
+                title="Send us an email"
+              >
+                <Mail size={16} />
+              </a>
+            </div>
           </div>
         </div>
       )}
@@ -240,14 +274,14 @@ const Navbar = () => {
         />
       )}
 
-      {/* Social Media Links - Left Side */}
-      <div className="fixed left-1.5 sm:left-2 lg:left-4 top-20 sm:top-24 lg:top-40 z-40 flex flex-col gap-1.5 sm:gap-2 lg:gap-4">
+      {/* Social Media Links - Left Side - Desktop and Tablet Only */}
+      <div className="hidden md:flex fixed left-2 lg:left-4 top-24 lg:top-40 z-40 flex-col gap-2 lg:gap-4">
         {/* Instagram */}
         <a
          href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
+          className="flex items-center justify-center w-11 lg:w-12 lg:h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
           aria-label="Instagram"
           title="Follow us on Instagram"
         >
@@ -259,7 +293,7 @@ const Navbar = () => {
           href="https://wa.me/919448866788"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:scale-110 transition-all duration-300"
+          className="flex items-center justify-center w-11 lg:w-12 lg:h-12 rounded-full bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:scale-110 transition-all duration-300"
           aria-label="WhatsApp"
           title="Contact us on WhatsApp"
         >
@@ -269,7 +303,7 @@ const Navbar = () => {
         {/* Email */}
         <a
            href="mailto:korarlajewellerypalace@gmail.com"
-          className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg hover:scale-110 transition-all duration-300"
+          className="flex items-center justify-center w-11 lg:w-12 lg:h-12 rounded-full bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg hover:scale-110 transition-all duration-300"
           aria-label="Email"
           title="Send us an email"
         >
