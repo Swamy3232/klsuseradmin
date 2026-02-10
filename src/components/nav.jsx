@@ -60,20 +60,20 @@ const Navbar = () => {
   return (
     <header className="w-full bg-blue-700 border-b border-blue-800 shadow-sm">
       {/* Bluestone-style: Single clean header row */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 lg:h-20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
             <img
               src={logo}
               alt="KLS Jewels"
-              className="h-15 w-15 lg:h-16 lg:w-16 object-contain"
+              className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 object-contain"
             />
-            <div className="ml-2 lg:ml-3">
-              <span className="text-lg lg:text-xl font-semibold text-white block leading-tight">
+            <div className="ml-1.5 sm:ml-2 lg:ml-3">
+              <span className="text-sm sm:text-lg lg:text-xl font-semibold text-white block leading-tight">
                 KLS <span className="text-yellow-300">Jewels</span>
               </span>
-              <span className="text-[10px] lg:text-xs text-blue-100 hidden sm:block">
+              <span className="text-[8px] sm:text-[10px] lg:text-xs text-blue-100 hidden sm:block">
                 Excellence Since 1995
               </span>
             </div>
@@ -114,10 +114,10 @@ const Navbar = () => {
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2 lg:gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
             {/* Location - Desktop */}
             <div className="hidden lg:block relative group">
-              <button className="flex items-center gap-2 px-3 py-2 text-blue-100 hover:text-yellow-300 text-sm font-medium">
+              <button className="flex items-center gap-2 px-3 py-2 text-blue-100 hover:text-yellow-300 text-xs sm:text-sm font-medium">
                 <MapPin size={18} />
                 <span>Store</span>
                 <ChevronDown size={14} />
@@ -187,16 +187,16 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {open && (
         <div className="lg:hidden border-t border-blue-800 bg-blue-700">
-          <div className="px-4 py-4 space-y-2">
+          <div className="px-3 sm:px-4 py-3 space-y-1 text-sm">
             {/* Mobile Search */}
-            <form onSubmit={handleSearch} className="flex items-center gap-2 mb-4">
-              <Search size={20} className="text-blue-200" />
+            <form onSubmit={handleSearch} className="flex items-center gap-2 mb-3">
+              <Search size={16} className="text-blue-200 flex-shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
-                className="flex-1 px-3 py-2 bg-blue-600 border border-blue-500 rounded-md text-sm text-blue-50 placeholder-blue-300"
+                className="flex-1 px-2.5 py-1.5 bg-blue-600 border border-blue-500 rounded text-xs text-blue-50 placeholder-blue-300"
               />
             </form>
             {mainNavItems.map((item) => (
@@ -206,7 +206,7 @@ const Navbar = () => {
                   navigate(item.path);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium ${
+                className={`w-full text-left px-3 py-2 rounded text-xs font-medium ${
                   location.pathname === item.path
                     ? "bg-blue-800 text-yellow-300"
                     : "text-blue-100 hover:bg-blue-800"
@@ -214,7 +214,7 @@ const Navbar = () => {
               >
                 {item.name}
                 {item.highlight && (
-                  <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  <span className="ml-2 inline-block w-1 h-1 rounded-full bg-amber-500" />
                 )}
               </button>
             ))}
@@ -223,9 +223,9 @@ const Navbar = () => {
                 window.open(apkDownloadLink, "_blank");
                 setOpen(false);
               }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 text-white font-medium rounded-lg mt-2"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-amber-600 text-white text-xs font-medium rounded mt-2"
             >
-              <Download size={18} />
+              <Download size={16} />
               Download App
             </button>
           </div>
@@ -241,17 +241,17 @@ const Navbar = () => {
       )}
 
       {/* Social Media Links - Left Side */}
-      <div className="fixed left-2 sm:left-3 lg:left-4 top-24 sm:top-28 lg:top-40 z-40 flex flex-col gap-2 sm:gap-3 lg:gap-4">
+      <div className="fixed left-1.5 sm:left-2 lg:left-4 top-20 sm:top-24 lg:top-40 z-40 flex flex-col gap-1.5 sm:gap-2 lg:gap-4">
         {/* Instagram */}
         <a
          href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
+          className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
           aria-label="Instagram"
           title="Follow us on Instagram"
         >
-          <Instagram size={20} />
+          <Instagram size={18} />
         </a>
 
         {/* WhatsApp */}
@@ -259,21 +259,21 @@ const Navbar = () => {
           href="https://wa.me/919448866788"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center w-12 h-12 rounded-full bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:scale-110 transition-all duration-300"
+          className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:scale-110 transition-all duration-300"
           aria-label="WhatsApp"
           title="Contact us on WhatsApp"
         >
-          <MessageCircle size={20} />
+          <MessageCircle size={18} />
         </a>
 
         {/* Email */}
         <a
            href="mailto:korarlajewellerypalace@gmail.com"
-          className="flex items-center justify-center w-12 h-12 rounded-full bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg hover:scale-110 transition-all duration-300"
+          className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg hover:scale-110 transition-all duration-300"
           aria-label="Email"
           title="Send us an email"
         >
-          <Mail size={20} />
+          <Mail size={18} />
         </a>
       </div>
     </header>
