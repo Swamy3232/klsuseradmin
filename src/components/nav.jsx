@@ -16,6 +16,7 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showPricesModal, setShowPricesModal] = useState(false);
+  const [currentPriceIndex, setCurrentPriceIndex] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -24,10 +25,33 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchAllMetalPrices();
-    const interval = setInterval(fetchAllMetalPrices, 300000); // Update every 5 minutes
+    const interval = setInterval(fetchAllMetalPrices, 5000); // Update every 5 seconds
     
     return () => clearInterval(interval);
   }, []);
+
+  // Rotate through different purities every 5 seconds
+  useEffect(() => {
+    const getAllPricesToShow = () => {
+      const allPrices = [];
+      if (allMetalPrices.gold && allMetalPrices.gold.length > 0) {
+        allPrices.push(...allMetalPrices.gold);
+      }
+      if (allMetalPrices.silver && allMetalPrices.silver.length > 0) {
+        allPrices.push(...allMetalPrices.silver);
+      }
+      return allPrices;
+    };
+
+    const allPricesToShow = getAllPricesToShow();
+    if (allPricesToShow.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentPriceIndex((prev) => (prev + 1) % allPricesToShow.length);
+      }, 5000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [allMetalPrices]);
 
   const fetchAllMetalPrices = async () => {
     try {
@@ -120,26 +144,47 @@ const Navbar = () => {
   return (
     <>
       {/* Price Ticker Header - Above Navigation */}
-      <div className="w-full bg-gradient-to-r from-amber-700 to-amber-800 text-white py-2 sticky top-0 z-50 shadow-md">
+      <div className="w-full bg-gradient-to-r from-amber-700 to-amber-800 text-white py-2 sticky top-0 z-50 shadow-md overflow-x-auto">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-2">
-            {/* Left: Gold Price Display */}
-            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
-              <span className="font-semibold hidden sm:inline">Today's Live Gold Price:</span>
-              <span className="font-semibold sm:hidden">Gold:</span>
+          <div className="flex items-center justify-between gap-3 min-w-max sm:min-w-0">
+            {/* Left: Rotating Metal Price Display */}
+            <div className="flex items-center gap-3 text-xs sm:text-sm md:text-base">
               {loading ? (
-                <span className="text-amber-100">Loading...</span>
-              ) : error || !allMetalPrices.gold?.length ? (
-                <span className="text-amber-100">--</span>
-              ) : (
-                <span className="font-bold text-yellow-200">
-                  ₹{formatPrice(allMetalPrices.gold[0]?.rate_per_gram)}/g
-                </span>
-              )}
+                <span className="text-amber-100">Loading prices...</span>
+              ) : (() => {
+                // Get all prices to rotate through
+                const allPricesToShow = [];
+                if (allMetalPrices.gold && allMetalPrices.gold.length > 0) {
+                  allPricesToShow.push(...allMetalPrices.gold);
+                }
+                if (allMetalPrices.silver && allMetalPrices.silver.length > 0) {
+                  allPricesToShow.push(...allMetalPrices.silver);
+                }
+
+                // Get current price to display
+                const currentPrice = allPricesToShow[currentPriceIndex];
+
+                return currentPrice ? (
+                  <div className="flex items-center gap-1 animate-fade">
+                    <span className="font-semibold hidden sm:inline">
+                      {currentPrice.metal_type === 'gold' ? 'Gold' : 'Silver'}
+                    </span>
+                    <span className="font-semibold sm:hidden">
+                      {currentPrice.metal_type === 'gold' ? 'Au' : 'Ag'}:
+                    </span>
+                    <span className={`font-bold ${currentPrice.metal_type === 'gold' ? 'text-yellow-200' : 'text-gray-200'}`}>
+                      ₹{formatPrice(currentPrice.rate_per_gram)}
+                    </span>
+                    <span className="text-amber-100 text-xs">({currentPrice.purity || 'Standard'})</span>
+                  </div>
+                ) : (
+                  <span className="text-amber-100">--</span>
+                );
+              })()}
             </div>
 
             {/* Right: Action Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {/* View All Prices Button */}
               <button
                 onClick={() => setShowPricesModal(true)}
@@ -148,13 +193,14 @@ const Navbar = () => {
                 View Prices
               </button>
 
-              {/* Contact Button */}
-              <button
-                onClick={() => navigate("/contact")}
-                className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap"
+              {/* Call Button */}
+              <a
+                href="tel:9448866788"
+                className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap inline-flex items-center gap-1"
               >
-                Contact
-              </button>
+                <span className="hidden sm:inline">📞 Call</span>
+                <span className="sm:hidden">📞</span>
+              </a>
             </div>
           </div>
         </div>
@@ -165,13 +211,13 @@ const Navbar = () => {
         {/* Bluestone-style: Single clean header row */}
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16 lg:h-20">
-          {/* Left: Quick Contact Links - Mobile Only */}
-          <div className="lg:hidden flex items-center gap-1">
+          {/* Left: Social Icons - All Screen Sizes */}
+          <div className="flex items-center gap-1 flex-shrink-0">
             <a
               href="https://wa.me/919448866788"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+              className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
               title="WhatsApp"
             >
               <MessageCircle size={16} />
@@ -180,22 +226,22 @@ const Navbar = () => {
               href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition-colors"
+              className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition-colors"
               title="Instagram"
             >
               <Instagram size={16} />
             </a>
           </div>
 
-          {/* Center: Logo and Name - Smaller on Mobile */}
-          <Link to="/" className="flex items-center flex-shrink-0 flex-1 sm:flex-initial justify-center sm:justify-start sm:ml-0">
+          {/* Center: Logo and Name - Bigger Logo */}
+          <Link to="/" className="flex items-center flex-shrink-0 flex-1 justify-center sm:justify-start sm:ml-2">
             <img
               src={logo}
               alt="KLS Jewels"
-              className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 object-contain"
+              className="h-10 w-10 sm:h-12 sm:w-12 lg:h-16 lg:w-16 object-contain"
             />
-            <div className="ml-1.5 sm:ml-2 lg:ml-3">
-              <span className="text-xs sm:text-lg lg:text-xl font-semibold text-gray-900 block leading-tight">
+            <div className="ml-2 sm:ml-3 lg:ml-4">
+              <span className="text-[10px] sm:text-base lg:text-lg font-semibold text-gray-900 block leading-tight">
                 KOMARLA <span className="text-amber-600">JEWELLWEY</span>
               </span>
               <span className="text-[7px] sm:text-[10px] lg:text-xs text-gray-500 block">
@@ -412,8 +458,8 @@ const Navbar = () => {
         />
       )}
 
-      {/* Social Media Links - Left Side - Desktop and Tablet Only */}
-      <div className="hidden md:flex fixed left-2 lg:left-4 top-32 lg:top-44 z-30 flex-col gap-2 lg:gap-4">
+      {/* Social Media Links - Right Side - Desktop and Tablet Only */}
+      <div className="hidden md:flex fixed right-2 lg:right-4 top-32 lg:top-44 z-30 flex-col gap-2 lg:gap-4">
         {/* Instagram */}
         <a
          href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
