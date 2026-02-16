@@ -198,7 +198,7 @@ const Navbar = () => {
               <span className="text-xs sm:text-lg lg:text-xl font-semibold text-gray-900 block leading-tight">
                 KOMARLA <span className="text-amber-600">JEWELLWEY</span>
               </span>
-              <span className="text-[8px] sm:text-[10px] lg:text-xs text-gray-500 hidden sm:block">
+              <span className="text-[7px] sm:text-[10px] lg:text-xs text-gray-500 block">
                 BY KLS GROUP SINCE 1975
               </span>
             </div>
