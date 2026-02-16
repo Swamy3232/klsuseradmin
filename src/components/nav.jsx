@@ -121,11 +121,16 @@ const Navbar = () => {
     <>
       {/* Price Ticker Header - Above Navigation */}
       <div className="w-full bg-gradient-to-r from-amber-700 to-amber-800 text-white py-2 sticky top-0 z-50 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
-            {/* Left: Gold Price Display */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-2">
+            {/* Left: Empty on mobile, Label on desktop */}
+            <div className="hidden sm:flex items-center gap-2 text-xs sm:text-sm md:text-base flex-1">
               <span className="font-semibold">Today's Live Gold Price:</span>
+            </div>
+
+            {/* Right: Gold Price Display - Visible on all screens */}
+            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
+              <span className="font-semibold sm:hidden">Gold:</span>
               {loading ? (
                 <span className="text-amber-100">Loading...</span>
               ) : error || !allMetalPrices.gold?.length ? (
@@ -137,12 +142,12 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Right: View All Prices Button */}
+            {/* View All Prices Button */}
             <button
               onClick={() => setShowPricesModal(true)}
-              className="px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105"
+              className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap ml-2"
             >
-              View All Prices
+              Prices
             </button>
           </div>
         </div>
@@ -151,26 +156,48 @@ const Navbar = () => {
       {/* Main Header */}
       <header className="w-full bg-white border-b border-gray-100 shadow-sm">
         {/* Bluestone-style: Single clean header row */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 lg:h-20">
-          {/* Logo */}
-          <Link to="/" className="flex items-center flex-shrink-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16 lg:h-20">
+          {/* Left: Quick Contact Links - Mobile Only */}
+          <div className="lg:hidden flex items-center gap-1">
+            <a
+              href="https://wa.me/919448866788"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+              title="WhatsApp"
+            >
+              <MessageCircle size={16} />
+            </a>
+            <a
+              href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition-colors"
+              title="Instagram"
+            >
+              <Instagram size={16} />
+            </a>
+          </div>
+
+          {/* Center: Logo and Name - Smaller on Mobile */}
+          <Link to="/" className="flex items-center flex-shrink-0 flex-1 sm:flex-initial justify-center sm:justify-start sm:ml-0">
             <img
               src={logo}
               alt="KLS Jewels"
-              className="h-10 w-10 lg:h-12 lg:w-12 object-contain"
+              className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 object-contain"
             />
-            <div className="ml-2 lg:ml-3">
-              <span className="text-lg lg:text-xl font-semibold text-gray-900 block leading-tight">
-                KOMARLA <span className="text-amber-600">JEWELLWEY PALACE</span>
+            <div className="ml-1.5 sm:ml-2 lg:ml-3">
+              <span className="text-xs sm:text-lg lg:text-xl font-semibold text-gray-900 block leading-tight">
+                KOMARLA <span className="text-amber-600">JEWELLWEY</span>
               </span>
-              <span className="text-[10px] lg:text-xs text-gray-500 hidden sm:block">
+              <span className="text-[8px] sm:text-[10px] lg:text-xs text-gray-500 hidden sm:block">
                 BY KLS GROUP SINCE 1975
               </span>
             </div>
           </Link>
 
-          {/* Center: Search - Bluestone style */}
+          {/* Center: Search - Desktop Only */}
           <div className="hidden lg:flex flex-1 max-w-xl mx-8">
             <form onSubmit={handleSearch} className="w-full relative">
               <input
@@ -205,7 +232,7 @@ const Navbar = () => {
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2 lg:gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-4 ml-1 sm:ml-0">
             {/* Location - Desktop */}
             <div className="hidden lg:block relative group">
               <button className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
@@ -246,7 +273,7 @@ const Navbar = () => {
               className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md"
               aria-label="Menu"
             >
-              {open ? <X size={24} /> : <Menu size={24} />}
+              {open ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
@@ -273,12 +300,12 @@ const Navbar = () => {
             ))}
           </ul>
         </nav>
-        </div>
+      </div>
       </header>
 
       {/* Mobile Menu */}
       {open && (
-        <div className="lg:hidden border-t border-gray-100 bg-white">
+        <div className="lg:hidden border-t border-gray-100 bg-white relative z-50">
           <div className="px-4 py-4 space-y-2">
             {/* Mobile Search */}
             <form onSubmit={handleSearch} className="flex items-center gap-2 mb-4">
@@ -373,7 +400,7 @@ const Navbar = () => {
       {/* Mobile overlay */}
       {open && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/20 z-40"
+          className="lg:hidden fixed inset-0 bg-black/20 z-30"
           onClick={() => setOpen(false)}
         />
       )}
@@ -623,5 +650,6 @@ const Navbar = () => {
     </>
   );
 };
+
 
 export default Navbar;

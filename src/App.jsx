@@ -24,7 +24,7 @@ function App() {
       </div>
 
       {/* Page Content */}
-      <div className="pt-24 sm:pt-32 lg:pt-40 min-h-screen"> {/* Padding to clear fixed navbar (price ticker + main header) */}
+      <div className="pt-20 sm:pt-28 lg:pt-40 min-h-screen"> {/* Padding to clear fixed navbar (price ticker + main header) */}
         <Routes>
           {/* Home page */}
           <Route path="/" element={<HomePage />} />
