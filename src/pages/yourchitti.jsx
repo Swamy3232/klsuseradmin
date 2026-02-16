@@ -455,6 +455,17 @@ const YourChitti = () => {
                         ></div>
                       </div>
                     </div>
+
+                    {/* Calculate Amount Button */}
+                    <div className="mt-8 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => navigate('/chittical')}
+                        className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all touch-manipulation min-h-[48px] active:from-green-800 active:to-green-900"
+                      >
+                        Calculate Investment Amount
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

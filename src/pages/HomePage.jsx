@@ -197,6 +197,22 @@ const HomePage = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Calculate Amount Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-8 flex justify-center"
+          >
+            <button
+              onClick={() => navigate("/chitti-calculator")}
+              className="px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+            >
+              <FaArrowRight className="text-lg" />
+              Calculate Investment Amount
+            </button>
+          </motion.div>
         </div>
       </section>
 

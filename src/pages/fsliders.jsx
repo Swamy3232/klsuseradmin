@@ -153,35 +153,6 @@ const KlsGoldSlider = () => {
 
   return (
     <div className="relative w-full overflow-hidden bg-white">
-      {/* Minimal Header for Mobile - Bluestone style */}
-      <div className="absolute top-0 left-0 right-0 z-50">
-        <div className="container mx-auto px-4 pt-4 md:pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <h1 className="text-xl md:text-3xl font-bold text-white leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-                KLS Jewels
-              </h1>
-              <p className="text-white/90 text-xs md:text-sm font-light uppercase tracking-wider drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
-                Timeless Excellence
-              </p>
-            </div>
-            
-            {/* Live Price Badge - Mobile and Desktop */}
-            {allMetalPrices.gold?.length > 0 && (
-              <button
-                onClick={() => setShowPricesModal(true)}
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 md:px-4 md:py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg border border-amber-200 shadow-sm text-amber-800 font-medium text-[10px] sm:text-xs md:text-sm transition-colors"
-              >
-                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                </svg>
-                <span className="hidden sm:inline">Gold ₹</span><span className="sm:hidden">₹</span>{allMetalPrices.gold[0]?.rate_per_gram?.toLocaleString('en-IN')}/g
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Main Slider */}
       <div className="relative">
         <Slider {...settings}>

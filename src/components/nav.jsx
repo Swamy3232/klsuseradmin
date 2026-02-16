@@ -8,11 +8,71 @@ const Navbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [allMetalPrices, setAllMetalPrices] = useState({
+    gold: [],
+    silver: [],
+    diamond: []
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showPricesModal, setShowPricesModal] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const apkDownloadLink =
     "https://drive.google.com/file/d/1v7xpcBh5YDqwXIpa8WyFmqQM6kqZEI9z/view?usp=drivesdk";
+
+  useEffect(() => {
+    fetchAllMetalPrices();
+    const interval = setInterval(fetchAllMetalPrices, 300000); // Update every 5 minutes
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchAllMetalPrices = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://klsbackend.onrender.com/get-metal-rates');
+      const data = await response.json();
+      
+      if (data.data && data.data.length > 0) {
+        const groupedPrices = data.data.reduce((acc, price) => {
+          if (!acc[price.metal_type]) {
+            acc[price.metal_type] = [];
+          }
+          acc[price.metal_type].push(price);
+          return acc;
+        }, {});
+        
+        setAllMetalPrices(groupedPrices);
+      }
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching metal prices:', err);
+      setError('Unable to fetch live prices');
+      setAllMetalPrices({
+        gold: [{
+          metal_type: "gold",
+          purity: "24K",
+          rate_per_gram: 14590,
+          currency: "INR"
+        }],
+        silver: [{
+          metal_type: "silver",
+          purity: "",
+          rate_per_gram: 295.75,
+          currency: "INR"
+        }]
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatPrice = (price) => {
+    if (!price) return '--';
+    return new Intl.NumberFormat('en-IN').format(price);
+  };
 
   const mainNavItems = [
     { name: "Home", path: "/" },
@@ -58,23 +118,54 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="w-full bg-blue-700 border-b border-blue-800 shadow-sm">
-      {/* Bluestone-style: Single clean header row */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-        <div className="flex justify-between items-center h-14 sm:h-16 lg:h-20">
+    <>
+      {/* Price Ticker Header - Above Navigation */}
+      <div className="w-full bg-gradient-to-r from-amber-700 to-amber-800 text-white py-2 sticky top-0 z-50 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            {/* Left: Gold Price Display */}
+            <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base">
+              <span className="font-semibold">Today's Live Gold Price:</span>
+              {loading ? (
+                <span className="text-amber-100">Loading...</span>
+              ) : error || !allMetalPrices.gold?.length ? (
+                <span className="text-amber-100">--</span>
+              ) : (
+                <span className="font-bold text-yellow-200">
+                  ₹{formatPrice(allMetalPrices.gold[0]?.rate_per_gram)}/g
+                </span>
+              )}
+            </div>
+
+            {/* Right: View All Prices Button */}
+            <button
+              onClick={() => setShowPricesModal(true)}
+              className="px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105"
+            >
+              View All Prices
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Header */}
+      <header className="w-full bg-white border-b border-gray-100 shadow-sm">
+        {/* Bluestone-style: Single clean header row */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
             <img
               src={logo}
               alt="KLS Jewels"
-              className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 object-contain"
+              className="h-10 w-10 lg:h-12 lg:w-12 object-contain"
             />
-            <div className="ml-1.5 sm:ml-2 lg:ml-3">
-              <span className="text-sm sm:text-lg lg:text-xl font-semibold text-white block leading-tight">
-                KLS <span className="text-yellow-300">Jewels</span>
+            <div className="ml-2 lg:ml-3">
+              <span className="text-lg lg:text-xl font-semibold text-gray-900 block leading-tight">
+                KOMARLA <span className="text-amber-600">JEWELLWEY PALACE</span>
               </span>
-              <span className="text-[8px] sm:text-[10px] lg:text-xs text-blue-100 hidden sm:block">
-                Excellence Since 1995
+              <span className="text-[10px] lg:text-xs text-gray-500 hidden sm:block">
+                BY KLS GROUP SINCE 1975
               </span>
             </div>
           </Link>
@@ -87,14 +178,14 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search Collection, Gallery, Chitti..."
-                className="w-full px-4 py-2.5 pl-10 bg-blue-50 border border-blue-200 rounded-md text-blue-900 placeholder-blue-400 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300/50 focus:border-yellow-300"
+                className="w-full px-4 py-2.5 pl-10 bg-gray-50 border border-gray-200 rounded-md text-gray-700 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
               />
               <Search
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               {searchSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-blue-50 rounded-md shadow-lg border border-blue-200 py-2 z-50">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50">
                   {searchSuggestions.map((s, i) => (
                     <button
                       key={i}
@@ -103,7 +194,7 @@ const Navbar = () => {
                         navigate(s.path);
                         setSearchQuery("");
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-blue-900 hover:bg-blue-100"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       {s.name}
                     </button>
@@ -114,16 +205,16 @@ const Navbar = () => {
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
+          <div className="flex items-center gap-2 lg:gap-4">
             {/* Location - Desktop */}
             <div className="hidden lg:block relative group">
-              <button className="flex items-center gap-2 px-3 py-2 text-blue-100 hover:text-yellow-300 text-xs sm:text-sm font-medium">
+              <button className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
                 <MapPin size={18} />
                 <span>Store</span>
                 <ChevronDown size={14} />
               </button>
-              <div className="absolute top-full right-0 mt-1 w-72 bg-blue-50 rounded-lg shadow-xl border border-blue-200 p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+              <div className="absolute top-full right-0 mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                   <Store size={16} />
                   Our Location
                 </h4>
@@ -131,10 +222,10 @@ const Navbar = () => {
                   <button
                     key={store.id}
                     onClick={() => navigate("/contact")}
-                    className="w-full text-left p-3 hover:bg-blue-100 rounded-lg"
+                    className="w-full text-left p-3 hover:bg-gray-50 rounded-lg"
                   >
-                    <p className="font-medium text-blue-900">{store.name}</p>
-                    <p className="text-sm text-blue-700 mt-0">{store.address}</p>
+                    <p className="font-medium text-gray-900">{store.name}</p>
+                    <p className="text-sm text-gray-600 mt-0">{store.address}</p>
                   </button>
                 ))}
               </div>
@@ -152,7 +243,7 @@ const Navbar = () => {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setOpen(!open)}
-              className="lg:hidden p-2 text-blue-100 hover:bg-blue-800 rounded-md"
+              className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md"
               aria-label="Menu"
             >
               {open ? <X size={24} /> : <Menu size={24} />}
@@ -161,7 +252,7 @@ const Navbar = () => {
         </div>
 
         {/* Desktop: Horizontal Nav Links - Bluestone category bar */}
-        <nav className="hidden lg:flex items-center border-t border-blue-800 overflow-x-auto">
+        <nav className="hidden lg:flex items-center border-t border-gray-100 overflow-x-auto">
           <ul className="flex items-center gap-1 py-3 min-w-0">
             {mainNavItems.map((item) => (
               <li key={item.path}>
@@ -169,8 +260,8 @@ const Navbar = () => {
                   onClick={() => navigate(item.path)}
                   className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     location.pathname === item.path
-                      ? "text-yellow-300 bg-blue-800"
-                      : "text-blue-100 hover:text-yellow-300 hover:bg-blue-800"
+                      ? "text-amber-600 bg-amber-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   } ${item.highlight ? "flex items-center gap-1.5" : ""}`}
                 >
                   {item.name}
@@ -182,21 +273,22 @@ const Navbar = () => {
             ))}
           </ul>
         </nav>
-      </div>
+        </div>
+      </header>
 
       {/* Mobile Menu */}
       {open && (
-        <div className="lg:hidden border-t border-blue-800 bg-blue-700">
-          <div className="px-3 sm:px-4 py-3 space-y-1 text-sm">
+        <div className="lg:hidden border-t border-gray-100 bg-white">
+          <div className="px-4 py-4 space-y-2">
             {/* Mobile Search */}
-            <form onSubmit={handleSearch} className="flex items-center gap-2 mb-3">
-              <Search size={16} className="text-blue-200 flex-shrink-0" />
+            <form onSubmit={handleSearch} className="flex items-center gap-2 mb-4">
+              <Search size={20} className="text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
-                className="flex-1 px-2.5 py-1.5 bg-blue-600 border border-blue-500 rounded text-xs text-blue-50 placeholder-blue-300"
+                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm"
               />
             </form>
             {mainNavItems.map((item) => (
@@ -206,26 +298,72 @@ const Navbar = () => {
                   navigate(item.path);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-3 py-2 rounded text-xs font-medium ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium ${
                   location.pathname === item.path
-                    ? "bg-blue-800 text-yellow-300"
-                    : "text-blue-100 hover:bg-blue-800"
+                    ? "bg-amber-50 text-amber-600"
+                    : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
                 {item.name}
                 {item.highlight && (
-                  <span className="ml-2 inline-block w-1 h-1 rounded-full bg-amber-500" />
+                  <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-amber-500" />
                 )}
               </button>
             ))}
+            
+            {/* Divider */}
+            <div className="border-t border-gray-200 my-3"></div>
+            
+            {/* Social Links in Mobile Menu */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-500 uppercase px-4">Connect With Us</p>
+              
+              {/* WhatsApp */}
+              <a
+                href="https://wa.me/919448866788"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="w-full flex items-center gap-3 px-4 py-3 text-green-600 hover:bg-green-50 rounded-lg font-medium text-sm"
+              >
+                <MessageCircle size={18} />
+                <span>WhatsApp</span>
+              </a>
+              
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="w-full flex items-center gap-3 px-4 py-3 text-pink-600 hover:bg-pink-50 rounded-lg font-medium text-sm"
+              >
+                <Instagram size={18} />
+                <span>Instagram</span>
+              </a>
+              
+              {/* Email */}
+              <a
+                href="mailto:korarlajewellerypalace@gmail.com"
+                onClick={() => setOpen(false)}
+                className="w-full flex items-center gap-3 px-4 py-3 text-amber-600 hover:bg-amber-50 rounded-lg font-medium text-sm"
+              >
+                <Mail size={18} />
+                <span>Email</span>
+              </a>
+            </div>
+            
+            {/* Divider */}
+            <div className="border-t border-gray-200 my-3"></div>
+            
             <button
               onClick={() => {
                 window.open(apkDownloadLink, "_blank");
                 setOpen(false);
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-amber-600 text-white text-xs font-medium rounded mt-2"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 text-white font-medium rounded-lg mt-2"
             >
-              <Download size={16} />
+              <Download size={18} />
               Download App
             </button>
           </div>
@@ -235,50 +373,13 @@ const Navbar = () => {
       {/* Mobile overlay */}
       {open && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/20 z-[-1]"
+          className="lg:hidden fixed inset-0 bg-black/20 z-40"
           onClick={() => setOpen(false)}
         />
       )}
 
-      {/* Social Media Links - Right Side on Mobile */}
-      <div className="md:hidden fixed right-2 top-20 z-40 flex flex-col gap-1.5">
-        {/* Instagram */}
-        <a
-         href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
-          aria-label="Instagram"
-          title="Follow us on Instagram"
-        >
-          <Instagram size={16} />
-        </a>
-
-        {/* WhatsApp */}
-        <a
-          href="https://wa.me/919448866788"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:scale-110 transition-all duration-300"
-          aria-label="WhatsApp"
-          title="Contact us on WhatsApp"
-        >
-          <MessageCircle size={16} />
-        </a>
-
-        {/* Email */}
-        <a
-           href="mailto:korarlajewellerypalace@gmail.com"
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-600 text-white hover:bg-amber-700 hover:shadow-lg hover:scale-110 transition-all duration-300"
-          aria-label="Email"
-          title="Send us an email"
-        >
-          <Mail size={16} />
-        </a>
-      </div>
-
       {/* Social Media Links - Left Side - Desktop and Tablet Only */}
-      <div className="hidden md:flex fixed left-2 lg:left-4 top-24 lg:top-40 z-40 flex-col gap-2 lg:gap-4">
+      <div className="hidden md:flex fixed left-2 lg:left-4 top-32 lg:top-44 z-30 flex-col gap-2 lg:gap-4">
         {/* Instagram */}
         <a
          href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
@@ -313,7 +414,213 @@ const Navbar = () => {
           <Mail size={18} />
         </a>
       </div>
-    </header>
+
+      {/* Prices Modal */}
+    {showPricesModal && (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-sm">
+        <div className="relative bg-gradient-to-b from-gray-900 to-black w-full max-w-md sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl border border-yellow-900/50 max-h-[85vh] overflow-hidden">
+          {/* Modal Header */}
+          <div className="sticky top-0 bg-gradient-to-b from-gray-900 to-gray-950 p-4 sm:p-6 border-b border-gray-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-600 to-yellow-800 rounded-full flex items-center justify-center shadow-lg">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-200" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-white">Live Metal Rates</h2>
+                  <div className="flex items-center space-x-2 mt-0.5">
+                    <span className="text-green-400 text-xs">● REAL TIME</span>
+                    <span className="text-gray-400 text-xs">|</span>
+                    <span className="text-yellow-200/80 text-xs">
+                      {new Date().toLocaleDateString('en-IN', { 
+                        day: 'numeric', 
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPricesModal(false)}
+                className="text-gray-400 hover:text-white transition-colors p-1"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Modal Content */}
+          <div className="p-4 sm:p-6 overflow-y-auto">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="relative">
+                  <div className="w-16 h-16 border-2 border-yellow-900/30 rounded-full"></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+                  </div>
+                </div>
+                <p className="mt-4 text-gray-400">Fetching latest rates...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-900/20 to-red-950/10 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <p className="text-red-400 mb-4">{error}</p>
+                <button
+                  onClick={fetchAllMetalPrices}
+                  className="px-6 py-2 bg-gradient-to-r from-yellow-700 to-yellow-900 text-white rounded-lg hover:from-yellow-600 hover:to-yellow-800 transition-colors text-sm"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Gold Section */}
+                {allMetalPrices.gold && allMetalPrices.gold.length > 0 && (
+                  <div className="bg-gradient-to-br from-yellow-950/20 to-yellow-900/10 backdrop-blur-sm rounded-xl p-4 border border-yellow-900/30">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-yellow-600 to-yellow-800 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-yellow-200" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-semibold text-yellow-200">Gold</h3>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {allMetalPrices.gold.map((price, index) => (
+                        <div key={index} className="flex items-center justify-between py-2 border-b border-yellow-900/20 last:border-0">
+                          <div>
+                            <span className="text-gray-300 text-sm">{price.purity}</span>
+                            <p className="text-gray-400 text-xs">Gold Purity</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-yellow-300">
+                              ₹{formatPrice(price.rate_per_gram)}
+                              <span className="text-yellow-200/70 text-sm ml-1">/g</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Silver Section */}
+                {allMetalPrices.silver && allMetalPrices.silver.length > 0 && (
+                  <div className="bg-gradient-to-br from-gray-900/20 to-gray-800/10 backdrop-blur-sm rounded-xl p-4 border border-gray-800/30">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-gray-200" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-200">Silver</h3>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-gray-300 text-sm">{allMetalPrices.silver[0].purity || "24"} Purity</span>
+                        <p className="text-gray-400 text-xs">Fine Silver</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-300">
+                          ₹{formatPrice(allMetalPrices.silver[0].rate_per_gram)}
+                          <span className="text-gray-200/70 text-sm ml-1">/g</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Diamond Section */}
+                {allMetalPrices.diamond && allMetalPrices.diamond.length > 0 && (
+                  <div className="bg-gradient-to-br from-blue-950/20 to-blue-900/10 backdrop-blur-sm rounded-xl p-4 border border-blue-900/30">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-blue-200" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 2l4 4 4-4-2-2-2 2-2-2-2 2-2-2-2 2z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-semibold text-blue-200">Diamond</h3>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-gray-300 text-sm">Premium Quality</span>
+                        <p className="text-gray-400 text-xs">Fine Diamonds</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-blue-300">
+                          ₹{formatPrice(allMetalPrices.diamond[0].rate_per_carat)}
+                          <span className="text-blue-200/70 text-sm ml-1">/carat</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Disclaimer */}
+                <div className="pt-4 border-t border-gray-800">
+                  <p className="text-gray-500 text-xs text-center">
+                    Prices update every 5 minutes. Rates are indicative and may vary for custom jewelry.
+                  </p>
+                  <p className="text-gray-400 text-xs text-center mt-1">
+                    Last updated: {new Date().toLocaleTimeString('en-IN', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Modal Footer */}
+          <div className="sticky bottom-0 bg-gradient-to-t from-gray-950 to-transparent p-4 border-t border-gray-800">
+            <div className="flex gap-3">
+              <button
+                onClick={fetchAllMetalPrices}
+                disabled={loading}
+                className="flex-1 py-3 bg-gradient-to-r from-yellow-800 to-yellow-900 text-white font-medium rounded-lg hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 disabled:opacity-50 flex items-center justify-center space-x-2 text-sm"
+              >
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>UPDATING</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>REFRESH</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setShowPricesModal(false)}
+                className="flex-1 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-medium rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 text-sm"
+              >
+                CLOSE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

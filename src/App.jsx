@@ -10,6 +10,7 @@ import Contact from "./pages/contact";
 import KLSGoldCollections from "./pages/Collections";
 import MetalRateCalculator from "./pages/MetalCalculator";
 import Gallery from "./pages/Gallery";
+import GoldChittiCalculator from "./pages/chittical";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
       </div>
 
       {/* Page Content */}
-      <div className="pt-20 sm:pt-24 lg:pt-32 min-h-screen"> {/* Minimal padding to clear fixed navbar on mobile */}
+      <div className="pt-24 sm:pt-32 lg:pt-40 min-h-screen"> {/* Padding to clear fixed navbar (price ticker + main header) */}
         <Routes>
           {/* Home page */}
           <Route path="/" element={<HomePage />} />
@@ -35,6 +36,7 @@ function App() {
           <Route path="/collection" element={<KLSGoldCollections />} />
           <Route path="/metal-calculator" element={<MetalRateCalculator />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/chitti-calculator" element={<GoldChittiCalculator />} />
         </Routes>
       </div>
 
