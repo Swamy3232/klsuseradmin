@@ -123,13 +123,9 @@ const Navbar = () => {
       <div className="w-full bg-gradient-to-r from-amber-700 to-amber-800 text-white py-2 sticky top-0 z-50 shadow-md">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-2">
-            {/* Left: Empty on mobile, Label on desktop */}
-            <div className="hidden sm:flex items-center gap-2 text-xs sm:text-sm md:text-base flex-1">
-              <span className="font-semibold">Today's Live Gold Price:</span>
-            </div>
-
-            {/* Right: Gold Price Display - Visible on all screens */}
+            {/* Left: Gold Price Display */}
             <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
+              <span className="font-semibold hidden sm:inline">Today's Live Gold Price:</span>
               <span className="font-semibold sm:hidden">Gold:</span>
               {loading ? (
                 <span className="text-amber-100">Loading...</span>
@@ -142,13 +138,24 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* View All Prices Button */}
-            <button
-              onClick={() => setShowPricesModal(true)}
-              className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap ml-2"
-            >
-              Prices
-            </button>
+            {/* Right: Action Buttons */}
+            <div className="flex items-center gap-2">
+              {/* View All Prices Button */}
+              <button
+                onClick={() => setShowPricesModal(true)}
+                className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap"
+              >
+                View Prices
+              </button>
+
+              {/* Contact Button */}
+              <button
+                onClick={() => navigate("/contact")}
+                className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap"
+              >
+                Contact
+              </button>
+            </div>
           </div>
         </div>
       </div>
