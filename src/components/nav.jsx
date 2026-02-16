@@ -166,11 +166,8 @@ const Navbar = () => {
 
                 return currentPrice ? (
                   <div className="flex items-center gap-1 animate-fade">
-                    <span className="font-semibold hidden sm:inline">
+                    <span className="font-semibold">
                       {currentPrice.metal_type === 'gold' ? 'Gold' : 'Silver'}
-                    </span>
-                    <span className="font-semibold sm:hidden">
-                      {currentPrice.metal_type === 'gold' ? 'Au' : 'Ag'}:
                     </span>
                     <span className={`font-bold ${currentPrice.metal_type === 'gold' ? 'text-yellow-200' : 'text-gray-200'}`}>
                       ₹{formatPrice(currentPrice.rate_per_gram)}
