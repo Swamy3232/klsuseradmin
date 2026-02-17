@@ -213,7 +213,7 @@ const Navbar = () => {
             <img
               src={logo}
               alt="KLS Jewels"
-              className="h-8 w-8 object-contain"
+              className="h-12 w-10 object-contain"
             />
             <div className="ml-1.5">
               <span className="text-[9px] font-semibold text-gray-900 block leading-tight">
