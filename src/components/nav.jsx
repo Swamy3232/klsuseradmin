@@ -217,7 +217,7 @@ const Navbar = () => {
             />
             <div className="ml-1.5">
               <span className="text-[9px] font-semibold text-gray-900 block leading-tight">
-                KLS <span className="text-amber-600">JEWEL</span>
+                KOMARAL <span className="text-amber-600">JEWELLERY</span>
               </span>
               <span className="text-[6px] text-gray-500 block">
                 JEWELLERY
