@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import KlsGoldSlider from "./fsliders";
+import { Gem } from "lucide-react";
 import {
   FaGem,
   FaStore,
@@ -23,6 +24,8 @@ import chitti from "../assets/collections/chitti.jpg";
 const HomePage = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const [collections, setCollections] = useState([]);
+  const [categories, setCategories] = useState([]);
   const planRef = useRef(null);
 
   useEffect(() => {
@@ -36,6 +39,24 @@ const HomePage = () => {
     );
     if (planRef.current) observer.observe(planRef.current);
     return () => planRef.current && observer.unobserve(planRef.current);
+  }, []);
+
+  // Fetch collections
+  useEffect(() => {
+    const fetchCollections = async () => {
+      try {
+        const res = await fetch('https://test-check-q5kj.onrender.com/gold');
+        const json = await res.json();
+        if (Array.isArray(json.data)) {
+          setCollections(json.data);
+          const uniqueCategories = [...new Set(json.data.map(item => item.name))].sort();
+          setCategories(uniqueCategories);
+        }
+      } catch (e) {
+        console.error('Failed to fetch collections:', e);
+      }
+    };
+    fetchCollections();
   }, []);
 
   // Bluestone-style: Category grid (main browsing tiles)
@@ -109,6 +130,55 @@ const HomePage = () => {
       <section className="relative -mx-4 sm:-mx-6 lg:-mx-8">
         <KlsGoldSlider />
       </section>
+
+      {/* Collection Categories - Small circles */}
+      {categories.length > 0 && (
+        <section className="py-8 bg-gradient-to-b from-gray-50 to-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap gap-6 justify-center items-start">
+              {categories.map(category => {
+                const categoryItems = collections.filter(item => item.name === category);
+                const firstItem = categoryItems[0];
+                
+                return (
+                  <motion.div
+                    key={category}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    onClick={() => navigate('/collection', { state: { selectedCategory: category } })}
+                    className="flex flex-col items-center gap-2 cursor-pointer group"
+                  >
+                    <button
+                      className={`relative w-16 h-16 rounded-full overflow-hidden border-3 transition-all hover:border-amber-600 hover:shadow-md group-hover:scale-110`}
+                      style={{
+                        borderColor: 'rgb(209, 213, 219)'
+                      }}
+                      title={category}
+                    >
+                      {firstItem?.image_url ? (
+                        <img 
+                          src={firstItem.image_url} 
+                          alt={category} 
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                          <Gem className="w-5 h-5 text-amber-600" />
+                        </div>
+                      )}
+                    </button>
+                    <p className="text-xs font-medium text-gray-700 text-center max-w-[70px] line-clamp-2">
+                      {category}
+                    </p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Bluestone-style: Category Grid - Primary navigation */}
       <section className="py-12 lg:py-16 bg-white">

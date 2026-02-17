@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   Filter, Search, X, Grid, List, Heart, Info, Scale, User, Gem, Sparkles, Loader2, Star, Share2, Phone, MapPin, Clock
 } from 'lucide-react';
 
 const KLSGoldCollections = () => {
+  const location = useLocation();
   const [collections, setCollections] = useState([]);
   const [filteredCollections, setFilteredCollections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ const KLSGoldCollections = () => {
   const [wishlist, setWishlist] = useState(new Set());
   const [selectedItem, setSelectedItem] = useState(null);
   const [showQuickView, setShowQuickView] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(location.state?.selectedCategory || null);
   const [categories, setCategories] = useState([]);
 
   const itemTypes = ['Gold', 'Silver', 'Diamond', 'Platinum', 'Rose Gold', 'White Gold'];
@@ -48,7 +50,11 @@ const KLSGoldCollections = () => {
         // Extract unique categories by name
         const uniqueCategories = [...new Set(json.data.map(item => item.name))];
         setCategories(uniqueCategories.sort());
-        if (uniqueCategories.length > 0) {
+        
+        // Set selectedCategory from location state or first category
+        if (location.state?.selectedCategory) {
+          setSelectedCategory(location.state.selectedCategory);
+        } else if (selectedCategory === null && uniqueCategories.length > 0) {
           setSelectedCategory(uniqueCategories[0]);
         }
 
@@ -224,10 +230,10 @@ const KLSGoldCollections = () => {
                 const itemCount = categoryItems.length;
                 
                 return (
-                  <div key={category} className="flex flex-col items-center gap-2">
+                  <div key={category} className="flex flex-col items-center gap-2 flex-shrink-0">
                     <button
                       onClick={() => setSelectedCategory(category)}
-                      className={`relative w-24 h-24 rounded-full overflow-hidden border-4 transition-all flex-shrink-0 ${
+                      className={`relative w-24 h-24 rounded-full overflow-hidden border-4 transition-all ${
                         selectedCategory === category
                           ? 'border-amber-600 shadow-lg scale-110'
                           : 'border-gray-300 hover:border-amber-400 hover:shadow-md'
