@@ -239,7 +239,8 @@ const HomePage = () => {
           <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8 text-center">
             The KLS Gold Promise
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-6 max-w-5xl mx-auto">
+
             {values.map((v, idx) => (
               <motion.div
                 key={v.title}
