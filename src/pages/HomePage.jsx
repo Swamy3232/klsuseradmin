@@ -135,48 +135,59 @@ const HomePage = () => {
       {categories.length > 0 && (
         <section className="py-8 bg-gradient-to-b from-gray-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap gap-6 justify-center items-start">
-              {categories.map(category => {
-                const categoryItems = collections.filter(item => item.name === category);
-                const firstItem = categoryItems[0];
-                
-                return (
-                  <motion.div
-                    key={category}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    onClick={() => navigate('/collection', { state: { selectedCategory: category } })}
-                    className="flex flex-col items-center gap-2 cursor-pointer group"
-                  >
-                    <button
-                      className={`relative w-16 h-16 rounded-full overflow-hidden border-3 transition-all hover:border-amber-600 hover:shadow-md group-hover:scale-110`}
-                      style={{
-                        borderColor: 'rgb(209, 213, 219)'
-                      }}
-                      title={category}
+            <div className="lg:flex lg:flex-wrap lg:gap-6 lg:justify-center lg:items-start overflow-x-auto lg:overflow-visible scrollbar-hide">
+              <div className="flex gap-6 lg:flex-wrap lg:justify-center lg:w-full min-w-min lg:min-w-0">
+                {categories.map(category => {
+                  const categoryItems = collections.filter(item => item.name === category);
+                  const firstItem = categoryItems[0];
+                  
+                  return (
+                    <motion.div
+                      key={category}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      onClick={() => navigate('/collection', { state: { selectedCategory: category } })}
+                      className="flex flex-col items-center gap-2 cursor-pointer group flex-shrink-0"
                     >
-                      {firstItem?.image_url ? (
-                        <img 
-                          src={firstItem.image_url} 
-                          alt={category} 
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                          <Gem className="w-5 h-5 text-amber-600" />
-                        </div>
-                      )}
-                    </button>
-                    <p className="text-xs font-medium text-gray-700 text-center max-w-[70px] line-clamp-2">
-                      {category}
-                    </p>
-                  </motion.div>
-                );
-              })}
+                      <button
+                        className={`relative w-16 h-16 rounded-full overflow-hidden border-3 transition-all hover:border-amber-600 hover:shadow-md group-hover:scale-110`}
+                        style={{
+                          borderColor: 'rgb(209, 213, 219)'
+                        }}
+                        title={category}
+                      >
+                        {firstItem?.image_url ? (
+                          <img 
+                            src={firstItem.image_url} 
+                            alt={category} 
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                            <Gem className="w-5 h-5 text-amber-600" />
+                          </div>
+                        )}
+                      </button>
+                      <p className="text-xs font-medium text-gray-700 text-center max-w-[70px] line-clamp-2">
+                        {category}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
           </div>
+          <style>{`
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+            }
+            .scrollbar-hide {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+            }
+          `}</style>
         </section>
       )}
 
