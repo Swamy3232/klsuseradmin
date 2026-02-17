@@ -220,7 +220,7 @@ const Navbar = () => {
                 KOMARAL <span className="text-amber-600">JEWELLERY</span>
               </span>
               <span className="text-[6px] text-gray-500 block">
-                JEWELLERY
+                  BY KLS GROUP SINCE 1975
               </span>
             </div>
           </Link>
