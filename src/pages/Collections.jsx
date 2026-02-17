@@ -18,6 +18,8 @@ const KLSGoldCollections = () => {
   const [wishlist, setWishlist] = useState(new Set());
   const [selectedItem, setSelectedItem] = useState(null);
   const [showQuickView, setShowQuickView] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   const itemTypes = ['Gold', 'Silver', 'Diamond', 'Platinum', 'Rose Gold', 'White Gold'];
   const genders = ['Male', 'Female', 'Unisex'];
@@ -43,6 +45,13 @@ const KLSGoldCollections = () => {
         setCollections(json.data);
         setFilteredCollections(json.data);
 
+        // Extract unique categories by name
+        const uniqueCategories = [...new Set(json.data.map(item => item.name))];
+        setCategories(uniqueCategories.sort());
+        if (uniqueCategories.length > 0) {
+          setSelectedCategory(uniqueCategories[0]);
+        }
+
         const weights = json.data.map(i => Number(i.weight_gm)).filter(w => Number.isFinite(w));
         if (weights.length) {
           setWeightRange({ min: 0, max: Math.ceil(Math.max(...weights) / 100) * 100 });
@@ -57,10 +66,15 @@ const KLSGoldCollections = () => {
   };
 
   // Filters
-  useEffect(() => { applyFilters(); }, [searchTerm, selectedTypes, selectedGenders, selectedPurities, weightRange, sortBy, collections]);
+  useEffect(() => { applyFilters(); }, [searchTerm, selectedTypes, selectedGenders, selectedPurities, weightRange, sortBy, collections, selectedCategory]);
 
   const applyFilters = () => {
     let filtered = [...collections];
+
+    // Filter by selected category
+    if (selectedCategory) {
+      filtered = filtered.filter(i => i.name === selectedCategory);
+    }
 
     if (searchTerm) {
       filtered = filtered.filter(i => 
@@ -198,6 +212,66 @@ const KLSGoldCollections = () => {
           </div>
         </div>
       </header>
+
+      {/* Horizontal Categories Navigation with Images */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="overflow-x-auto scrollbar-hide">
+            <div className="flex gap-4 py-4 min-w-full">
+              {categories.map(category => {
+                const categoryItems = collections.filter(item => item.name === category);
+                const firstItem = categoryItems[0];
+                const itemCount = categoryItems.length;
+                
+                return (
+                  <div key={category} className="flex flex-col items-center gap-2">
+                    <button
+                      onClick={() => setSelectedCategory(category)}
+                      className={`relative w-24 h-24 rounded-full overflow-hidden border-4 transition-all flex-shrink-0 ${
+                        selectedCategory === category
+                          ? 'border-amber-600 shadow-lg scale-110'
+                          : 'border-gray-300 hover:border-amber-400 hover:shadow-md'
+                      }`}
+                      title={category}
+                    >
+                      {firstItem?.image_url ? (
+                        <img 
+                          src={firstItem.image_url} 
+                          alt={category} 
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                          <Gem className="w-8 h-8 text-amber-600" />
+                        </div>
+                      )}
+                      {selectedCategory === category && (
+                        <div className="absolute inset-0 bg-black/10 rounded-full"></div>
+                      )}
+                    </button>
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-gray-800 max-w-[100px] truncate">
+                        {category}
+                      </p>
+                      <p className="text-xs text-gray-500">({itemCount})</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <style>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
