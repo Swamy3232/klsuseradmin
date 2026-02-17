@@ -23,8 +23,8 @@ function App() {
         <Navbar />
       </div>
 
-      {/* Page Content */}
-      <div className="pt-20 sm:pt-28 lg:pt-40 min-h-screen"> {/* Padding to clear fixed navbar (price ticker + main header) */}
+      {/* Page Content - bottom padding clears fixed bottom menu bar */}
+      <div className="pt-20 sm:pt-28 lg:pt-40 pb-20 min-h-screen">
         <Routes>
           {/* Home page */}
           <Route path="/" element={<HomePage />} />
@@ -38,10 +38,9 @@ function App() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/chitti-calculator" element={<GoldChittiCalculator />} />
         </Routes>
-      </div>
 
-      {/* Footer */}
-      <Footer />
+        <Footer />
+      </div>
     </Router>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Search, MapPin, Store, Download, ChevronDown, X, Menu, Instagram, MessageCircle, Mail } from "lucide-react";
+import { Search, MapPin, Store, Download, ChevronDown, X, Menu, Instagram, MessageCircle, Mail, LayoutGrid, Wallet, Calculator, Scale, Loader2, Gem } from "lucide-react";
 import logo from "../assets/image/newlogo.png";
 
 const Navbar = () => {
@@ -17,8 +17,77 @@ const Navbar = () => {
   const [error, setError] = useState(null);
   const [showPricesModal, setShowPricesModal] = useState(false);
   const [currentPriceIndex, setCurrentPriceIndex] = useState(0);
+  const [showCollectionsModal, setShowCollectionsModal] = useState(false);
+  const [collectionsData, setCollectionsData] = useState([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [collModalTypes, setCollModalTypes] = useState([]);
+  const [collModalGenders, setCollModalGenders] = useState([]);
+  const [collModalPurities, setCollModalPurities] = useState([]);
+  const [collModalWeightMin, setCollModalWeightMin] = useState(0);
+  const [collModalWeightMax, setCollModalWeightMax] = useState(1000);
+  const [selectedCollectionName, setSelectedCollectionName] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const COLLECTION_API = "https://test-check-q5kj.onrender.com/gold";
+  const itemTypes = ["Gold", "Silver", "Diamond", "Platinum", "Rose Gold", "White Gold"];
+  const genders = ["Male", "Female", "Unisex", "Kids"];
+  const purities = ["18K", "22K", "24K", "925"];
+
+  const fetchCollectionsForModal = async () => {
+    setCollectionsLoading(true);
+    try {
+      const res = await fetch(COLLECTION_API);
+      const json = await res.json();
+      if (Array.isArray(json.data)) {
+        setCollectionsData(json.data);
+        const weights = json.data.map((i) => Number(i.weight_gm)).filter((w) => Number.isFinite(w));
+        if (weights.length) setCollModalWeightMax(Math.ceil(Math.max(...weights) / 100) * 100);
+      } else {
+        setCollectionsData([]);
+      }
+    } catch (e) {
+      console.error("Failed to fetch collections:", e);
+      setCollectionsData([]);
+    } finally {
+      setCollectionsLoading(false);
+    }
+  };
+
+  const openCollectionsModal = () => {
+    setShowCollectionsModal(true);
+    setSelectedCollectionName(null);
+    setOpen(false);
+    fetchCollectionsForModal();
+  };
+
+  const closeCollectionsModal = () => {
+    setShowCollectionsModal(false);
+    setSelectedCollectionName(null);
+  };
+
+  const goToCollectionsPage = () => {
+    closeCollectionsModal();
+    navigate("/collection", {
+      state: {
+        selectedTypes: collModalTypes,
+        selectedGenders: collModalGenders,
+        selectedPurities: collModalPurities,
+        weightMin: collModalWeightMin,
+        weightMax: collModalWeightMax,
+      },
+    });
+  };
+
+  const toggleCollType = (t) => setCollModalTypes((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  const toggleCollGender = (g) => setCollModalGenders((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
+  const toggleCollPurity = (p) => setCollModalPurities((prev) => (prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]));
+  const clearCollModalFilters = () => {
+    setCollModalTypes([]);
+    setCollModalGenders([]);
+    setCollModalPurities([]);
+    setCollModalWeightMin(0);
+  };
 
   const apkDownloadLink =
     "https://drive.google.com/file/d/1v7xpcBh5YDqwXIpa8WyFmqQM6kqZEI9z/view?usp=drivesdk";
@@ -100,17 +169,22 @@ const Navbar = () => {
 
   const mainNavItems = [
     { name: "Home", path: "/" },
-    { name: "Collection", path: "/collection" },
     { name: "Gallery", path: "/gallery" },
-    { name: "Your Chitti", path: "/chitti", highlight: true },
     { name: "Update Payment", path: "/update-your-payment" },
-    { name: "Calculator", path: "/metal-calculator" },
     { name: "Contacts", path: "/contact" },
   ];
 
+  const bottomNavItems = [
+    { name: "Collections", path: "/collection", icon: LayoutGrid },
+    { name: "Your Chitti", path: "/chitti", icon: Wallet, highlight: true },
+    { name: "Calculator", path: "/metal-calculator", icon: Calculator },
+  ];
+
+  const allNavItemsForSearch = [...mainNavItems, ...bottomNavItems];
+
   useEffect(() => {
     if (searchQuery.trim()) {
-      const suggestions = mainNavItems
+      const suggestions = allNavItemsForSearch
         .filter(
           (item) =>
             item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -385,12 +459,16 @@ const Navbar = () => {
                 className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm"
               />
             </form>
-            {mainNavItems.map((item) => (
+            {[...mainNavItems, ...bottomNavItems].map((item) => (
               <button
                 key={item.path}
                 onClick={() => {
-                  navigate(item.path);
-                  setOpen(false);
+                  if (item.path === "/collection") {
+                    openCollectionsModal();
+                  } else {
+                    navigate(item.path);
+                    setOpen(false);
+                  }
                 }}
                 className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium ${
                   location.pathname === item.path
@@ -508,6 +586,228 @@ const Navbar = () => {
           <Mail size={18} />
         </a>
       </div>
+
+      {/* Bottom Menu Bar - Collections, Your Chitti, Calculator */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <div className="max-w-7xl mx-auto px-2">
+          <div className="flex items-center justify-around h-16">
+            {bottomNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              const isCollections = item.path === "/collection";
+              const content = (
+                <>
+                  <span className="relative inline-block">
+                    <Icon size={22} className="flex-shrink-0" />
+                    {item.highlight && !isActive && (
+                      <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    )}
+                  </span>
+                  <span className="text-xs font-medium mt-1 truncate w-full text-center max-w-[80px]">
+                    {item.name}
+                  </span>
+                </>
+              );
+              if (isCollections) {
+                return (
+                  <button
+                    key={item.path}
+                    type="button"
+                    onClick={openCollectionsModal}
+                    className={`relative flex flex-col items-center justify-center flex-1 py-2 px-1 min-w-0 rounded-lg transition-colors ${
+                      isActive ? "text-amber-600 bg-amber-50" : "text-gray-600 hover:text-amber-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {content}
+                  </button>
+                );
+              }
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`relative flex flex-col items-center justify-center flex-1 py-2 px-1 min-w-0 rounded-lg transition-colors ${
+                    isActive ? "text-amber-600 bg-amber-50" : "text-gray-600 hover:text-amber-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {content}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+
+      {/* Collections Modal: Names → Filters → View collections (no direct navigate) */}
+      {showCollectionsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={closeCollectionsModal}>
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex-shrink-0 border-b border-gray-200 p-4 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-900">Collections</h3>
+              <button onClick={closeCollectionsModal} className="p-2 hover:bg-gray-100 rounded-full">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {collectionsLoading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="w-10 h-10 animate-spin text-amber-600 mb-3" />
+                  <p className="text-gray-500 text-sm">Loading collections...</p>
+                </div>
+              ) : (
+                <>
+                  {/* 1. Collection names with images (clickable, selectable) */}
+                  <div>
+                    <h4 className="font-medium mb-3 text-gray-800">Collections</h4>
+                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide min-h-[100px]">
+                      {(() => {
+                        const names = [...new Set(collectionsData.map((i) => i.name))].sort();
+                        if (names.length === 0) {
+                          return <p className="text-sm text-gray-500 py-2">No collections found.</p>;
+                        }
+                        return names.map((name) => {
+                          const items = collectionsData.filter((i) => i.name === name);
+                          const firstItem = items[0];
+                          const count = items.length;
+                          const isSelected = selectedCollectionName === name;
+                          return (
+                            <button
+                              key={name}
+                              type="button"
+                              onClick={() => setSelectedCollectionName(name)}
+                              className="flex flex-col items-center gap-1.5 flex-shrink-0 focus:outline-none cursor-pointer"
+                            >
+                              <div className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 transition-all shadow-sm ${
+                                isSelected
+                                  ? "border-amber-600 shadow-lg scale-110 bg-amber-50"
+                                  : "border-gray-200 hover:border-amber-400 bg-gray-100"
+                              }`}>
+                                {firstItem?.image_url ? (
+                                  <img
+                                    src={firstItem.image_url}
+                                    alt={name}
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-100 to-amber-200">
+                                    <Gem className="w-8 h-8 text-amber-600" />
+                                  </div>
+                                )}
+                                {isSelected && (
+                                  <div className="absolute inset-0 bg-black/10 rounded-full"></div>
+                                )}
+                              </div>
+                              <div className="text-center">
+                                <p className={`text-xs font-medium max-w-[72px] truncate ${
+                                  isSelected ? "text-amber-600" : "text-gray-800"
+                                }`}>{name}</p>
+                                <p className="text-[10px] text-gray-500">({count})</p>
+                              </div>
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+                    <style>{`
+                      .scrollbar-hide::-webkit-scrollbar { display: none; }
+                      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+                    `}</style>
+                  </div>
+
+                  {/* 2. Filters */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h4 className="font-medium mb-3 text-gray-800">Filters</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-xs font-medium text-gray-600 mb-2">Material type</p>
+                        <div className="flex flex-wrap gap-2">
+                          {itemTypes.map((t) => (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => toggleCollType(t)}
+                              className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
+                                collModalTypes.includes(t) ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
+                            >
+                              {t}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-600 mb-2">Gender</p>
+                        <div className="flex flex-wrap gap-2">
+                          {genders.map((g) => (
+                            <button
+                              key={g}
+                              type="button"
+                              onClick={() => toggleCollGender(g)}
+                              className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
+                                collModalGenders.includes(g) ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
+                            >
+                              {g}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-600 mb-2">Purity</p>
+                        <div className="flex flex-wrap gap-2">
+                          {purities.map((p) => (
+                            <button
+                              key={p}
+                              type="button"
+                              onClick={() => toggleCollPurity(p)}
+                              className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
+                                collModalPurities.includes(p) ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-600 mb-2 flex items-center gap-1">
+                          <Scale className="w-3.5 h-3.5" />
+                          Min weight (gm)
+                        </p>
+                        <input
+                          type="range"
+                          min={0}
+                          max={collModalWeightMax}
+                          value={collModalWeightMin}
+                          onChange={(e) => setCollModalWeightMin(Number(e.target.value))}
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">0 – {collModalWeightMin} gm (min)</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {!collectionsLoading && collectionsData.length > 0 && (
+              <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 flex gap-3">
+                <button type="button" onClick={clearCollModalFilters} className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 font-medium">
+                  Clear filters
+                </button>
+                <button type="button" onClick={goToCollectionsPage} className="flex-1 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 font-medium">
+                  View collections
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Prices Modal */}
     {showPricesModal && (

@@ -22,6 +22,8 @@ const KLSGoldCollections = () => {
   const [showQuickView, setShowQuickView] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(location.state?.selectedCategory || null);
   const [categories, setCategories] = useState([]);
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
+  const [filterPopupCategory, setFilterPopupCategory] = useState(null);
 
   const itemTypes = ['Gold', 'Silver', 'Diamond', 'Platinum', 'Rose Gold', 'White Gold'];
   const genders = ['Male', 'Female', 'Unisex','Kids'];
@@ -34,6 +36,13 @@ const KLSGoldCollections = () => {
     { value: 'name-asc', label: 'Name: A to Z' },
     { value: 'name-desc', label: 'Name: Z to A' }
   ];
+
+  // Watch for location.state changes (when navigating from nav modal)
+  useEffect(() => {
+    if (location.state?.selectedCategory) {
+      setSelectedCategory(location.state.selectedCategory);
+    }
+  }, [location.state?.selectedCategory]);
 
   // Fetch collections
   useEffect(() => { fetchCollections(); }, []);
@@ -51,17 +60,25 @@ const KLSGoldCollections = () => {
         const uniqueCategories = [...new Set(json.data.map(item => item.name))];
         setCategories(uniqueCategories.sort());
         
-        // Set selectedCategory from location state or first category
-        if (location.state?.selectedCategory) {
+        // Set selectedCategory from location state (priority) or first category
+        if (location.state?.selectedCategory && uniqueCategories.includes(location.state.selectedCategory)) {
           setSelectedCategory(location.state.selectedCategory);
-        } else if (selectedCategory === null && uniqueCategories.length > 0) {
+        } else if (!selectedCategory && uniqueCategories.length > 0) {
           setSelectedCategory(uniqueCategories[0]);
         }
 
         const weights = json.data.map(i => Number(i.weight_gm)).filter(w => Number.isFinite(w));
+        const maxW = weights.length ? Math.ceil(Math.max(...weights) / 100) * 100 : 1000;
+        const state = location.state || {};
         if (weights.length) {
-          setWeightRange({ min: 0, max: Math.ceil(Math.max(...weights) / 100) * 100 });
+          setWeightRange({
+            min: state.weightMin != null ? state.weightMin : 0,
+            max: state.weightMax != null ? state.weightMax : maxW,
+          });
         }
+        if (state.selectedTypes?.length) setSelectedTypes(state.selectedTypes);
+        if (state.selectedGenders?.length) setSelectedGenders(state.selectedGenders);
+        if (state.selectedPurities?.length) setSelectedPurities(state.selectedPurities);
       }
     } catch (e) { 
       console.error('Failed to fetch collections:', e);
@@ -232,7 +249,11 @@ const KLSGoldCollections = () => {
                 return (
                   <div key={category} className="flex flex-col items-center gap-2 flex-shrink-0">
                     <button
-                      onClick={() => setSelectedCategory(category)}
+                      onClick={() => {
+                        setSelectedCategory(category);
+                        setFilterPopupCategory(category);
+                        setShowFilterPopup(true);
+                      }}
                       className={`relative w-24 h-24 rounded-full overflow-hidden border-4 transition-all ${
                         selectedCategory === category
                           ? 'border-amber-600 shadow-lg scale-110'
@@ -257,9 +278,17 @@ const KLSGoldCollections = () => {
                       )}
                     </button>
                     <div className="text-center">
-                      <p className="text-xs font-medium text-gray-800 max-w-[100px] truncate">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setFilterPopupCategory(category);
+                          setShowFilterPopup(true);
+                        }}
+                        className="text-xs font-medium text-gray-800 max-w-[100px] truncate block w-full hover:text-amber-600 focus:outline-none"
+                      >
                         {category}
-                      </p>
+                      </button>
                       <p className="text-xs text-gray-500">({itemCount})</p>
                     </div>
                   </div>
@@ -278,6 +307,136 @@ const KLSGoldCollections = () => {
           }
         `}</style>
       </div>
+
+      {/* Filter Popup: Filters → Names → Collections (opens when category clicked) */}
+      {showFilterPopup && filterPopupCategory && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowFilterPopup(false)}>
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex-shrink-0 border-b border-gray-200 p-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Filters for {filterPopupCategory}</h3>
+                  <p className="text-sm text-gray-500 mt-0.5">Refine, then see names and collection</p>
+                </div>
+                <button onClick={() => setShowFilterPopup(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {(() => {
+                const categoryItems = collections.filter(i => i.name === filterPopupCategory);
+                let filteredByPopup = categoryItems.filter(i => {
+                  if (selectedTypes.length && !selectedTypes.includes(i.type)) return false;
+                  if (selectedGenders.length && !selectedGenders.includes(i.gender)) return false;
+                  if (selectedPurities.length && !selectedPurities.includes(i.purity)) return false;
+                  if (i.weight_gm < weightRange.min || i.weight_gm > weightRange.max) return false;
+                  return true;
+                });
+                return (
+                  <>
+                    {/* 1. Filters */}
+                    <div>
+                      <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
+                        <Gem className="w-4 h-4 text-amber-600" />
+                        Material Type
+                      </h4>
+                      <div className="space-y-2">
+                        {itemTypes.filter(t => categoryItems.some(i => i.type === t)).map(t => (
+                          <label key={t} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
+                            <div className="flex items-center gap-3">
+                              <input type="checkbox" checked={selectedTypes.includes(t)} onChange={() => toggleType(t)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
+                              <span className="text-gray-700">{t}</span>
+                            </div>
+                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.type === t).length}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
+                        <User className="w-4 h-4 text-amber-600" />
+                        Gender
+                      </h4>
+                      <div className="space-y-2">
+                        {genders.filter(g => categoryItems.some(i => i.gender === g)).map(g => (
+                          <label key={g} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
+                            <div className="flex items-center gap-3">
+                              <input type="checkbox" checked={selectedGenders.includes(g)} onChange={() => toggleGender(g)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
+                              <span className="text-gray-700">{g}</span>
+                            </div>
+                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.gender === g).length}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
+                        <Sparkles className="w-4 h-4 text-amber-600" />
+                        Purity
+                      </h4>
+                      <div className="space-y-2">
+                        {purities.filter(p => categoryItems.some(i => i.purity === p)).map(p => (
+                          <label key={p} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
+                            <div className="flex items-center gap-3">
+                              <input type="checkbox" checked={selectedPurities.includes(p)} onChange={() => togglePurity(p)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
+                              <span className="text-gray-700">{p}</span>
+                            </div>
+                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.purity === p).length}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
+                        <Scale className="w-4 h-4 text-amber-600" />
+                        Weight Range
+                      </h4>
+                      <div className="px-2">
+                        <input type="range" min="0" max={weightRange.max} value={weightRange.min} onChange={e => setWeightRange(prev => ({ ...prev, min: parseInt(e.target.value) }))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-600" />
+                        <div className="flex justify-between text-sm text-gray-600 mt-2">
+                          <span>0 gm</span>
+                          <span className="font-medium">Min: {weightRange.min} gm</span>
+                          <span>{weightRange.max} gm</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. All names (after filters) */}
+                    <div className="border-t border-gray-200 pt-4">
+                      <h4 className="font-medium mb-3 text-gray-700">Names in this collection ({filteredByPopup.length})</h4>
+                      <div className="max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-2 space-y-1">
+                        {filteredByPopup.length === 0 ? (
+                          <p className="text-sm text-gray-500 py-2">No items match the filters. Adjust filters above.</p>
+                        ) : (
+                          filteredByPopup.map((item) => (
+                            <div key={item.id} className="text-sm text-gray-800 py-1.5 px-2 rounded hover:bg-white">
+                              {item.name} <span className="text-gray-500">— {item.type} · {item.weight_gm} gm</span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
+            <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 flex gap-3">
+              <button onClick={clearFilters} className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 font-medium">
+                Clear filters
+              </button>
+              <button onClick={() => setShowFilterPopup(false)} className="flex-1 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 font-medium">
+                Show collection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
