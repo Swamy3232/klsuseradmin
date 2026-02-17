@@ -24,7 +24,7 @@ const KLSGoldCollections = () => {
   const [categories, setCategories] = useState([]);
 
   const itemTypes = ['Gold', 'Silver', 'Diamond', 'Platinum', 'Rose Gold', 'White Gold'];
-  const genders = ['Male', 'Female', 'Unisex'];
+  const genders = ['Male', 'Female', 'Unisex','Kids'];
   const purities = ['18K', '22K', '24K', '925']; // 925 for silver
   const sortOptions = [
     { value: 'newest', label: 'Newest First' },
