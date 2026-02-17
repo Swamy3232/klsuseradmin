@@ -208,8 +208,8 @@ const Navbar = () => {
         {/* Bluestone-style: Single clean header row */}
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16 lg:h-20">
-          {/* Left: Social Icons - All Screen Sizes */}
-          <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Left: Social Icons - Desktop Only (hidden on mobile) */}
+          <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
             <a
               href="https://wa.me/919448866788"
               target="_blank"
@@ -231,7 +231,7 @@ const Navbar = () => {
           </div>
 
           {/* Center: Logo and Name - Bigger Logo */}
-          <Link to="/" className="flex items-center flex-shrink-0 flex-1 justify-center sm:justify-start sm:ml-2">
+          <Link to="/" className="hidden sm:flex items-center flex-shrink-0 flex-1 justify-start sm:ml-2">
             <img
               src={logo}
               alt="KLS Jewels"
@@ -243,6 +243,23 @@ const Navbar = () => {
               </span>
               <span className="text-[7px] sm:text-[10px] lg:text-xs text-gray-500 block">
                 BY KLS GROUP SINCE 1975
+              </span>
+            </div>
+          </Link>
+
+          {/* Mobile Only: Logo and Name - Right Side */}
+          <Link to="/" className="sm:hidden flex items-center flex-shrink-0 ml-auto">
+            <img
+              src={logo}
+              alt="KLS Jewels"
+              className="h-8 w-8 object-contain"
+            />
+            <div className="ml-1.5">
+              <span className="text-[9px] font-semibold text-gray-900 block leading-tight">
+                KLS <span className="text-amber-600">JEWEL</span>
+              </span>
+              <span className="text-[6px] text-gray-500 block">
+                JEWELLERY
               </span>
             </div>
           </Link>
