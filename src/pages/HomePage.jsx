@@ -54,18 +54,18 @@ const HomePage = () => {
       image: img15,
       subtitle: "500+ Designs",
     },
-    {
-      title: "Collection",
-      path: "/collection",
-      image: img16,
-      subtitle: "New Arrivals",
-    },
-    {
-      title: "Your Chitti",
-      path: "/chitti",
-      image: chitti,
-      subtitle: "Gold Plans",
-    },
+    // {
+    //   title: "Collection",
+    //   path: "/collection",
+    //   image: img16,
+    //   subtitle: "New Arrivals",
+    // },
+    // {
+    //   title: "Your Chitti",
+    //   path: "/chitti",
+    //   image: chitti,
+    //   subtitle: "Gold Plans",
+    // },
     {
       title: "Store",
       path: "/contact",
@@ -182,7 +182,7 @@ const HomePage = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, idx) => (
               <motion.div
                 key={plan.months}
