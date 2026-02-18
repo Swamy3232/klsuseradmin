@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/nav";
 import ScrollToTop from "./components/ScrollToTop";
+import { CollectionsProvider, useCollectionsContext } from "./context/CollectionsContext";
 
 import Footer from "./components/footer";
 import HomePage from "./pages/HomePage";
@@ -12,19 +13,23 @@ import MetalRateCalculator from "./pages/MetalCalculator";
 import Gallery from "./pages/Gallery";
 import GoldChittiCalculator from "./pages/chittical";
 
-function App() {
+function AppContent() {
+  const { isFullscreenCollections } = useCollectionsContext();
+
   return (
-    <Router>
+    <>
       {/* Scroll to top on route change */}
       <ScrollToTop />
 
-      {/* Navbar */}
-      <div className="fixed top-0 left-0 w-full z-50">
-        <Navbar />
-      </div>
+      {/* Navbar - Hidden in fullscreen collections mode */}
+      {!isFullscreenCollections && (
+        <div className="fixed top-0 left-0 w-full z-50">
+          <Navbar />
+        </div>
+      )}
 
       {/* Page Content - bottom padding clears fixed bottom menu bar */}
-      <div className="pt-20 sm:pt-28 lg:pt-40 pb-20 min-h-screen">
+      <div className={isFullscreenCollections ? "" : "pt-20 sm:pt-28 lg:pt-40 pb-20 min-h-screen"}>
         <Routes>
           {/* Home page */}
           <Route path="/" element={<HomePage />} />
@@ -39,8 +44,19 @@ function App() {
           <Route path="/chitti-calculator" element={<GoldChittiCalculator />} />
         </Routes>
 
-        <Footer />
+        {/* Footer - Hidden in fullscreen collections mode */}
+        {!isFullscreenCollections && <Footer />}
       </div>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <CollectionsProvider>
+        <AppContent />
+      </CollectionsProvider>
     </Router>
   );
 }

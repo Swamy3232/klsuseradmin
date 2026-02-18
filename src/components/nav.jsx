@@ -256,21 +256,33 @@ const Navbar = () => {
 
             {/* Right: Action Buttons */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* View All Prices Button */}
-              {/* <button
-                onClick={() => setShowPricesModal(true)}
-                className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap"
+              {/* Instagram Button */}
+              <a
+                href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
+                title="Follow us on Instagram"
               >
-                View Prices
-              </button> */}
+                <Instagram size={18} />
+              </a>
+
+              {/* Email Button */}
+              <a
+                href="mailto:korarlajewellerypalace@gmail.com"
+                className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-600 hover:bg-amber-700 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
+                title="Send us an email"
+              >
+                <Mail size={18} />
+              </a>
 
               {/* Call Button */}
               <a
                 href="tel:9448866788"
-                className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap inline-flex items-center gap-1"
+                className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500 hover:bg-green-600 text-white hover:shadow-lg hover:scale-110 transition-all duration-300"
+                title="Call us"
               >
-                <span className="hidden sm:inline">📞 Call</span>
-                <span className="sm:hidden">📞</span>
+                <span className="text-lg">📞</span>
               </a>
             </div>
           </div>

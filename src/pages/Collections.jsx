@@ -3,9 +3,11 @@ import { useLocation } from 'react-router-dom';
 import { 
   Filter, Search, X, Grid, List, Heart, Info, Scale, User, Gem, Sparkles, Loader2, Star, Share2, Phone, MapPin, Clock
 } from 'lucide-react';
+import { useCollectionsContext } from '../context/CollectionsContext';
 
 const KLSGoldCollections = () => {
   const location = useLocation();
+  const { setIsFullscreenCollections } = useCollectionsContext();
   const [collections, setCollections] = useState([]);
   const [filteredCollections, setFilteredCollections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,6 +48,13 @@ const KLSGoldCollections = () => {
 
   // Fetch collections
   useEffect(() => { fetchCollections(); }, []);
+
+  // Reset fullscreen when component unmounts
+  useEffect(() => {
+    return () => {
+      setIsFullscreenCollections(false);
+    };
+  }, [setIsFullscreenCollections]);
 
   const fetchCollections = async () => {
     try {
@@ -90,6 +99,12 @@ const KLSGoldCollections = () => {
 
   // Filters
   useEffect(() => { applyFilters(); }, [searchTerm, selectedTypes, selectedGenders, selectedPurities, weightRange, sortBy, collections, selectedCategory]);
+
+  // Update fullscreen mode based on filters and category
+  useEffect(() => {
+    const hasActiveFilters = selectedTypes.length > 0 || selectedGenders.length > 0 || selectedPurities.length > 0 || weightRange.min > 0;
+    setIsFullscreenCollections(hasActiveFilters && selectedCategory);
+  }, [selectedTypes, selectedGenders, selectedPurities, weightRange, selectedCategory, setIsFullscreenCollections]);
 
   const applyFilters = () => {
     let filtered = [...collections];
@@ -204,6 +219,227 @@ const KLSGoldCollections = () => {
   };
 
   // ----- RENDER - Bluestone style -----
+  
+  // Check if fullscreen view should be shown (filters active + category selected)
+  const hasActiveFilters = selectedTypes.length > 0 || selectedGenders.length > 0 || selectedPurities.length > 0 || weightRange.min > 0;
+  const shouldShowFullscreen = hasActiveFilters && selectedCategory;
+
+  if (shouldShowFullscreen) {
+    // FULLSCREEN MODE - Just collections grid, no navbar/footer/header
+    return (
+      <div className="min-h-screen bg-white w-full">
+        {/* Back button in top-left corner */}
+        <button
+          onClick={() => {
+            clearFilters();
+            setSelectedCategory(null);
+          }}
+          className="fixed top-4 left-4 z-40 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200"
+          title="Back to collections"
+        >
+          <X size={24} className="text-gray-700" />
+        </button>
+
+        {/* Fullscreen Collections Grid */}
+        <div className="w-full pt-20 pb-8">
+          {loading ? (
+            <div className="flex items-center justify-center min-h-screen">
+              <Loader2 className="w-12 h-12 text-amber-600 animate-spin" />
+            </div>
+          ) : filteredCollections.length === 0 ? (
+            <div className="flex flex-col items-center justify-center min-h-screen text-gray-600">
+              <Gem className="w-16 h-16 mb-4 text-gray-400" />
+              <p className="text-xl font-medium">No items match your filters</p>
+              <p className="text-sm text-gray-500 mt-2">Try adjusting your selection</p>
+              <button
+                onClick={() => {
+                  clearFilters();
+                  setSelectedCategory(null);
+                }}
+                className="mt-6 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div className={`w-full ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 p-2 sm:p-4' : 'space-y-4 p-4'}`}>
+              {filteredCollections.map((item) => (
+                <div
+                  key={item.id}
+                  className={`${
+                    viewMode === 'grid'
+                      ? 'relative group overflow-hidden rounded-lg bg-white border border-gray-200 hover:shadow-lg transition-all'
+                      : 'flex gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-all'
+                  }`}
+                >
+                  {/* Image */}
+                  <div
+                    className={`${
+                      viewMode === 'grid'
+                        ? 'w-full aspect-square'
+                        : 'w-24 h-24 flex-shrink-0'
+                    } bg-gray-100 overflow-hidden rounded-lg cursor-pointer`}
+                    onClick={() => openQuickView(item)}
+                  >
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-100 to-amber-200">
+                        <Gem className="w-8 h-8 text-amber-600" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  {viewMode === 'list' && (
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                        <div className="flex gap-2 mt-2 flex-wrap">
+                          <span className={`text-xs font-medium px-2 py-1 rounded-full border ${getTypeColor(item.type)}`}>
+                            {item.type}
+                          </span>
+                          <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                            {item.purity}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">{item.weight_gm} gm</span> • {item.gender}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Grid View Overlay */}
+                  {viewMode === 'grid' && (
+                    <div className="absolute inset-0 bg-black/0 hover:bg-black/60 transition-all flex items-end opacity-0 hover:opacity-100">
+                      <div className="w-full p-3 bg-gradient-to-t from-black/80 to-transparent text-white">
+                        <h3 className="font-semibold text-sm truncate">{item.name}</h3>
+                        <p className="text-xs text-gray-200">{item.type} • {item.weight_gm} gm</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Quick Actions */}
+                  <div className={`${viewMode === 'grid' ? 'absolute top-2 right-2 opacity-0 group-hover:opacity-100' : 'flex gap-2'} transition-opacity`}>
+                    <button
+                      onClick={() => toggleWishlist(item.id)}
+                      className={`p-2 rounded-full transition-all ${
+                        wishlist.has(item.id)
+                          ? 'bg-red-500 text-white'
+                          : 'bg-white text-gray-600 hover:bg-red-100'
+                      }`}
+                      title={wishlist.has(item.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                    >
+                      <Heart className="w-4 h-4" fill={wishlist.has(item.id) ? 'currentColor' : 'none'} />
+                    </button>
+                    <button
+                      onClick={() => openQuickView(item)}
+                      className="p-2 rounded-full bg-white text-amber-600 hover:bg-amber-100 transition-all"
+                      title="Quick view"
+                    >
+                      <Info className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => contactViaWhatsApp(item)}
+                      className="p-2 rounded-full bg-white text-green-600 hover:bg-green-100 transition-all"
+                      title="WhatsApp"
+                    >
+                      <Phone className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Quick View Modal */}
+        {showQuickView && selectedItem && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowQuickView(false)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <div className="grid md:grid-cols-2 gap-6 p-6">
+                <div className="flex items-center justify-center bg-gray-50 rounded-xl h-80 md:h-96 overflow-hidden">
+                  {selectedItem.image_url ? (
+                    <img src={selectedItem.image_url} alt={selectedItem.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Gem className="w-16 h-16 text-gray-400" />
+                  )}
+                </div>
+                <div className="flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start gap-4 mb-4">
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900">{selectedItem.name}</h2>
+                        <p className="text-sm text-gray-600 mt-1">{selectedItem.type} Jewellery</p>
+                      </div>
+                      <button onClick={() => setShowQuickView(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                        <X className="w-6 h-6 text-gray-500" />
+                      </button>
+                    </div>
+                    <div className="flex gap-2 mb-4">
+                      <span className={`text-sm font-medium px-3 py-1 rounded-full border ${getTypeColor(selectedItem.type)}`}>
+                        {selectedItem.type}
+                      </span>
+                      <span className="text-sm font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                        {selectedItem.purity}
+                      </span>
+                      <span className="text-sm font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                        {selectedItem.gender}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600 mb-1">Weight</div>
+                        <div className="text-lg font-semibold text-gray-900">{selectedItem.weight_gm} gm</div>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600 mb-1">Purity</div>
+                        <div className="text-lg font-semibold text-gray-900">{selectedItem.purity || 'N/A'}</div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600 mb-1">Gender</div>
+                        <div className="text-lg font-semibold text-gray-900">{selectedItem.gender}</div>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600 mb-1">Type</div>
+                        <div className="text-lg font-semibold text-gray-900">{selectedItem.type}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4 mt-6">
+                    <button onClick={() => contactViaWhatsApp(selectedItem)} className="w-full py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-3 font-medium text-lg">
+                      <Phone className="w-5 h-5" />
+                      Contact via WhatsApp
+                    </button>
+                    <button onClick={() => handleShare(selectedItem)} className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 font-medium">
+                      <Share2 className="w-5 h-5" />
+                      Share this Item
+                    </button>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-3 text-gray-600">
+                      <Info className="w-5 h-5" />
+                      <p className="text-sm">For accurate pricing and availability, please contact us directly. Prices vary based on current market rates and craftsmanship.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // NORMAL MODE - Show filter UI and collections
   return (
     <div className="min-h-screen bg-white">
       {/* Header - Bluestone clean header */}
@@ -430,7 +666,13 @@ const KLSGoldCollections = () => {
               <button onClick={clearFilters} className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 font-medium">
                 Clear filters
               </button>
-              <button onClick={() => setShowFilterPopup(false)} className="flex-1 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 font-medium">
+              <button 
+                onClick={() => {
+                  setShowFilterPopup(false);
+                  // Keep filters applied to toggle fullscreen view
+                }} 
+                className="flex-1 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 font-medium"
+              >
                 Show collection
               </button>
             </div>
