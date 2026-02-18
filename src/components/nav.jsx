@@ -257,12 +257,12 @@ const Navbar = () => {
             {/* Right: Action Buttons */}
             <div className="flex items-center gap-2 flex-shrink-0">
               {/* View All Prices Button */}
-              <button
+              {/* <button
                 onClick={() => setShowPricesModal(true)}
                 className="px-2 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-white/20 hover:bg-white/30 rounded-full border border-white/30 font-medium transition-all hover:scale-105 whitespace-nowrap"
               >
                 View Prices
-              </button>
+              </button> */}
 
               {/* Call Button */}
               <a

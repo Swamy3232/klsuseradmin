@@ -182,38 +182,39 @@ const HomePage = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {plans.map((plan, idx) => (
-              <motion.div
-                key={plan.months}
-                initial={{ opacity: 0, x: idx === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className={`rounded-xl p-6 lg:p-8 border ${plan.borderColor} bg-gradient-to-br ${plan.color} hover:shadow-lg transition-shadow`}
-              >
-                <div className="flex justify-between items-start mb-6">
-                  <h3 className="text-xl font-bold text-gray-900">{plan.title}</h3>
-                  <span className="px-3 py-1 bg-amber-600 text-white text-sm font-semibold rounded-full">
-                    {plan.benefit}
-                  </span>
-                </div>
-                <ul className="space-y-2 mb-6">
-                  {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-2 text-gray-700 text-sm">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => navigate("/chitti")}
-                  className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors"
-                >
-                  Start {plan.months} Month Plan
-                </button>
-              </motion.div>
-            ))}
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+  {plans.map((plan, idx) => (
+    <motion.div
+      key={plan.months}
+      initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      className={`rounded-xl p-6 lg:p-8 border ${plan.borderColor} bg-gradient-to-br ${plan.color} hover:shadow-lg transition-shadow`}
+    >
+      <div className="flex justify-between items-start mb-6">
+        <h3 className="text-xl font-bold text-gray-900">{plan.title}</h3>
+        <span className="px-3 py-1 bg-amber-600 text-white text-sm font-semibold rounded-full">
+          {plan.benefit}
+        </span>
+      </div>
+      <ul className="space-y-2 mb-6">
+        {plan.features.map((f, i) => (
+          <li key={i} className="flex items-center gap-2 text-gray-700 text-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+            {f}
+          </li>
+        ))}
+      </ul>
+      <button
+        onClick={() => navigate("/chitti")}
+        className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors"
+      >
+        Start {plan.months} Month Plan
+      </button>
+    </motion.div>
+  ))}
+</div>
+
 
           {/* Calculate Amount Button */}
           <motion.div
