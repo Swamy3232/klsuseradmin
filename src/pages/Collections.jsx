@@ -100,10 +100,11 @@ const KLSGoldCollections = () => {
   // Filters
   useEffect(() => { applyFilters(); }, [searchTerm, selectedTypes, selectedGenders, selectedPurities, weightRange, sortBy, collections, selectedCategory]);
 
-  // Update fullscreen mode based on selected category
+  // Update fullscreen mode based on filters and category
   useEffect(() => {
-    setIsFullscreenCollections(!!selectedCategory);
-  }, [selectedCategory, setIsFullscreenCollections]);
+    const hasActiveFilters = selectedTypes.length > 0 || selectedGenders.length > 0 || selectedPurities.length > 0 || weightRange.min > 0;
+    setIsFullscreenCollections(hasActiveFilters && selectedCategory);
+  }, [selectedTypes, selectedGenders, selectedPurities, weightRange, selectedCategory, setIsFullscreenCollections]);
 
   const applyFilters = () => {
     let filtered = [...collections];
@@ -227,38 +228,17 @@ const KLSGoldCollections = () => {
     // FULLSCREEN MODE - Just collections grid, no navbar/footer/header
     return (
       <div className="min-h-screen bg-white w-full">
-        {/* Top Toolbar */}
-        <div className="fixed top-4 left-4 right-4 z-40 flex justify-between items-center">
-          {/* Back button */}
-          <button
-            onClick={() => {
-              clearFilters();
-              setSelectedCategory(null);
-            }}
-            className="bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200"
-            title="Back to collections"
-          >
-            <X size={24} className="text-gray-700" />
-          </button>
-
-          {/* Filter button */}
-          <button
-            onClick={() => {
-              setFilterPopupCategory(selectedCategory);
-              setShowFilterPopup(true);
-            }}
-            className="bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 flex items-center gap-2 px-4"
-            title="Apply filters"
-          >
-            <Filter size={20} className="text-gray-700" />
-            <span className="text-sm font-medium text-gray-700">Filters</span>
-            {(selectedTypes.length + selectedGenders.length + selectedPurities.length + (weightRange.min > 0 ? 1 : 0)) > 0 && (
-              <span className="bg-amber-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ml-2">
-                {selectedTypes.length + selectedGenders.length + selectedPurities.length + (weightRange.min > 0 ? 1 : 0)}
-              </span>
-            )}
-          </button>
-        </div>
+        {/* Back button in top-left corner */}
+        <button
+          onClick={() => {
+            clearFilters();
+            setSelectedCategory(null);
+          }}
+          className="fixed top-4 left-4 z-40 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200"
+          title="Back to collections"
+        >
+          <X size={24} className="text-gray-700" />
+        </button>
 
         {/* Fullscreen Collections Grid */}
         <div className="w-full pt-20 pb-8">
@@ -335,9 +315,9 @@ const KLSGoldCollections = () => {
                     </div>
                   )}
 
-                  {/* Grid View Overlay - Always Visible */}
+                  {/* Grid View Overlay */}
                   {viewMode === 'grid' && (
-                    <div className="absolute inset-0 bg-black/60 flex items-end">
+                    <div className="absolute inset-0 bg-black/0 hover:bg-black/60 transition-all flex items-end opacity-0 hover:opacity-100">
                       <div className="w-full p-3 bg-gradient-to-t from-black/80 to-transparent text-white">
                         <h3 className="font-semibold text-sm truncate">{item.name}</h3>
                         <p className="text-xs text-gray-200">{item.type} • {item.weight_gm} gm</p>
@@ -345,8 +325,8 @@ const KLSGoldCollections = () => {
                     </div>
                   )}
 
-                  {/* Quick Actions - Always Visible */}
-                  <div className={`${viewMode === 'grid' ? 'absolute top-2 right-2' : 'flex gap-2'} transition-opacity flex gap-2`}>
+                  {/* Quick Actions */}
+                  <div className={`${viewMode === 'grid' ? 'absolute top-2 right-2 opacity-0 group-hover:opacity-100' : 'flex gap-2'} transition-opacity`}>
                     <button
                       onClick={() => toggleWishlist(item.id)}
                       className={`p-2 rounded-full transition-all ${
@@ -455,127 +435,6 @@ const KLSGoldCollections = () => {
             </div>
           </div>
         )}
-
-        {/* Filter Popup in Fullscreen Mode */}
-        {showFilterPopup && filterPopupCategory && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowFilterPopup(false)}>
-            <div
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex-shrink-0 border-b border-gray-200 p-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Filters for {filterPopupCategory}</h3>
-                    <p className="text-sm text-gray-500 mt-0.5">Refine your collection</p>
-                  </div>
-                  <button onClick={() => setShowFilterPopup(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                    <X className="w-5 h-5 text-gray-500" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                {(() => {
-                  const categoryItems = collections.filter(i => i.name === filterPopupCategory);
-                  let filteredByPopup = categoryItems.filter(i => {
-                    if (selectedTypes.length && !selectedTypes.includes(i.type)) return false;
-                    if (selectedGenders.length && !selectedGenders.includes(i.gender)) return false;
-                    if (selectedPurities.length && !selectedPurities.includes(i.purity)) return false;
-                    if (i.weight_gm < weightRange.min || i.weight_gm > weightRange.max) return false;
-                    return true;
-                  });
-                  return (
-                    <>
-                      {/* Material Type */}
-                      <div>
-                        <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                          <Gem className="w-4 h-4 text-amber-600" />
-                          Material Type
-                        </h4>
-                        <div className="space-y-2">
-                          {itemTypes.filter(t => categoryItems.some(i => i.type === t)).map(t => (
-                            <label key={t} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                              <div className="flex items-center gap-3">
-                                <input type="checkbox" checked={selectedTypes.includes(t)} onChange={() => toggleType(t)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
-                                <span className="text-gray-700">{t}</span>
-                              </div>
-                              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.type === t).length}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                      {/* Gender */}
-                      <div>
-                        <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                          <User className="w-4 h-4 text-amber-600" />
-                          Gender
-                        </h4>
-                        <div className="space-y-2">
-                          {genders.filter(g => categoryItems.some(i => i.gender === g)).map(g => (
-                            <label key={g} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                              <div className="flex items-center gap-3">
-                                <input type="checkbox" checked={selectedGenders.includes(g)} onChange={() => toggleGender(g)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
-                                <span className="text-gray-700">{g}</span>
-                              </div>
-                              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.gender === g).length}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                      {/* Purity */}
-                      <div>
-                        <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                          <Sparkles className="w-4 h-4 text-amber-600" />
-                          Purity
-                        </h4>
-                        <div className="space-y-2">
-                          {purities.filter(p => categoryItems.some(i => i.purity === p)).map(p => (
-                            <label key={p} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                              <div className="flex items-center gap-3">
-                                <input type="checkbox" checked={selectedPurities.includes(p)} onChange={() => togglePurity(p)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
-                                <span className="text-gray-700">{p}</span>
-                              </div>
-                              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.purity === p).length}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                      {/* Weight */}
-                      <div>
-                        <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                          <Scale className="w-4 h-4 text-amber-600" />
-                          Weight Range
-                        </h4>
-                        <div className="px-2">
-                          <input type="range" min="0" max={weightRange.max} value={weightRange.min} onChange={e => setWeightRange(prev => ({ ...prev, min: parseInt(e.target.value) }))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-600" />
-                          <div className="flex justify-between text-sm text-gray-600 mt-2">
-                            <span>0 gm</span>
-                            <span className="font-medium">Min: {weightRange.min} gm</span>
-                            <span>{weightRange.max} gm</span>
-                          </div>
-                        </div>
-                      </div>
-                      {/* Results */}
-                      <div className="border-t border-gray-200 pt-4">
-                        <p className="text-sm text-gray-700 font-medium">Matching items: <span className="text-amber-600 font-semibold">{filteredByPopup.length}</span></p>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-
-              <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 flex gap-3">
-                <button onClick={clearFilters} className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 font-medium">
-                  Clear filters
-                </button>
-                <button onClick={() => setShowFilterPopup(false)} className="flex-1 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 font-medium">
-                  Done
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
@@ -628,6 +487,8 @@ const KLSGoldCollections = () => {
                     <button
                       onClick={() => {
                         setSelectedCategory(category);
+                        setFilterPopupCategory(category);
+                        setShowFilterPopup(true);
                       }}
                       className={`relative w-24 h-24 rounded-full overflow-hidden border-4 transition-all ${
                         selectedCategory === category
@@ -657,6 +518,8 @@ const KLSGoldCollections = () => {
                         type="button"
                         onClick={() => {
                           setSelectedCategory(category);
+                          setFilterPopupCategory(category);
+                          setShowFilterPopup(true);
                         }}
                         className="text-xs font-medium text-gray-800 max-w-[100px] truncate block w-full hover:text-amber-600 focus:outline-none"
                       >
