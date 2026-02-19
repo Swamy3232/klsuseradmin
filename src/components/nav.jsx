@@ -70,6 +70,7 @@ const Navbar = () => {
     closeCollectionsModal();
     navigate("/collection", {
       state: {
+        selectedCategory: selectedCollectionName,
         selectedTypes: collModalTypes,
         selectedGenders: collModalGenders,
         selectedPurities: collModalPurities,
