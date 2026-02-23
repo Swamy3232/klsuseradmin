@@ -501,7 +501,6 @@ const Navbar = () => {
             {/* Social Links in Mobile Menu */}
             <div className="space-y-2">
               <p className="text-xs font-semibold text-gray-500 uppercase px-4">Connect With Us</p>
-              
               {/* WhatsApp */}
               <a
                 href="https://wa.me/919448866788"
@@ -513,7 +512,6 @@ const Navbar = () => {
                 <MessageCircle size={18} />
                 <span>WhatsApp</span>
               </a>
-              
               {/* Instagram */}
               <a
                 href="https://www.instagram.com/kjp_jewellers?igsh=MTEwNjBiOWdpanZmOA=="
@@ -525,7 +523,6 @@ const Navbar = () => {
                 <Instagram size={18} />
                 <span>Instagram</span>
               </a>
-              
               {/* Email */}
               <a
                 href="mailto:korarlajewellerypalace@gmail.com"
@@ -535,6 +532,18 @@ const Navbar = () => {
                 <Mail size={18} />
                 <span>Email</span>
               </a>
+              {/* Download App - Mobile Only, right after social links */}
+              <button
+                onClick={() => {
+                  window.open(apkDownloadLink, "_blank");
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-4 py-3 bg-amber-600 text-white font-medium rounded-lg mt-2 sm:hidden"
+                style={{ display: 'flex' }}
+              >
+                <Download size={18} />
+                Download App
+              </button>
             </div>
             
             {/* Divider */}
