@@ -315,9 +315,9 @@ const KLSGoldCollections = () => {
                     </div>
                   )}
 
-                  {/* Grid View Overlay - Always visible */}
+                  {/* Grid View Overlay */}
                   {viewMode === 'grid' && (
-                    <div className="absolute inset-0 bg-black/60 flex items-end transition-all duration-300">
+                    <div className="absolute inset-0 bg-black/0 hover:bg-black/60 transition-all flex items-end opacity-0 hover:opacity-100">
                       <div className="w-full p-3 bg-gradient-to-t from-black/80 to-transparent text-white">
                         <h3 className="font-semibold text-sm truncate">{item.name}</h3>
                         <p className="text-xs text-gray-200">{item.type} • {item.weight_gm} gm</p>
@@ -325,8 +325,8 @@ const KLSGoldCollections = () => {
                     </div>
                   )}
 
-                  {/* Quick Actions - Always visible */}
-                  <div className="flex gap-2 transition-opacity absolute top-2 right-2 z-10">
+                  {/* Quick Actions */}
+                  <div className={`${viewMode === 'grid' ? 'absolute top-2 right-2 opacity-0 group-hover:opacity-100' : 'flex gap-2'} transition-opacity`}>
                     <button
                       onClick={() => toggleWishlist(item.id)}
                       className={`p-2 rounded-full transition-all ${

@@ -70,7 +70,6 @@ const Navbar = () => {
     closeCollectionsModal();
     navigate("/collection", {
       state: {
-        selectedCategory: selectedCollectionName,
         selectedTypes: collModalTypes,
         selectedGenders: collModalGenders,
         selectedPurities: collModalPurities,
@@ -304,7 +303,7 @@ const Navbar = () => {
             />
             <div className="ml-1.5">
               <span className="text-[9px] font-semibold text-gray-900 block leading-tight">
-                KOMARAL <span className="text-amber-600">JEWELLERY</span>
+                KOMARALA <span className="text-amber-600">JEWELLERY</span>
               </span>
               <span className="text-[6px] text-gray-500 block">
                   BY KLS GROUP SINCE 1975
