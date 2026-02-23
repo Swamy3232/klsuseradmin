@@ -322,7 +322,7 @@ const Navbar = () => {
           </Link>
 
           {/* Left: Social Icons - Desktop Only (hidden on mobile) */}
-          <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
+          {/* <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
             <a
               href="https://wa.me/919448866788"
               target="_blank"
@@ -341,7 +341,7 @@ const Navbar = () => {
             >
               <Instagram size={16} />
             </a>
-          </div>
+          </div> */}
 
           {/* Center: Logo and Name - Desktop Only */}
           <Link to="/" className="hidden sm:flex items-center flex-shrink-0 flex-1 justify-start sm:ml-2">

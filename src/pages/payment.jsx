@@ -12,11 +12,11 @@ import {
   ShieldCheck,
   TrendingUp,
   Wallet,
-  // Cash,
   Banknote,
   QrCode,
   Receipt
 } from "lucide-react";
+import paymentQR from "../assets/payment.jpeg";
 
 const PaymentUpdateForm = () => {
   const [formData, setFormData] = useState({
@@ -254,6 +254,24 @@ const PaymentUpdateForm = () => {
   return (
     <div className="min-h-screen bg-white py-4 sm:py-8 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
+        {/* Payment QR and Phone - Responsive */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mb-8">
+          <div className="flex flex-col items-center">
+            <img
+              src={paymentQR}
+              alt="KLS Payment QR Code"
+              className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-xl border-4 border-amber-200 shadow-lg object-contain bg-white"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
+            <span className="mt-3 text-xs sm:text-sm text-gray-500">Scan to pay via UPI/any app</span>
+          </div>
+          <div className="flex flex-col items-center sm:items-start">
+            <span className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-2">KLS Payment Phone</span>
+            <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-700 tracking-wide select-all">94499 63323</span>
+            <span className="mt-2 text-xs sm:text-sm text-gray-600">Use this number for UPI or PhonePe/Google Pay</span>
+          </div>
+        </div>
+
         {/* Header Section - Bluestone style */}
         <div className="text-center mb-6 sm:mb-10">
           <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-amber-50 rounded-xl mb-4 sm:mb-6">
