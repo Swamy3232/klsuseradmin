@@ -284,6 +284,16 @@ const Navbar = () => {
               >
                 <span className="text-lg">📞</span>
               </a>
+
+              {/* Download App - Mobile Only, beside social icons */}
+              <button
+                onClick={() => window.open(apkDownloadLink, "_blank")}
+                className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-600 hover:bg-amber-700 text-white hover:shadow-lg hover:scale-110 transition-all duration-300 sm:hidden"
+                title="Download App"
+                style={{ display: 'flex' }}
+              >
+                <Download size={18} />
+              </button>
             </div>
           </div>
         </div>
