@@ -63,7 +63,7 @@ const Footer = () => {
                   href="mailto:korarlajewellerypalace@gmail.com"
                   className="text-gray-400 hover:text-amber-400 transition-colors"
                 >
-                  ✉️ korarlajewellerypalace@gmail.com
+                  ✉️ Email
                 </a>
               </li>
              <li className="text-gray-400">📍 Beside Old Sangeetha Mobiles, Chintamani</li>
@@ -105,7 +105,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-800">
           <p className="text-center text-xs sm:text-sm text-gray-500 px-2">
-            © {new Date().getFullYear()} KLS Jewels — Korarla Jewellery Palace. All rights reserved.
+            © {new Date().getFullYear()} KLS Jewels — Komorla Jewellery Palace. All rights reserved.
           </p>
         </div>
       </div>

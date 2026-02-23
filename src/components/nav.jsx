@@ -303,7 +303,7 @@ const Navbar = () => {
             />
             <div className="ml-1.5">
               <span className="text-[9px] font-semibold text-gray-900 block leading-tight">
-                KOMARALA <span className="text-amber-600">JEWELLERY</span>
+                KOMARALA <span className="text-amber-600">JEWELLERY PALACE</span>
               </span>
               <span className="text-[6px] text-gray-500 block">
                   BY KLS GROUP SINCE 1975
@@ -539,13 +539,15 @@ const Navbar = () => {
             
             {/* Divider */}
             <div className="border-t border-gray-200 my-3"></div>
-            
+
+            {/* Download App - Mobile Only */}
             <button
               onClick={() => {
                 window.open(apkDownloadLink, "_blank");
                 setOpen(false);
               }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 text-white font-medium rounded-lg mt-2"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 text-white font-medium rounded-lg mt-2 sm:hidden"
+              style={{ display: 'flex' }}
             >
               <Download size={18} />
               Download App
