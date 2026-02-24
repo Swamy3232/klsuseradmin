@@ -315,12 +315,14 @@ const KLSGoldCollections = () => {
                     </div>
                   )}
 
-                  {/* Grid View Overlay - always visible in fullscreen mode */}
+                  {/* Grid View Overlay - always visible in fullscreen mode, light style */}
                   {viewMode === 'grid' && (
-                    <div className="absolute inset-0 bg-black/60 flex items-end transition-all">
-                      <div className="w-full p-3 bg-gradient-to-t from-black/80 to-transparent text-white">
-                        <h3 className="font-semibold text-sm truncate">{item.name}</h3>
-                        <p className="text-xs text-gray-200">{item.type} • {item.weight_gm} gm</p>
+                    <div className="absolute inset-0 flex items-end transition-all pointer-events-none">
+                      <div className="w-full m-2 rounded-lg bg-white/80 backdrop-blur-sm text-gray-900 px-3 py-2 shadow-md">
+                        <h3 className="font-semibold text-xs sm:text-sm truncate">{item.name}</h3>
+                        <p className="text-[11px] sm:text-xs text-gray-700">
+                          {item.type} • {item.weight_gm} gm
+                        </p>
                       </div>
                     </div>
                   )}
