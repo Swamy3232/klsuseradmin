@@ -70,6 +70,7 @@ const Navbar = () => {
     closeCollectionsModal();
     navigate("/collection", {
       state: {
+        selectedCategory: selectedCollectionName || null,
         selectedTypes: collModalTypes,
         selectedGenders: collModalGenders,
         selectedPurities: collModalPurities,
@@ -305,11 +306,11 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16 lg:h-20">
           {/* Mobile Only: Logo and Name - Left Side */}
-          <Link to="/" className="sm:hidden flex items-center flex-shrink-0">
+          <Link to="/" className="sm:hidden flex items-center flex-shrink-0 -mt-1">
             <img
               src={logo}
               alt="KLS Jewels"
-              className="h-12 w-10 object-contain"
+              className="h-14 w-14 object-contain"
             />
             <div className="ml-1.5">
               <span className="text-[9px] font-semibold text-gray-900 block leading-tight">
@@ -344,11 +345,11 @@ const Navbar = () => {
           </div> */}
 
           {/* Center: Logo and Name - Desktop Only */}
-          <Link to="/" className="hidden sm:flex items-center flex-shrink-0 flex-1 justify-start sm:ml-2">
+          <Link to="/" className="hidden sm:flex items-center flex-shrink-0 flex-1 justify-start sm:ml-2 -mt-2">
             <img
               src={logo}
               alt="KLS Jewels"
-              className="h-10 w-10 sm:h-12 sm:w-12 lg:h-16 lg:w-16 object-contain"
+              className="h-14 w-14 sm:h-18 sm:w-18 lg:h-24 lg:w-24 object-contain"
             />
             <div className="ml-2 sm:ml-3 lg:ml-4">
               <span className="text-[10px] sm:text-base lg:text-lg font-semibold text-gray-900 block leading-tight">
