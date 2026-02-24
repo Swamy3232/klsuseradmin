@@ -315,9 +315,9 @@ const KLSGoldCollections = () => {
                     </div>
                   )}
 
-                  {/* Grid View Overlay */}
+                  {/* Grid View Overlay - always visible in fullscreen mode */}
                   {viewMode === 'grid' && (
-                    <div className="absolute inset-0 bg-black/0 hover:bg-black/60 transition-all flex items-end opacity-0 hover:opacity-100">
+                    <div className="absolute inset-0 bg-black/60 flex items-end transition-all">
                       <div className="w-full p-3 bg-gradient-to-t from-black/80 to-transparent text-white">
                         <h3 className="font-semibold text-sm truncate">{item.name}</h3>
                         <p className="text-xs text-gray-200">{item.type} • {item.weight_gm} gm</p>
