@@ -1,53 +1,166 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
-  Filter, Search, X, Grid, List, Heart, Info, Scale, User, Gem, Sparkles, Loader2, Star, Share2, Phone, MapPin, Clock
+  Filter, Search, X, Grid, List, Heart, Info, Scale, User, Gem, Sparkles, Loader2, Star, Share2, Phone, MapPin, Clock, ChevronRight
 } from 'lucide-react';
 import { useCollectionsContext } from '../context/CollectionsContext';
 
 const KLSGoldCollections = () => {
   const location = useLocation();
   const { setIsFullscreenCollections } = useCollectionsContext();
+  
+  // Core state
   const [collections, setCollections] = useState([]);
-  const [filteredCollections, setFilteredCollections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('grid');
+  const [wishlist, setWishlist] = useState(new Set());
+  const [showQuickView, setShowQuickView] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  
+  // Hierarchical navigation state
+  const [selectedType, setSelectedType] = useState(null);
+  const [selectedGender, setSelectedGender] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [navigationStep, setNavigationStep] = useState('types');
+  
+  // Filter and search state
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('grid');
+  const [showFilters, setShowFilters] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedGenders, setSelectedGenders] = useState([]);
   const [selectedPurities, setSelectedPurities] = useState([]);
   const [weightRange, setWeightRange] = useState({ min: 0, max: 1000 });
-  const [sortBy, setSortBy] = useState('newest');
-  const [showFilters, setShowFilters] = useState(false);
-  const [wishlist, setWishlist] = useState(new Set());
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [showQuickView, setShowQuickView] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(location.state?.selectedCategory || null);
-  const [categories, setCategories] = useState([]);
-  const [showFilterPopup, setShowFilterPopup] = useState(false);
-  const [filterPopupCategory, setFilterPopupCategory] = useState(null);
 
-  const itemTypes = ['Gold', 'Silver', 'Diamond', 'Platinum', 'Rose Gold', 'White Gold'];
-  const genders = ['Male', 'Female', 'Unisex','Kids'];
-  const purities = ['18K', '22K', '24K', '925']; // 925 for silver
-  const sortOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' },
-    { value: 'weight-high', label: 'Weight: High to Low' },
-    { value: 'weight-low', label: 'Weight: Low to High' },
-    { value: 'name-asc', label: 'Name: A to Z' },
-    { value: 'name-desc', label: 'Name: Z to A' }
-  ];
+  const itemTypes = ['Gold', 'Silver', 'Diamond', 'All'];
+  const genders = ['Male', 'Female', 'Unisex', 'Kids'];
+  const purities = ['22K', '18K', '14K', '925', '999'];
 
-  // Watch for location.state changes (when navigating from nav modal)
-  useEffect(() => {
-    if (location.state?.selectedCategory) {
-      setSelectedCategory(location.state.selectedCategory);
+  // Get available types from collections
+  const getAvailableTypes = () => {
+    const types = [...new Set(collections.map(item => item.type))];
+    return itemTypes.filter(t => types.includes(t));
+  };
+
+  // Get available genders for selected type
+  const getAvailableGenders = () => {
+    if (!selectedType) return [];
+    const genderSet = new Set(
+      collections
+        .filter(item => item.type === selectedType)
+        .map(item => item.gender)
+    );
+    return genders.filter(g => genderSet.has(g));
+  };
+
+  // Get available subcategories for selected type & gender
+  const getAvailableSubcategories = () => {
+    if (!selectedType || !selectedGender) return [];
+    const subcatSet = new Set(
+      collections
+        .filter(item => item.type === selectedType && item.gender === selectedGender)
+        .map(item => item.name)
+    );
+    return Array.from(subcatSet).sort();
+  };
+
+  // Get items for selected type, gender, and subcategory
+  const getItemsForSelection = () => {
+    let items = [...collections];
+    if (selectedType) items = items.filter(i => i.type === selectedType);
+    if (selectedGender) items = items.filter(i => i.gender === selectedGender);
+    if (selectedSubcategory) items = items.filter(i => i.name === selectedSubcategory);
+    return items;
+  };
+
+  // Get first image for displays
+  const getFirstImageForType = (type) => {
+    return collections.find(item => item.type === type)?.image_url;
+  };
+
+  const getFirstImageForGender = (type, gender) => {
+    return collections.find(item => item.type === type && item.gender === gender)?.image_url;
+  };
+
+  const getFirstImageForSubcategory = (type, gender, subcat) => {
+    return collections.find(item => item.type === type && item.gender === gender && item.name === subcat)?.image_url;
+  };
+
+  // Filter functions
+  const toggleType = (type) => {
+    setSelectedTypes(prev => 
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    );
+  };
+
+  const toggleGender = (gender) => {
+    setSelectedGenders(prev => 
+      prev.includes(gender) ? prev.filter(g => g !== gender) : [...prev, gender]
+    );
+  };
+
+  const togglePurity = (purity) => {
+    setSelectedPurities(prev => 
+      prev.includes(purity) ? prev.filter(p => p !== purity) : [...prev, purity]
+    );
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedTypes([]);
+    setSelectedGenders([]);
+    setSelectedPurities([]);
+    setWeightRange({ min: 0, max: 1000 });
+  };
+
+  // Get filtered collections
+  const filteredCollections = getItemsForSelection().filter(item => {
+    // Search filter
+    if (searchTerm && !item.name?.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
     }
-  }, [location.state?.selectedCategory]);
+    // Type filter (only if in items view and filters are applied)
+    if (navigationStep === 'items' && selectedTypes.length > 0 && !selectedTypes.includes(item.type)) {
+      return false;
+    }
+    // Purity filter
+    if (selectedPurities.length > 0 && !selectedPurities.includes(item.purity)) {
+      return false;
+    }
+    // Weight filter
+    const weight = parseFloat(item.weight_gm) || 0;
+    if (weight < weightRange.min || weight > weightRange.max) {
+      return false;
+    }
+    return true;
+  });
+
+  // Handle location state from nav modal
+  useEffect(() => {
+    if (location.state) {
+      const { 
+        selectedTypes: navTypes, 
+        selectedGenders: navGenders, 
+        selectedPurities: navPurities, 
+        weightMin, 
+        weightMax 
+      } = location.state;
+      
+      if (navTypes?.length) setSelectedTypes(navTypes);
+      if (navGenders?.length) setSelectedGenders(navGenders);
+      if (navPurities?.length) setSelectedPurities(navPurities);
+      if (weightMin !== undefined || weightMax !== undefined) {
+        setWeightRange(prev => ({
+          min: weightMin ?? prev.min,
+          max: weightMax ?? prev.max
+        }));
+      }
+    }
+  }, [location.state]);
 
   // Fetch collections
-  useEffect(() => { fetchCollections(); }, []);
+  useEffect(() => { 
+    fetchCollections(); 
+  }, []);
 
   // Reset fullscreen when component unmounts
   useEffect(() => {
@@ -63,109 +176,58 @@ const KLSGoldCollections = () => {
       const json = await res.json();
       if (Array.isArray(json.data)) {
         setCollections(json.data);
-        setFilteredCollections(json.data);
-
-        // Extract unique categories by name
-        const uniqueCategories = [...new Set(json.data.map(item => item.name))];
-        setCategories(uniqueCategories.sort());
         
-        // Set selectedCategory from location state (priority) or first category
-        if (location.state?.selectedCategory && uniqueCategories.includes(location.state.selectedCategory)) {
-          setSelectedCategory(location.state.selectedCategory);
-        } else if (!selectedCategory && uniqueCategories.length > 0) {
-          setSelectedCategory(uniqueCategories[0]);
-        }
-
         const weights = json.data.map(i => Number(i.weight_gm)).filter(w => Number.isFinite(w));
         const maxW = weights.length ? Math.ceil(Math.max(...weights) / 100) * 100 : 1000;
-        const state = location.state || {};
-        if (weights.length) {
-          setWeightRange({
-            min: state.weightMin != null ? state.weightMin : 0,
-            max: state.weightMax != null ? state.weightMax : maxW,
-          });
-        }
-        if (state.selectedTypes?.length) setSelectedTypes(state.selectedTypes);
-        if (state.selectedGenders?.length) setSelectedGenders(state.selectedGenders);
-        if (state.selectedPurities?.length) setSelectedPurities(state.selectedPurities);
+        setWeightRange({ min: 0, max: maxW });
       }
     } catch (e) { 
       console.error('Failed to fetch collections:', e);
-    }
-    finally { 
+    } finally { 
       setLoading(false); 
     }
   };
 
-  // Filters
-  useEffect(() => { applyFilters(); }, [searchTerm, selectedTypes, selectedGenders, selectedPurities, weightRange, sortBy, collections, selectedCategory]);
-
-  // Update fullscreen mode based on filters and category
-  useEffect(() => {
-    const hasActiveFilters = selectedTypes.length > 0 || selectedGenders.length > 0 || selectedPurities.length > 0 || weightRange.min > 0;
-    setIsFullscreenCollections(hasActiveFilters && selectedCategory);
-  }, [selectedTypes, selectedGenders, selectedPurities, weightRange, selectedCategory, setIsFullscreenCollections]);
-
-  const applyFilters = () => {
-    let filtered = [...collections];
-
-    // Filter by selected category
-    if (selectedCategory) {
-      filtered = filtered.filter(i => i.name === selectedCategory);
-    }
-
-    if (searchTerm) {
-      filtered = filtered.filter(i => 
-        i.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        i.type.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    if (selectedTypes.length) filtered = filtered.filter(i => selectedTypes.includes(i.type));
-    if (selectedGenders.length) filtered = filtered.filter(i => selectedGenders.includes(i.gender));
-    if (selectedPurities.length) filtered = filtered.filter(i => selectedPurities.includes(i.purity));
-    filtered = filtered.filter(i => i.weight_gm >= weightRange.min && i.weight_gm <= weightRange.max);
-
-    filtered.sort((a,b) => {
-      switch(sortBy){
-        case 'newest': return new Date(b.created_at) - new Date(a.created_at);
-        case 'oldest': return new Date(a.created_at) - new Date(b.created_at);
-        case 'weight-high': return b.weight_gm - a.weight_gm;
-        case 'weight-low': return a.weight_gm - b.weight_gm;
-        case 'name-asc': return a.name.localeCompare(b.name);
-        case 'name-desc': return b.name.localeCompare(a.name);
-        default: return 0;
-      }
-    });
-
-    setFilteredCollections(filtered);
-  };
-
-  const toggleType = t => setSelectedTypes(prev => prev.includes(t) ? prev.filter(i=>i!==t) : [...prev,t]);
-  const toggleGender = g => setSelectedGenders(prev => prev.includes(g) ? prev.filter(i=>i!==g) : [...prev,g]);
-  const togglePurity = p => setSelectedPurities(prev => prev.includes(p) ? prev.filter(i=>i!==p) : [...prev,p]);
-  const toggleWishlist = id => { 
+  const toggleWishlist = (id) => { 
     const w = new Set(wishlist); 
     w.has(id) ? w.delete(id) : w.add(id); 
     setWishlist(w); 
   };
-  
-  const clearFilters = () => { 
-    setSearchTerm(''); 
-    setSelectedTypes([]); 
-    setSelectedGenders([]); 
-    setSelectedPurities([]); 
-    setWeightRange({min:0, max:weightRange.max}); 
-    setSortBy('newest'); 
+
+  // Navigation functions
+  const goToTypes = () => {
+    setNavigationStep('types');
+    setSelectedType(null);
+    setSelectedGender(null);
+    setSelectedSubcategory(null);
+  };
+
+  const goToGenders = (type) => {
+    setSelectedType(type);
+    setNavigationStep('genders');
+    setSelectedGender(null);
+    setSelectedSubcategory(null);
+  };
+
+  const goToSubcategories = (type, gender) => {
+    setSelectedType(type);
+    setSelectedGender(gender);
+    setNavigationStep('subcategories');
+    setSelectedSubcategory(null);
+  };
+
+  const showItems = (type, gender, subcategory) => {
+    setSelectedType(type);
+    setSelectedGender(gender);
+    setSelectedSubcategory(subcategory);
+    setNavigationStep('items');
   };
 
   const getTypeColor = (type) => {
-    switch(type){
+    switch(type) {
       case 'Gold': return 'bg-amber-50 text-amber-800 border-amber-200';
       case 'Silver': return 'bg-gray-50 text-gray-800 border-gray-200';
       case 'Diamond': return 'bg-blue-50 text-blue-800 border-blue-200';
-      case 'Platinum': return 'bg-slate-50 text-slate-800 border-slate-200';
-      case 'Rose Gold': return 'bg-pink-50 text-pink-800 border-pink-200';
-      case 'White Gold': return 'bg-cyan-50 text-cyan-800 border-cyan-200';
       default: return 'bg-gray-50 text-gray-800 border-gray-200';
     }
   };
@@ -192,7 +254,7 @@ const KLSGoldCollections = () => {
       '',
       'Thank you!'
     ].filter(Boolean);
-    window.open(`https://wa.me/919448866788?text=${encodeURIComponent(lines.join('\n'))}`,'_blank');
+    window.open(`https://wa.me/919448866788?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
   };
 
   const openQuickView = (item) => { 
@@ -212,239 +274,14 @@ const KLSGoldCollections = () => {
         console.log('Error sharing:', err);
       }
     } else {
-      // Fallback: Copy to clipboard
       navigator.clipboard.writeText(`${item.name} - KLS Jewellers\n${window.location.href}`);
       alert('Link copied to clipboard!');
     }
   };
 
-  // ----- RENDER - Bluestone style -----
-  
-  // Check if fullscreen view should be shown (filters active + category selected)
-  const hasActiveFilters = selectedTypes.length > 0 || selectedGenders.length > 0 || selectedPurities.length > 0 || weightRange.min > 0;
-  const shouldShowFullscreen = hasActiveFilters && selectedCategory;
-
-  if (shouldShowFullscreen) {
-    // FULLSCREEN MODE - Just collections grid, no navbar/footer/header
-    return (
-      <div className="min-h-screen bg-white w-full">
-        {/* Back button in top-left corner */}
-        <button
-          onClick={() => {
-            clearFilters();
-            setSelectedCategory(null);
-          }}
-          className="fixed top-4 left-4 z-40 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200"
-          title="Back to collections"
-        >
-          <X size={24} className="text-gray-700" />
-        </button>
-
-        {/* Fullscreen Collections Grid */}
-        <div className="w-full pt-20 pb-8">
-          {loading ? (
-            <div className="flex items-center justify-center min-h-screen">
-              <Loader2 className="w-12 h-12 text-amber-600 animate-spin" />
-            </div>
-          ) : filteredCollections.length === 0 ? (
-            <div className="flex flex-col items-center justify-center min-h-screen text-gray-600">
-              <Gem className="w-16 h-16 mb-4 text-gray-400" />
-              <p className="text-xl font-medium">No items match your filters</p>
-              <p className="text-sm text-gray-500 mt-2">Try adjusting your selection</p>
-              <button
-                onClick={() => {
-                  clearFilters();
-                  setSelectedCategory(null);
-                }}
-                className="mt-6 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-              >
-                Reset Filters
-              </button>
-            </div>
-          ) : (
-            <div className={`w-full ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 p-2 sm:p-4' : 'space-y-4 p-4'}`}>
-              {filteredCollections.map((item) => (
-                <div
-                  key={item.id}
-                  className={`${
-                    viewMode === 'grid'
-                      ? 'relative group overflow-hidden rounded-lg bg-white border border-gray-200 hover:shadow-lg transition-all'
-                      : 'flex gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-all'
-                  }`}
-                >
-                  {/* Image */}
-                  <div
-                    className={`${
-                      viewMode === 'grid'
-                        ? 'w-full aspect-square'
-                        : 'w-24 h-24 flex-shrink-0'
-                    } bg-gray-100 overflow-hidden rounded-lg cursor-pointer`}
-                    onClick={() => openQuickView(item)}
-                  >
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-100 to-amber-200">
-                        <Gem className="w-8 h-8 text-amber-600" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  {viewMode === 'list' && (
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                        <div className="flex gap-2 mt-2 flex-wrap">
-                          <span className={`text-xs font-medium px-2 py-1 rounded-full border ${getTypeColor(item.type)}`}>
-                            {item.type}
-                          </span>
-                          <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                            {item.purity}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <span className="font-medium">{item.weight_gm} gm</span> • {item.gender}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Grid View Overlay - always visible in fullscreen mode, light style */}
-                  {viewMode === 'grid' && (
-                    <div className="absolute inset-0 flex items-end transition-all pointer-events-none">
-                      <div className="w-full m-2 rounded-lg bg-white/80 backdrop-blur-sm text-gray-900 px-3 py-2 shadow-md">
-                        <h3 className="font-semibold text-xs sm:text-sm truncate">{item.name}</h3>
-                        <p className="text-[11px] sm:text-xs text-gray-700">
-                          {item.type} • {item.weight_gm} gm
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Quick Actions */}
-                  <div className={`${viewMode === 'grid' ? 'absolute top-2 right-2 opacity-0 group-hover:opacity-100' : 'flex gap-2'} transition-opacity`}>
-                    <button
-                      onClick={() => toggleWishlist(item.id)}
-                      className={`p-2 rounded-full transition-all ${
-                        wishlist.has(item.id)
-                          ? 'bg-red-500 text-white'
-                          : 'bg-white text-gray-600 hover:bg-red-100'
-                      }`}
-                      title={wishlist.has(item.id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                    >
-                      <Heart className="w-4 h-4" fill={wishlist.has(item.id) ? 'currentColor' : 'none'} />
-                    </button>
-                    <button
-                      onClick={() => openQuickView(item)}
-                      className="p-2 rounded-full bg-white text-amber-600 hover:bg-amber-100 transition-all"
-                      title="Quick view"
-                    >
-                      <Info className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => contactViaWhatsApp(item)}
-                      className="p-2 rounded-full bg-white text-green-600 hover:bg-green-100 transition-all"
-                      title="WhatsApp"
-                    >
-                      <Phone className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Quick View Modal */}
-        {showQuickView && selectedItem && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowQuickView(false)}>
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-              <div className="grid md:grid-cols-2 gap-6 p-6">
-                <div className="flex items-center justify-center bg-gray-50 rounded-xl h-80 md:h-96 overflow-hidden">
-                  {selectedItem.image_url ? (
-                    <img src={selectedItem.image_url} alt={selectedItem.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <Gem className="w-16 h-16 text-gray-400" />
-                  )}
-                </div>
-                <div className="flex flex-col justify-between">
-                  <div>
-                    <div className="flex justify-between items-start gap-4 mb-4">
-                      <div>
-                        <h2 className="text-2xl font-bold text-gray-900">{selectedItem.name}</h2>
-                        <p className="text-sm text-gray-600 mt-1">{selectedItem.type} Jewellery</p>
-                      </div>
-                      <button onClick={() => setShowQuickView(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                        <X className="w-6 h-6 text-gray-500" />
-                      </button>
-                    </div>
-                    <div className="flex gap-2 mb-4">
-                      <span className={`text-sm font-medium px-3 py-1 rounded-full border ${getTypeColor(selectedItem.type)}`}>
-                        {selectedItem.type}
-                      </span>
-                      <span className="text-sm font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                        {selectedItem.purity}
-                      </span>
-                      <span className="text-sm font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                        {selectedItem.gender}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-1">Weight</div>
-                        <div className="text-lg font-semibold text-gray-900">{selectedItem.weight_gm} gm</div>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-1">Purity</div>
-                        <div className="text-lg font-semibold text-gray-900">{selectedItem.purity || 'N/A'}</div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mt-4">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-1">Gender</div>
-                        <div className="text-lg font-semibold text-gray-900">{selectedItem.gender}</div>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-1">Type</div>
-                        <div className="text-lg font-semibold text-gray-900">{selectedItem.type}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-4 mt-6">
-                    <button onClick={() => contactViaWhatsApp(selectedItem)} className="w-full py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-3 font-medium text-lg">
-                      <Phone className="w-5 h-5" />
-                      Contact via WhatsApp
-                    </button>
-                    <button onClick={() => handleShare(selectedItem)} className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 font-medium">
-                      <Share2 className="w-5 h-5" />
-                      Share this Item
-                    </button>
-                  </div>
-                  <div className="mt-6 pt-4 border-t border-gray-200">
-                    <div className="flex items-center gap-3 text-gray-600">
-                      <Info className="w-5 h-5" />
-                      <p className="text-sm">For accurate pricing and availability, please contact us directly. Prices vary based on current market rates and craftsmanship.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // NORMAL MODE - Show filter UI and collections
   return (
     <div className="min-h-screen bg-white">
-      {/* Header - Bluestone clean header */}
+      {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
@@ -463,643 +300,363 @@ const KLSGoldCollections = () => {
                   <span>10 AM - 8 PM</span>
                 </div>
               </div>
-              <button className="relative p-2 text-gray-600 hover:text-amber-600">
-                <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span className="absolute -top-0.5 -right-0.5 bg-amber-600 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center font-semibold">
-                  {wishlist.size}
-                </span>
-              </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Horizontal Categories Navigation with Images */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex gap-4 py-4 min-w-full">
-              {categories.map(category => {
-                const categoryItems = collections.filter(item => item.name === category);
-                const firstItem = categoryItems[0];
-                const itemCount = categoryItems.length;
-                
-                return (
-                  <div key={category} className="flex flex-col items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => {
-                        setSelectedCategory(category);
-                        setFilterPopupCategory(category);
-                        setShowFilterPopup(true);
-                      }}
-                      className={`relative w-24 h-24 rounded-full overflow-hidden border-4 transition-all ${
-                        selectedCategory === category
-                          ? 'border-amber-600 shadow-lg scale-110'
-                          : 'border-gray-300 hover:border-amber-400 hover:shadow-md'
-                      }`}
-                      title={category}
-                    >
-                      {firstItem?.image_url ? (
-                        <img 
-                          src={firstItem.image_url} 
-                          alt={category} 
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                          <Gem className="w-8 h-8 text-amber-600" />
-                        </div>
-                      )}
-                      {selectedCategory === category && (
-                        <div className="absolute inset-0 bg-black/10 rounded-full"></div>
-                      )}
-                    </button>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setFilterPopupCategory(category);
-                          setShowFilterPopup(true);
-                        }}
-                        className="text-xs font-medium text-gray-800 max-w-[100px] truncate block w-full hover:text-amber-600 focus:outline-none"
-                      >
-                        {category}
-                      </button>
-                      <p className="text-xs text-gray-500">({itemCount})</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-        <style>{`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-        `}</style>
-      </div>
-
-      {/* Filter Popup: Filters → Names → Collections (opens when category clicked) */}
-      {showFilterPopup && filterPopupCategory && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowFilterPopup(false)}>
-          <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex-shrink-0 border-b border-gray-200 p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Filters for {filterPopupCategory}</h3>
-                  <p className="text-sm text-gray-500 mt-0.5">Refine, then see names and collection</p>
-                </div>
-                <button onClick={() => setShowFilterPopup(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {(() => {
-                const categoryItems = collections.filter(i => i.name === filterPopupCategory);
-                let filteredByPopup = categoryItems.filter(i => {
-                  if (selectedTypes.length && !selectedTypes.includes(i.type)) return false;
-                  if (selectedGenders.length && !selectedGenders.includes(i.gender)) return false;
-                  if (selectedPurities.length && !selectedPurities.includes(i.purity)) return false;
-                  if (i.weight_gm < weightRange.min || i.weight_gm > weightRange.max) return false;
-                  return true;
-                });
-                return (
-                  <>
-                    {/* 1. Filters */}
-                    <div>
-                      <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                        <Gem className="w-4 h-4 text-amber-600" />
-                        Material Type
-                      </h4>
-                      <div className="space-y-2">
-                        {itemTypes.filter(t => categoryItems.some(i => i.type === t)).map(t => (
-                          <label key={t} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                            <div className="flex items-center gap-3">
-                              <input type="checkbox" checked={selectedTypes.includes(t)} onChange={() => toggleType(t)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
-                              <span className="text-gray-700">{t}</span>
-                            </div>
-                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.type === t).length}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                        <User className="w-4 h-4 text-amber-600" />
-                        Gender
-                      </h4>
-                      <div className="space-y-2">
-                        {genders.filter(g => categoryItems.some(i => i.gender === g)).map(g => (
-                          <label key={g} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                            <div className="flex items-center gap-3">
-                              <input type="checkbox" checked={selectedGenders.includes(g)} onChange={() => toggleGender(g)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
-                              <span className="text-gray-700">{g}</span>
-                            </div>
-                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.gender === g).length}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                        <Sparkles className="w-4 h-4 text-amber-600" />
-                        Purity
-                      </h4>
-                      <div className="space-y-2">
-                        {purities.filter(p => categoryItems.some(i => i.purity === p)).map(p => (
-                          <label key={p} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                            <div className="flex items-center gap-3">
-                              <input type="checkbox" checked={selectedPurities.includes(p)} onChange={() => togglePurity(p)} className="rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
-                              <span className="text-gray-700">{p}</span>
-                            </div>
-                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{categoryItems.filter(i => i.purity === p).length}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                        <Scale className="w-4 h-4 text-amber-600" />
-                        Weight Range
-                      </h4>
-                      <div className="px-2">
-                        <input type="range" min="0" max={weightRange.max} value={weightRange.min} onChange={e => setWeightRange(prev => ({ ...prev, min: parseInt(e.target.value) }))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-600" />
-                        <div className="flex justify-between text-sm text-gray-600 mt-2">
-                          <span>0 gm</span>
-                          <span className="font-medium">Min: {weightRange.min} gm</span>
-                          <span>{weightRange.max} gm</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 2. All names (after filters) */}
-                    <div className="border-t border-gray-200 pt-4">
-                      <h4 className="font-medium mb-3 text-gray-700">Names in this collection ({filteredByPopup.length})</h4>
-                      <div className="max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-2 space-y-1">
-                        {filteredByPopup.length === 0 ? (
-                          <p className="text-sm text-gray-500 py-2">No items match the filters. Adjust filters above.</p>
-                        ) : (
-                          filteredByPopup.map((item) => (
-                            <div key={item.id} className="text-sm text-gray-800 py-1.5 px-2 rounded hover:bg-white">
-                              {item.name} <span className="text-gray-500">— {item.type} · {item.weight_gm} gm</span>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-
-            <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 flex gap-3">
-              <button onClick={clearFilters} className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 font-medium">
-                Clear filters
-              </button>
-              <button 
-                onClick={() => {
-                  setShowFilterPopup(false);
-                  // Keep filters applied to toggle fullscreen view
-                }} 
-                className="flex-1 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 font-medium"
-              >
-                Show collection
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Search & Controls */}
-        <div className="mb-8 space-y-4">
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-            <div className="relative flex-1 max-w-2xl w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input 
-                type="text" 
-                value={searchTerm} 
-                onChange={e => setSearchTerm(e.target.value)} 
-                placeholder="Search jewellery by name, type, or description..." 
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white shadow-sm"
-              />
-            </div>
-
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <button 
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg border ${showFilters ? 'bg-amber-600 text-white border-amber-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'} flex-1 md:flex-none`}
-              >
-                <Filter className="w-4 h-4" /> 
-                Filters
-                {(selectedTypes.length + selectedGenders.length + selectedPurities.length + (weightRange.min > 0 ? 1 : 0)) > 0 && (
-                  <span className="bg-amber-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {selectedTypes.length + selectedGenders.length + selectedPurities.length + (weightRange.min > 0 ? 1 : 0)}
-                  </span>
-                )}
-              </button>
-              
-              <div className="flex bg-gray-100 p-1 rounded-lg">
-                <button 
-                  onClick={() => setViewMode('grid')} 
-                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-600 hover:text-gray-900'}`}
-                >
-                  <Grid className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => setViewMode('list')} 
-                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-600 hover:text-gray-900'}`}
-                >
-                  <List className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <select 
-                value={sortBy} 
-                onChange={e => setSortBy(e.target.value)} 
-                className="px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm w-full md:w-auto"
-              >
-                {sortOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-          </div>
-
-          {/* Active Filters */}
-          {(selectedTypes.length > 0 || selectedGenders.length > 0 || selectedPurities.length > 0 || searchTerm || weightRange.min > 0) && (
-            <div className="flex flex-wrap gap-2 p-4 bg-white rounded-lg border border-gray-200">
-              <span className="text-gray-600 font-medium">Active filters:</span>
-              {searchTerm && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
-                  Search: "{searchTerm}"
-                  <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-blue-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {selectedTypes.map(type => (
-                <span key={type} className="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm">
-                  {type}
-                  <button onClick={() => toggleType(type)} className="ml-1 hover:text-amber-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-              {selectedGenders.map(gender => (
-                <span key={gender} className="inline-flex items-center gap-1 px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm">
-                  {gender}
-                  <button onClick={() => toggleGender(gender)} className="ml-1 hover:text-purple-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-              {selectedPurities.map(purity => (
-                <span key={purity} className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm">
-                  {purity}
-                  <button onClick={() => togglePurity(purity)} className="ml-1 hover:text-emerald-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-              {weightRange.min > 0 && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                  Min weight: {weightRange.min}gm
-                  <button onClick={() => setWeightRange(prev => ({...prev, min: 0}))} className="ml-1 hover:text-gray-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Content Area */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar - Mobile Overlay / Desktop Sidebar */}
-          {showFilters && (
-            <>
-              {/* Mobile Overlay */}
-              <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setShowFilters(false)} />
-              
-              {/* Filters Panel */}
-              <div className="fixed lg:relative inset-y-0 left-0 lg:inset-auto w-full lg:w-72 bg-white z-50 lg:z-auto shadow-xl lg:shadow-none border-r lg:border rounded-xl overflow-y-auto max-h-[calc(100vh-200px)] lg:max-h-none">
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={clearFilters} 
-                        className="text-sm text-amber-600 hover:text-amber-700 font-medium"
-                      >
-                        Clear all
-                      </button>
-                      <button 
-                        onClick={() => setShowFilters(false)} 
-                        className="lg:hidden p-1 hover:bg-gray-100 rounded"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Type Filter */}
-                  <div className="mb-6">
-                    <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                      <Gem className="w-4 h-4 text-amber-600" /> 
-                      Material Type
-                    </h4>
-                    <div className="space-y-2">
-                      {itemTypes.map(t => (
-                        <label key={t} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                          <div className="flex items-center gap-3">
-                            <input 
-                              type="checkbox" 
-                              checked={selectedTypes.includes(t)} 
-                              onChange={() => toggleType(t)} 
-                              className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-                            />
-                            <span className="text-gray-700">{t}</span>
-                          </div>
-                          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            {collections.filter(i => i.type === t).length}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Gender Filter */}
-                  <div className="mb-6">
-                    <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                      <User className="w-4 h-4 text-amber-600" /> 
-                      Gender
-                    </h4>
-                    <div className="space-y-2">
-                      {genders.map(g => (
-                        <label key={g} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                          <div className="flex items-center gap-3">
-                            <input 
-                              type="checkbox" 
-                              checked={selectedGenders.includes(g)} 
-                              onChange={() => toggleGender(g)} 
-                              className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-                            />
-                            <span className="text-gray-700">{g}</span>
-                          </div>
-                          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            {collections.filter(i => i.gender === g).length}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Purity Filter */}
-                  <div className="mb-6">
-                    <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                      <Sparkles className="w-4 h-4 text-amber-600" /> 
-                      Purity
-                    </h4>
-                    <div className="space-y-2">
-                      {purities.map(p => (
-                        <label key={p} className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
-                          <div className="flex items-center gap-3">
-                            <input 
-                              type="checkbox" 
-                              checked={selectedPurities.includes(p)} 
-                              onChange={() => togglePurity(p)} 
-                              className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-                            />
-                            <span className="text-gray-700">{p}</span>
-                          </div>
-                          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            {collections.filter(i => i.purity === p).length}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Weight Filter */}
-                  <div>
-                    <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-700">
-                      <Scale className="w-4 h-4 text-amber-600" /> 
-                      Weight Range
-                    </h4>
-                    <div className="px-2">
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max={weightRange.max} 
-                        value={weightRange.min} 
-                        onChange={e => setWeightRange(prev => ({...prev, min: parseInt(e.target.value)}))} 
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-600"
-                      />
-                      <div className="flex justify-between text-sm text-gray-600 mt-2">
-                        <span>0 gm</span>
-                        <span className="font-medium">Min: {weightRange.min} gm</span>
-                        <span>{weightRange.max} gm</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Collections Grid/List */}
-          <div className="flex-1">
-            {/* Results Count */}
-            <div className="mb-4 flex justify-between items-center">
-              <p className="text-gray-600">
-                Showing <span className="font-semibold">{filteredCollections.length}</span> of <span className="font-semibold">{collections.length}</span> items
-              </p>
-              <button 
-                onClick={() => setShowFilters(true)} 
-                className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                <Filter className="w-4 h-4" />
-                Filters
-              </button>
-            </div>
-
-            {loading ? (
-              <div className="flex flex-col items-center justify-center h-96">
-                <Loader2 className="w-12 h-12 animate-spin text-amber-600 mb-4" />
-                <p className="text-gray-600">Loading jewellery collection...</p>
-              </div>
-            ) : filteredCollections.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-xl border border-gray-200 shadow-sm">
-                <Gem className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No items found</h3>
-                <p className="text-gray-600 mb-4">Try adjusting your filters or search term</p>
-                <button 
-                  onClick={clearFilters} 
-                  className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
-                >
-                  Clear all filters
-                </button>
-              </div>
-            ) : viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCollections.map(item => (
-                  <div 
-                    key={item.id} 
-                    className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-200 transition-all duration-300"
-                  >
-                    <div className="relative h-64 overflow-hidden">
-                      <img 
-                        src={item.image_url} 
-                        alt={item.name} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                      <button 
-                        onClick={() => toggleWishlist(item.id)} 
-                        className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white transition-colors"
-                      >
-                        <Heart className={`w-5 h-5 ${wishlist.has(item.id) ? 'fill-red-500 text-red-500' : 'text-gray-600 hover:text-red-500'}`} />
-                      </button>
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                        <span className={`px-3 py-1.5 rounded-full text-sm font-medium border ${getTypeColor(item.type)}`}>
-                          {item.type}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6">
-                      <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-1">
-                        {item.name}
-                      </h3>
-                      
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          {getGenderIcon(item.gender)}
-                          <span>{item.gender}</span>
-                        </div>
-                        <div className="text-sm text-gray-700 font-medium">
-                          {item.weight_gm} gm
-                        </div>
-                      </div>
-                      
-                      {item.purity && (
-                        <div className="mb-4">
-                          <span className="text-sm text-gray-600">Purity:</span>
-                          <span className="ml-2 text-sm font-medium text-gray-800">{item.purity}</span>
-                        </div>
-                      )}
-                      
-                      <div className="flex gap-2 mt-4">
-                        <button 
-                          onClick={() => contactViaWhatsApp(item)} 
-                          className="flex-1 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 font-medium"
-                        >
-                          <Phone className="w-4 h-4" />
-                          Inquire Now
-                        </button>
-                        <button 
-                          onClick={() => handleShare(item)} 
-                          className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                        >
-                          <Share2 className="w-5 h-5 text-gray-600" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              // List View
-              <div className="space-y-4">
-                {filteredCollections.map(item => (
-                  <div 
-                    key={item.id} 
-                    className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex flex-col sm:flex-row">
-                      <div className="relative sm:w-48 h-48 sm:h-auto">
-                        <img 
-                          src={item.image_url} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                        <button 
-                          onClick={() => toggleWishlist(item.id)} 
-                          className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm"
-                        >
-                          <Heart className={`w-4 h-4 ${wishlist.has(item.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
-                        </button>
-                      </div>
-                      
-                      <div className="flex-1 p-6">
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 text-lg mb-2">{item.name}</h3>
-                            <div className="flex items-center gap-3 mb-3">
-                              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(item.type)}`}>
-                                {item.type}
-                              </span>
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
-                                {getGenderIcon(item.gender)}
-                                <span>{item.gender}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-lg font-semibold text-gray-900 mb-1">
-                              {item.weight_gm} gm
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              Purity: {item.purity || 'N/A'}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-                          <button 
-                            onClick={() => openQuickView(item)} 
-                            className="text-sm text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1"
-                          >
-                            <Info className="w-4 h-4" />
-                            View Details
-                          </button>
-                          <div className="flex gap-3">
-                            <button 
-                              onClick={() => handleShare(item)} 
-                              className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                            >
-                              <Share2 className="w-4 h-4 text-gray-600" />
-                            </button>
-                            <button 
-                              onClick={() => contactViaWhatsApp(item)} 
-                              className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2"
-                            >
-                              <Phone className="w-4 h-4" />
-                              Contact
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+      {/* Breadcrumb Navigation */}
+      <div className="bg-gray-50 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center gap-2 text-sm">
+            <button onClick={goToTypes} className="text-amber-600 hover:text-amber-700 font-medium">
+              Collections
+            </button>
+            {selectedType && (
+              <>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">{selectedType}</span>
+              </>
+            )}
+            {selectedGender && (
+              <>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">{selectedGender}</span>
+              </>
+            )}
+            {selectedSubcategory && (
+              <>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-900 font-medium">{selectedSubcategory}</span>
+              </>
             )}
           </div>
         </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {loading ? (
+          <div className="flex items-center justify-center min-h-96">
+            <Loader2 className="w-12 h-12 text-amber-600 animate-spin" />
+          </div>
+        ) : (
+          <>
+            {/* Step 1: Show Types */}
+            {navigationStep === 'types' && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Material Type</h2>
+                  <p className="text-gray-600">Select the type of jewellery you're interested in</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {getAvailableTypes().map(type => (
+                    <button
+                      key={type}
+                      onClick={() => goToGenders(type)}
+                      className="group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-amber-300 transition-all duration-300 overflow-hidden"
+                    >
+                      <div className="aspect-square bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center p-8">
+                        {getFirstImageForType(type) ? (
+                          <img
+                            src={getFirstImageForType(type)}
+                            alt={type}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        ) : (
+                          <Gem className="w-16 h-16 text-amber-600 group-hover:scale-110 transition-transform" />
+                        )}
+                      </div>
+                      <div className="p-4 text-center">
+                        <h3 className="font-semibold text-gray-900 text-lg mb-1">{type}</h3>
+                        <p className="text-sm text-gray-600">
+                          {collections.filter(item => item.type === type).length} items
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Show Genders */}
+            {navigationStep === 'genders' && selectedType && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedType} Collections</h2>
+                  <p className="text-gray-600">Choose the gender category</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {getAvailableGenders().map(gender => (
+                    <button
+                      key={gender}
+                      onClick={() => goToSubcategories(selectedType, gender)}
+                      className="group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-amber-300 transition-all duration-300 overflow-hidden"
+                    >
+                      <div className="aspect-square bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center p-8">
+                        {getFirstImageForGender(selectedType, gender) ? (
+                          <img
+                            src={getFirstImageForGender(selectedType, gender)}
+                            alt={gender}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            {getGenderIcon(gender)}
+                            <span className="text-amber-600 font-medium mt-2">{gender}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4 text-center">
+                        <h3 className="font-semibold text-gray-900 text-lg mb-1">{gender}</h3>
+                        <p className="text-sm text-gray-600">
+                          {collections.filter(item => item.type === selectedType && item.gender === gender).length} items
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Show Subcategories */}
+            {navigationStep === 'subcategories' && selectedType && selectedGender && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {selectedGender} {selectedType} Collections
+                  </h2>
+                  <p className="text-gray-600">Choose a collection to explore</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {getAvailableSubcategories().map(subcategory => (
+                    <button
+                      key={subcategory}
+                      onClick={() => showItems(selectedType, selectedGender, subcategory)}
+                      className="group bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-amber-300 transition-all duration-300 overflow-hidden"
+                    >
+                      <div className="aspect-square bg-gray-50 flex items-center justify-center p-4">
+                        {getFirstImageForSubcategory(selectedType, selectedGender, subcategory) ? (
+                          <img
+                            src={getFirstImageForSubcategory(selectedType, selectedGender, subcategory)}
+                            alt={subcategory}
+                            className="w-full h-full object-cover rounded"
+                          />
+                        ) : (
+                          <Gem className="w-8 h-8 text-amber-600" />
+                        )}
+                      </div>
+                      <div className="p-3 text-center">
+                        <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">{subcategory}</h3>
+                        <p className="text-xs text-gray-600">
+                          {collections.filter(item => 
+                            item.type === selectedType && 
+                            item.gender === selectedGender && 
+                            item.name === subcategory
+                          ).length} items
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Show Items */}
+            {navigationStep === 'items' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-1">{selectedSubcategory}</h2>
+                    <p className="text-gray-600">{selectedGender} {selectedType} Collection</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex bg-gray-100 p-1 rounded-lg">
+                      <button
+                        onClick={() => setViewMode('grid')}
+                        className={`p-2 rounded ${viewMode === 'grid' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-600 hover:text-gray-900'}`}
+                      >
+                        <Grid className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => setViewMode('list')}
+                        className={`p-2 rounded ${viewMode === 'list' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-600 hover:text-gray-900'}`}
+                      >
+                        <List className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Search */}
+                <div className="relative max-w-md">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    placeholder="Search items..."
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  />
+                </div>
+
+                {/* Items Display */}
+                {filteredCollections.length === 0 ? (
+                  <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+                    <Gem className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No items found</h3>
+                    <p className="text-gray-600 mb-4">Try adjusting your search term</p>
+                  </div>
+                ) : viewMode === 'grid' ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredCollections.map(item => (
+                      <div
+                        key={item.id}
+                        className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-200 transition-all duration-300"
+                      >
+                        <div className="relative h-64 overflow-hidden">
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                          <button
+                            onClick={() => toggleWishlist(item.id)}
+                            className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white transition-colors"
+                          >
+                            <Heart className={`w-5 h-5 ${wishlist.has(item.id) ? 'fill-red-500 text-red-500' : 'text-gray-600 hover:text-red-500'}`} />
+                          </button>
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <span className={`px-3 py-1.5 rounded-full text-sm font-medium border ${getTypeColor(item.type)}`}>
+                              {item.type}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="p-6">
+                          <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-1">
+                            {item.name}
+                          </h3>
+
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              {getGenderIcon(item.gender)}
+                              <span>{item.gender}</span>
+                            </div>
+                            <div className="text-sm text-gray-700 font-medium">
+                              {item.weight_gm} gm
+                            </div>
+                          </div>
+
+                          {item.purity && (
+                            <div className="mb-4">
+                              <span className="text-sm text-gray-600">Purity:</span>
+                              <span className="ml-2 text-sm font-medium text-gray-800">{item.purity}</span>
+                            </div>
+                          )}
+
+                          <div className="flex gap-2 mt-4">
+                            <button
+                              onClick={() => contactViaWhatsApp(item)}
+                              className="flex-1 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 font-medium"
+                            >
+                              <Phone className="w-4 h-4" />
+                              Inquire Now
+                            </button>
+                            <button
+                              onClick={() => handleShare(item)}
+                              className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                            >
+                              <Share2 className="w-5 h-5 text-gray-600" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  // List View
+                  <div className="space-y-4">
+                    {filteredCollections.map(item => (
+                      <div
+                        key={item.id}
+                        className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex flex-col sm:flex-row">
+                          <div className="relative sm:w-48 h-48 sm:h-auto">
+                            <img
+                              src={item.image_url}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                            <button
+                              onClick={() => toggleWishlist(item.id)}
+                              className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm"
+                            >
+                              <Heart className={`w-4 h-4 ${wishlist.has(item.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+                            </button>
+                          </div>
+
+                          <div className="flex-1 p-6">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3">
+                              <div>
+                                <h3 className="font-semibold text-gray-900 text-lg mb-2">{item.name}</h3>
+                                <div className="flex items-center gap-3 mb-3">
+                                  <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(item.type)}`}>
+                                    {item.type}
+                                  </span>
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    {getGenderIcon(item.gender)}
+                                    <span>{item.gender}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-lg font-semibold text-gray-900 mb-1">
+                                  {item.weight_gm} gm
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  Purity: {item.purity || 'N/A'}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+                              <button
+                                onClick={() => openQuickView(item)}
+                                className="text-sm text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1"
+                              >
+                                <Info className="w-4 h-4" />
+                                View Details
+                              </button>
+                              <div className="flex gap-3">
+                                <button
+                                  onClick={() => handleShare(item)}
+                                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                >
+                                  <Share2 className="w-4 h-4 text-gray-600" />
+                                </button>
+                                <button
+                                  onClick={() => contactViaWhatsApp(item)}
+                                  className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2"
+                                >
+                                  <Phone className="w-4 h-4" />
+                                  Contact
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
       </main>
 
       {/* Quick View Modal */}
@@ -1198,7 +755,7 @@ const KLSGoldCollections = () => {
       )}
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-12">
+      {/* <footer className="bg-gray-900 text-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
@@ -1216,7 +773,7 @@ const KLSGoldCollections = () => {
             </div>
           </div>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 };
