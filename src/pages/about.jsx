@@ -39,11 +39,11 @@ const AboutKLS = () => {
         {/* Content */}
         <div>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            About Komaral Jewellery Palace
+            About Komarla Jewellery Palace
           </h2>
 
           <p className="text-gray-600 mb-4 leading-relaxed">
-            <strong>Komaral Jewellery Palace</strong> is one of the most trusted 
+            <strong>Komarla Jewellery Palace</strong> is one of the most trusted 
             and renowned gold jewellery stores in <strong>Chintamani, Karnataka</strong>. 
             Established in <strong>1975</strong> by proprietor <strong>Niranjan</strong>, 
             the store has been serving customers with authentic and high-quality 
@@ -52,7 +52,7 @@ const AboutKLS = () => {
 
           <p className="text-gray-600 mb-4 leading-relaxed">
             Known for its elegant designs, purity, and customer trust, 
-            Komaral Jewellery Palace offers a wide range of jewellery including 
+            Komarla Jewellery Palace offers a wide range of jewellery including 
             traditional gold ornaments, modern designs, bridal collections, 
             necklaces, bangles, rings, and custom jewellery pieces.
           </p>
@@ -70,7 +70,7 @@ const AboutKLS = () => {
             </h3>
 
             <p className="text-gray-700">
-              Komaral Jewellery Palace <br />
+              Komarla Jewellery Palace <br />
               Beside Old Sangeetha Mobiles <br />
               Bengaluru Circle, Chintamani <br />
               Karnataka, India

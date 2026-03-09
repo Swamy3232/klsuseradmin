@@ -123,43 +123,71 @@ const HomePage = () => {
   return (
     <div className="bg-white">
       {/* Hero Slider - Bluestone style full-width banner */}
-      <section className="relative -mx-4 sm:-mx-6 lg:-mx-8">
+      <section className="bg-gradient-to-br from-yellow-50 via-white to-amber-100 py-10 lg:py-16">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
+
+    {/* LEFT SIDE VIDEO */}
+    <div className="flex justify-center">
+      <div className="relative w-[320px] sm:w-[360px] md:w-[420px] aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl">
         <KlsGoldSlider />
-      </section>
+      </div>
+    </div>
 
-      {/* Bluestone-style: Category Grid - Primary navigation */}
-      <section className="py-12 lg:py-16 bg-white">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8 text-center">
-      Shop by Category
-    </h2>
+    {/* RIGHT SIDE CONTENT */}
+    <div className="text-center lg:text-left">
+      
+      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+        Komaral Jewellery Palace
+      </h1>
 
-    <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 justify-items-center">
-      {categoryGrid.map((item, idx) => (
-        <motion.div
-          key={item.path}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: idx * 0.1 }}
-          onClick={() => navigate(item.path)}
-          className="group cursor-pointer bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-amber-200 transition-all duration-300"
+      <p className="text-lg text-amber-600 font-semibold mt-2">
+        Since 1975
+      </p>
+
+      <p className="text-gray-600 mt-4 max-w-lg">
+        One of the most trusted jewellery stores in Chintamani. 
+        Discover elegant gold jewellery collections crafted with purity, 
+        tradition, and timeless design for every special moment.
+      </p>
+
+      <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-center lg:justify-start">
+
+        <button
+          onClick={() => navigate("/gallery")}
+          className="px-8 py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-lg transition"
         >
-          <div className="aspect-square overflow-hidden bg-gray-100">
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
+          Explore Gallery
+        </button>
 
-          <div className="p-4 text-center">
-            <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition-colors">
-              {item.title}
-            </h3>
-            <p className="text-sm text-gray-500 mt-0.5">{item.subtitle}</p>
-          </div>
-        </motion.div>
-      ))}
+        <button
+          onClick={() => navigate("/contact")}
+          className="px-8 py-3 border border-amber-600 text-amber-600 font-semibold rounded-lg hover:bg-amber-50 transition"
+        >
+          Visit Store
+        </button>
+
+      </div>
+
+      {/* Quick Trust Highlights */}
+      <div className="flex flex-wrap gap-4 mt-8 justify-center lg:justify-start text-sm text-gray-600">
+
+        <span className="flex items-center gap-2">
+          <FaAward className="text-amber-600" />
+          Trusted Since 1975
+        </span>
+
+        <span className="flex items-center gap-2">
+          <FaShieldAlt className="text-amber-600" />
+          Certified Gold
+        </span>
+
+        <span className="flex items-center gap-2">
+          <FaStore className="text-amber-600" />
+          Chintamani Store
+        </span>
+
+      </div>
+
     </div>
   </div>
 </section>
