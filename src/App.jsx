@@ -12,7 +12,7 @@ import KLSGoldCollections from "./pages/Collections";
 import MetalRateCalculator from "./pages/MetalCalculator";
 import Gallery from "./pages/Gallery";
 import GoldChittiCalculator from "./pages/chittical";
-
+import AboutKLS from "./pages/about";
 function AppContent() {
   const { isFullscreenCollections } = useCollectionsContext();
 
@@ -42,6 +42,7 @@ function AppContent() {
           <Route path="/metal-calculator" element={<MetalRateCalculator />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/chitti-calculator" element={<GoldChittiCalculator />} />
+          <Route path="/about" element={<AboutKLS />} />
         </Routes>
 
         {/* Footer - Hidden in fullscreen collections mode */}

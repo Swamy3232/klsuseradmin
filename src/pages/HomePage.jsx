@@ -129,38 +129,40 @@ const HomePage = () => {
 
       {/* Bluestone-style: Category Grid - Primary navigation */}
       <section className="py-12 lg:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8 text-center">
-            Shop by Category
-          </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {categoryGrid.map((item, idx) => (
-              <motion.div
-                key={item.path}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: idx * 0.1 }}
-                onClick={() => navigate(item.path)}
-                className="group cursor-pointer bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-amber-200 transition-all duration-300"
-              >
-                <div className="aspect-square overflow-hidden bg-gray-100">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-0.5">{item.subtitle}</p>
-                </div>
-              </motion.div>
-            ))}
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8 text-center">
+      Shop by Category
+    </h2>
+
+    <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 justify-items-center">
+      {categoryGrid.map((item, idx) => (
+        <motion.div
+          key={item.path}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: idx * 0.1 }}
+          onClick={() => navigate(item.path)}
+          className="group cursor-pointer bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-amber-200 transition-all duration-300"
+        >
+          <div className="aspect-square overflow-hidden bg-gray-100">
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
           </div>
-        </div>
-      </section>
+
+          <div className="p-4 text-center">
+            <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition-colors">
+              {item.title}
+            </h3>
+            <p className="text-sm text-gray-500 mt-0.5">{item.subtitle}</p>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* Promotional Banners - Bluestone Gold Mine style */}
       <section className="py-12 lg:py-16 bg-gray-50">
@@ -182,7 +184,7 @@ const HomePage = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
   {plans.map((plan, idx) => (
     <motion.div
       key={plan.months}

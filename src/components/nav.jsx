@@ -112,8 +112,10 @@ const Navbar = () => {
 
   const bottomNavItems = [
     { name: "Collections", path: "/collection", icon: LayoutGrid },
+    {name: "About Us", path: "/about", icon: Gem},
     { name: "Your Chitti", path: "/chitti", icon: Wallet, highlight: true },
     { name: "Calculator", path: "/metal-calculator", icon: Calculator },
+    
   ];
 
   const allNavItemsForSearch = [...mainNavItems, ...bottomNavItems];
