@@ -14,9 +14,9 @@ const KlsGoldSlider = () => {
 
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center justify-center bg-gradient-to-br from-yellow-50 via-white to-amber-100 py-8">
-      <h1 className="text-3xl md:text-5xl font-bold text-center mb-8 text-yellow-600 drop-shadow-lg">
+      {/* <h1 className="text-3xl md:text-5xl font-bold text-center mb-8 text-yellow-600 drop-shadow-lg">
         KLS GOLD
-      </h1>
+      </h1> */}
 
       <div className="relative w-[320px] sm:w-[360px] md:w-[420px] lg:w-[500px] xl:w-[600px] aspect-[9/16]">
 

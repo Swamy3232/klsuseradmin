@@ -137,7 +137,7 @@ const HomePage = () => {
     <div className="text-center lg:text-left">
       
       <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-        Komaral Jewellery Palace
+        Komarla Jewellery Palace
       </h1>
 
       <p className="text-lg text-amber-600 font-semibold mt-2">
